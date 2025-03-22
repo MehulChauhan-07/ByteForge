@@ -1,50 +1,34 @@
-# Vite & HeroUI Template
+# Mantine Vite template
 
-This is a template for creating applications using Vite and HeroUI (v2).
+## Features
 
-[Try it on CodeSandbox](https://githubbox.com/frontio-ai/vite-template)
+This template comes with the following features:
 
-## Technologies Used
+- [PostCSS](https://postcss.org/) with [mantine-postcss-preset](https://mantine.dev/styles/postcss-preset)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Storybook](https://storybook.js.org/)
+- [Vitest](https://vitest.dev/) setup with [React Testing Library](https://testing-library.com/docs/react-testing-library/intro)
+- ESLint setup with [eslint-config-mantine](https://github.com/mantinedev/eslint-config-mantine)
 
-- [Vite](https://vitejs.dev/guide/)
-- [HeroUI](https://heroui.com)
-- [Tailwind CSS](https://tailwindcss.com)
-- [Tailwind Variants](https://tailwind-variants.org)
-- [TypeScript](https://www.typescriptlang.org)
-- [Framer Motion](https://www.framer.com/motion)
+## npm scripts
 
-## How to Use
+## Build and dev scripts
 
-To clone the project, run the following command:
+- `dev` – start development server
+- `build` – build production version of the app
+- `preview` – locally preview production build
 
-```bash
-git clone https://github.com/frontio-ai/vite-template.git
-```
+### Testing scripts
 
-### Install dependencies
+- `typecheck` – checks TypeScript types
+- `lint` – runs ESLint
+- `prettier:check` – checks files with Prettier
+- `vitest` – runs vitest tests
+- `vitest:watch` – starts vitest watch
+- `test` – runs `vitest`, `prettier:check`, `lint` and `typecheck` scripts
 
-You can use one of them `npm`, `yarn`, `pnpm`, `bun`, Example using `npm`:
+### Other scripts
 
-```bash
-npm install
-```
-
-### Run the development server
-
-```bash
-npm run dev
-```
-
-### Setup pnpm (optional)
-
-If you are using `pnpm`, you need to add the following code to your `.npmrc` file:
-
-```bash
-public-hoist-pattern[]=*@heroui/*
-```
-
-After modifying the `.npmrc` file, you need to run `pnpm install` again to ensure that the dependencies are installed correctly.
-
-## License
-
-Licensed under the [MIT license](https://github.com/frontio-ai/vite-template/blob/main/LICENSE).
+- `storybook` – starts storybook dev server
+- `storybook:build` – build production storybook bundle to `storybook-static`
+- `prettier:write` – formats all files with Prettier
