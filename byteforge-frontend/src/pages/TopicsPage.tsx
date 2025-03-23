@@ -229,13 +229,13 @@ const TopicsPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredTopics.map((topic) => (
           <Card key={topic.id} className="overflow-hidden">
-            <div className="aspect-video w-full overflow-hidden">
+            {/* <div className="aspect-video w-full overflow-hidden">
               <img
                 src={topic.image || "/placeholder.svg"}
                 alt={topic.title}
                 className="object-cover w-full h-full transition-transform hover:scale-105"
               />
-            </div>
+            </div> */}
             <CardHeader className="pb-2">
               <div className="flex justify-between items-center">
                 <Badge

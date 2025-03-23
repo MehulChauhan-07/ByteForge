@@ -1,9 +1,9 @@
 import { Code, MessageSquare, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
-import Hero from "@/components/home/HeroSection";
 import { Button } from "@/components/ui/button";
-import FeatureSection from "@/components/home/FeatureSection";
-import JavaTopics from "@/components/home/JavaTopics";
+import Hero from "@/components/features/home/HeroSection";
+import FeatureSection from "@/components/features/home/FeatureSection";
+import JavaTopics from "@/components/features/home/Topics";
 
 const HomePage = () => {
   return (
@@ -92,7 +92,7 @@ const HomePage = () => {
                   asChild
                   variant="outline"
                   size="lg"
-                  className="border-white text-white hover:bg-primary-foreground/10"
+                  className="border-white text-black dark:border-slate-800 dark:text-slate-200 hover:bg-primary-foreground/10"
                 >
                   <Link to="/topics">Browse Topics</Link>
                 </Button>

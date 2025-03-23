@@ -5,12 +5,12 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "../ui/card";
-import { Badge } from "../ui/badge";
-import { Button } from "../ui/button";
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ArrowRight, Clock } from "lucide-react";
-import type { Topic } from "../../types";
+import type { Topic } from "@/types";
 
 const topics: Topic[] = [
   {
@@ -101,13 +101,13 @@ const JavaTopics = () => {
         <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 pt-12">
           {topics.map((topic) => (
             <Card key={topic.id} className="overflow-hidden">
-              <div className="aspect-video w-full overflow-hidden">
+              {/* <div className="aspect-video w-full overflow-hidden">
                 <img
                   src={topic.image || "/placeholder.svg"}
                   alt={topic.title}
                   className="object-cover w-full h-full transition-transform hover:scale-105"
                 />
-              </div>
+              </div> */}
               <CardHeader className="pb-2">
                 <div className="flex justify-between items-center">
                   <Badge

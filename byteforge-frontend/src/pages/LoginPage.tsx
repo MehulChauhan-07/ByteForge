@@ -14,9 +14,10 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "../components/ui/card";
-import { Checkbox } from "../components/ui/checkbox";
+} from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Github, Code } from "lucide-react";
+import { Logo } from "@/components/ui/icons";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -41,7 +42,7 @@ const LoginPage = () => {
         <CardHeader className="space-y-1">
           <div className="flex justify-center mb-4">
             <div className="flex items-center gap-2">
-              <Code className="h-6 w-6 text-primary" />
+              <Logo className="h-9 w-11 text-primary" />
               <span className="text-xl font-bold">ByteForge</span>
             </div>
           </div>
