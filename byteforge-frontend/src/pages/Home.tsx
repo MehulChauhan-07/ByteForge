@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Hero from "@/components/features/home/HeroSection";
 import FeatureSection from "@/components/features/home/FeatureSection";
-import JavaTopics from "@/components/features/home/Topics";
+import JavaTopics from "@/components/features/home/JavaTopics";
 
 const HomePage = () => {
   return (

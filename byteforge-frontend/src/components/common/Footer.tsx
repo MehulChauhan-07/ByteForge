@@ -7,21 +7,27 @@ const Footer = () => {
   return (
     <footer className="bg-slate-50 dark:bg-slate-900 border-t">
       <div className="container px-4 md:px-6 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+          {/* Brand Section */}
           <div className="space-y-4">
             <Link to="/" className="flex items-center gap-2">
-              {/* <Code className="h-6 w-6" /> */}
-              <Logo className=" h-10 w-10 md:block" />
-
-              <span className="text-xl font-bold">ByteForge</span>
+              <Logo className="h-10 w-10" />
+              <span className="text-xl font-bold text-slate-800 dark:text-slate-200">
+                ByteForge
+              </span>
             </Link>
-            <p className="text-sm text-slate-500 dark:text-slate-400">
+            <p className="text-sm text-slate-600 dark:text-slate-400">
               An intuitive platform for mastering Java programming with
               interactive lessons, integrated compiler, and AI-powered
               assistance.
             </p>
             <div className="flex space-x-4">
-              <Button variant="ghost" size="icon" asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+                asChild
+              >
                 <a
                   href="https://github.com/MehulChauhan-22/ByteForge"
                   target="_blank"
@@ -33,105 +39,83 @@ const Footer = () => {
               </Button>
             </div>
           </div>
+
+          {/* Learn Section */}
           <div className="space-y-4">
-            <h3 className="text-sm font-medium">Learn</h3>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link
-                  to="/courses"
-                  className="text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-primary"
-                >
-                  Courses
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/tutorials"
-                  className="text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-primary"
-                >
-                  Tutorials
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/exercises"
-                  className="text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-primary"
-                >
-                  Exercises
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/certification"
-                  className="text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-primary"
-                >
-                  Certification
-                </Link>
-              </li>
+            <h3 className="text-sm font-medium text-slate-800 dark:text-slate-200">
+              Learn
+            </h3>
+            <ul className="space-y-2">
+              {["Courses", "Tutorials", "Exercises", "Certification"].map(
+                (item) => (
+                  <li key={item}>
+                    <Link
+                      to={`/${item.toLowerCase()}`}
+                      className="text-sm text-slate-600 hover:text-primary dark:text-slate-400 dark:hover:text-primary transition-colors"
+                    >
+                      {item}
+                    </Link>
+                  </li>
+                )
+              )}
             </ul>
           </div>
+
+          {/* Tools Section */}
           <div className="space-y-4">
-            <h3 className="text-sm font-medium">Tools</h3>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link
-                  to="/compiler"
-                  className="text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-primary"
-                >
-                  Java Compiler
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/assistant"
-                  className="text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-primary"
-                >
-                  AI Assistant
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/notes"
-                  className="text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-primary"
-                >
-                  Note Taking
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/community"
-                  className="text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-primary"
-                >
-                  Community
-                </Link>
-              </li>
+            <h3 className="text-sm font-medium text-slate-800 dark:text-slate-200">
+              Tools
+            </h3>
+            <ul className="space-y-2">
+              {["Compiler", "Assistant", "Notes", "Community"].map((item) => (
+                <li key={item}>
+                  <Link
+                    to={`/${item.toLowerCase()}`}
+                    className="text-sm text-slate-600 hover:text-primary dark:text-slate-400 dark:hover:text-primary transition-colors"
+                  >
+                    {item}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Support Section */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium text-slate-800 dark:text-slate-200">
+              Support
+            </h3>
+            <ul className="space-y-2">
+              {["Help Center", "Contact Us", "FAQs"].map((item) => (
+                <li key={item}>
+                  <Link
+                    to={`/${item.toLowerCase().replace(" ", "-")}`}
+                    className="text-sm text-slate-600 hover:text-primary dark:text-slate-400 dark:hover:text-primary transition-colors"
+                  >
+                    {item}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
+
+        {/* Bottom Section */}
         <div className="mt-12 pt-8 border-t border-slate-200 dark:border-slate-800">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-slate-500 dark:text-slate-400">
-              © 2025 ByteForge. All rights reserved.
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              © {new Date().getFullYear()} ByteForge. All rights reserved.
             </p>
-            <div className="flex space-x-4 text-sm">
-              <Link
-                to="/terms"
-                className="text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-primary"
-              >
-                Terms
-              </Link>
-              <Link
-                to="/privacy"
-                className="text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-primary"
-              >
-                Privacy
-              </Link>
-              <Link
-                to="/cookies"
-                className="text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-primary"
-              >
-                Cookies
-              </Link>
+            <div className="flex space-x-4">
+              {["Terms", "Privacy", "Cookies"].map((item) => (
+                <Link
+                  key={item}
+                  to={`/${item.toLowerCase()}`}
+                  className="text-sm text-slate-600 hover:text-primary dark:text-slate-400 dark:hover:text-primary transition-colors"
+                >
+                  {item}
+                </Link>
+              ))}
             </div>
           </div>
         </div>
