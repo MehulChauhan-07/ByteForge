@@ -1,7 +1,4 @@
-
-
-
-// About.tsx by Me 
+// About.tsx by Me
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
@@ -40,20 +37,20 @@ const AboutPage = () => {
             learning ecosystem. Here’s what sets us apart:
           </p>
           <ul className="list-disc list-inside space-y-2">
-            <li className="text-slate-500 dark:text-slate-400">
+            <li className="text-slate-500 dark:text-slate-400  list-none">
               <strong>✔ Learn by Doing:</strong> We believe the best way to
               master Java is by writing code. That’s why ByteForge emphasizes
               hands-on learning from day one.
             </li>
-            <li className="text-slate-500 dark:text-slate-400">
+            <li className="text-slate-500 dark:text-slate-400  list-none">
               <strong>✔ Integrated Java Compiler:</strong> Write, run, and debug
               Java code directly in your browser.
             </li>
-            <li className="text-slate-500 dark:text-slate-400">
+            <li className="text-slate-500 dark:text-slate-400  list-none">
               <strong>✔ Real-Time Feedback:</strong> Get instant results and
               error explanations to improve your skills faster.
             </li>
-            <li className="text-slate-500 dark:text-slate-400">
+            <li className="text-slate-500 dark:text-slate-400  list-none">
               <strong>✔ Structured Learning Paths:</strong> Our curriculum is
               designed to take you from an absolute beginner to an advanced Java
               developer. Core Java: Variables, loops, functions, and OOP
@@ -61,22 +58,22 @@ const AboutPage = () => {
               collections. Project-Based Learning: Build real-world projects to
               solidify your skills.
             </li>
-            <li className="text-slate-500 dark:text-slate-400">
+            <li className="text-slate-500 dark:text-slate-400  list-none">
               <strong>✔ AI-Powered Assistance:</strong> Stuck on a concept or
               debugging an error? Our AI chatbot is here to help. Instant
               Explanations: Get clear, concise answers to your Java questions.
               Code Suggestions: Learn best practices and write cleaner, more
               efficient code.
             </li>
-            <li className="text-slate-500 dark:text-slate-400">
+            <li className="text-slate-500 dark:text-slate-400  list-none">
               <strong>✔ Notes Keeper:</strong> Save your learning notes and
               important snippets.
             </li>
-            <li className="text-slate-500 dark:text-slate-400">
+            <li className="text-slate-500 dark:text-slate-400  list-none">
               <strong>✔ Beginner-Friendly UI:</strong> Designed to guide you
               through each concept step by step.
             </li>
-            <li className="text-slate-500 dark:text-slate-400">
+            <li className="text-slate-500 dark:text-slate-400  list-none">
               <strong>✔ Community Support:</strong> Join a vibrant community of
               learners and educators to share knowledge and experiences.
             </li>
@@ -91,16 +88,20 @@ const AboutPage = () => {
             We believe education should be accessible to all. ByteForge offers:
           </p>
           <ul className="list-disc list-inside space-y-2">
-            <li className="text-slate-500 dark:text-slate-400">
+            <li className="text-slate-500 dark:text-slate-400   list-none">
               🆓 <strong>Free Learning Content:</strong> We believe in free and
               open education. All our learning content is available without
               paywalls or hidden fees.
             </li>
-            <li className="text-slate-500 dark:text-slate-400">
+            <li className="text-slate-500 dark:text-slate-400   list-none">
               🆓 <strong>Free Sign-Up:</strong> Save your progress, notes, and
               code snippets. Features like code execution, note-taking, and AI
               chatbot support require a free sign-up to store your data, but the
               learning experience remains accessible to all.
+            </li>
+            <li className="text-slate-500 dark:text-slate-400   list-none">
+              🆓 <strong>Community Resources:</strong> Access forums, tutorials,
+              and additional materials to enhance your learning experience.
             </li>
           </ul>
         </div>

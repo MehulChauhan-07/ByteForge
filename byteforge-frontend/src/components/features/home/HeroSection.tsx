@@ -81,7 +81,7 @@ const Hero = () => {
               <Button
                 asChild
                 size="lg"
-                className="bg-primary hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-primary/20"
+                className="bg-primary hover:bg-primary/90 transition-all duration-100 shadow-lg hover:shadow-xl hover:shadow-primary/20"
               >
                 <Link to="/topics">
                   Start Learning Now <ArrowRight className="ml-2 h-4 w-4" />
@@ -91,7 +91,7 @@ const Hero = () => {
                 asChild
                 variant="outline"
                 size="lg"
-                className="transition-all duration-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                className="transition-all duration-100 hover:bg-slate-100 dark:hover:bg-slate-800"
               >
                 <Link to="/login">Log In</Link>
               </Button>

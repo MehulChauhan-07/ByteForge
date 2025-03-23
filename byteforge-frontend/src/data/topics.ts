@@ -70,18 +70,18 @@ export const topics: Topic[] = [
     ],
     image: "/placeholder.svg?height=200&width=400",
   },
-  {
-    id: "multithreading",
-    title: "Multithreading & Concurrency",
-    description: "Build concurrent applications with Java threads",
-    level: "Advanced",
-    duration: "8 hours",
-    topics: [
-      "Threads",
-      "Synchronization",
-      "Executors",
-      "Concurrent Collections",
-    ],
-    image: "/placeholder.svg?height=200&width=400",
-  },
+  // {
+  //   id: "multithreading 2",
+  //   title: "Multithreading & Concurrency 2",
+  //   description: "Build concurrent applications with Java threads",
+  //   level: "Advanced",
+  //   duration: "8 hours",
+  //   topics: [
+  //     "Threads",
+  //     "Synchronization",
+  //     "Executors",
+  //     "Concurrent Collections",
+  //   ],
+  //   image: "/placeholder.svg?height=200&width=400",
+  // },
 ];
