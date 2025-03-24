@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -33,6 +33,7 @@ interface NavLinkProps {
   icon?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
+  onClick?: () => void;
 }
 
 interface DropdownItemProps {
@@ -43,8 +44,17 @@ interface DropdownItemProps {
 }
 
 // Reusable components
-const MobileNavLink: React.FC<NavLinkProps> = ({ to, icon, children }) => (
-  <Link to={to} className="flex items-center gap-2 text-lg font-medium">
+const MobileNavLink: React.FC<NavLinkProps> = ({
+  to,
+  icon,
+  children,
+  onClick,
+}) => (
+  <Link
+    to={to}
+    className="flex items-center gap-2 text-lg font-medium transition-colors hover:text-primary"
+    onClick={onClick}
+  >
     {icon}
     <span>{children}</span>
   </Link>
@@ -76,18 +86,48 @@ const DropdownItem: React.FC<DropdownItemProps> = ({
 
 const Navbar: React.FC = () => {
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const desktopSearchRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  // Close search on escape key press
+  // Monitor location changes to close sidebar on navigation
+  useEffect(() => {
+    setIsSidebarOpen(false);
+    setIsSearchOpen(false);
+  }, [location]);
+
+  // Close search and sidebar on escape key press
   useEffect(() => {
     const handleEscKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isSearchOpen) {
-        setIsSearchOpen(false);
+      if (e.key === "Escape") {
+        if (isSearchOpen) setIsSearchOpen(false);
+        if (isSidebarOpen) setIsSidebarOpen(false);
       }
     };
 
     window.addEventListener("keydown", handleEscKey);
     return () => window.removeEventListener("keydown", handleEscKey);
+  }, [isSearchOpen, isSidebarOpen]);
+
+  // Close search when clicking outside
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      // For desktop search
+      if (
+        isSearchOpen &&
+        desktopSearchRef.current &&
+        !desktopSearchRef.current.contains(e.target as Node) &&
+        // Make sure we're not closing when clicking the search button itself
+        !(e.target as Element).closest('button[aria-label*="search" i]')
+      ) {
+        setIsSearchOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, [isSearchOpen]);
 
   // Focus search input when opened
@@ -96,6 +136,12 @@ const Navbar: React.FC = () => {
       searchInputRef.current.focus();
     }
   }, [isSearchOpen]);
+
+  // Handle closing the sidebar
+  const closeSidebar = () => setIsSidebarOpen(false);
+
+  // Handle closing the search
+  const closeSearch = () => setIsSearchOpen(false);
 
   // Menu items for reuse
   const mobileMenuItems = [
@@ -174,45 +220,77 @@ const Navbar: React.FC = () => {
         {/* Left side: Logo and navigation */}
         <div className="flex items-center gap-2 md:gap-4">
           {/* Mobile menu */}
-          <Sheet>
+          <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
             <SheetTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
                 className="md:hidden"
                 aria-label="Open mobile menu"
+                onClick={() => setIsSidebarOpen(true)}
               >
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Toggle menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-[300px] sm:w-[400px]">
+            <SheetContent side="left" className="w-[300px] sm:w-[400px] p-0">
               <nav
-                className="flex flex-col gap-6"
+                className="flex h-full flex-col gap-6 p-6 overflow-auto"
                 aria-label="Mobile navigation"
               >
                 <Link
                   to="/"
                   className="flex items-center gap-2 text-lg font-bold"
+                  onClick={closeSidebar}
                 >
                   <Logo className="h-10 w-10 md:block" aria-hidden="true" />
                   <span>ByteForge</span>
                 </Link>
 
                 {/* Mobile menu links */}
-                <div className="flex flex-col gap-2">
-                  {mobileMenuItems.map((item) => (
-                    <MobileNavLink key={item.to} to={item.to} icon={item.icon}>
-                      {item.label}
-                    </MobileNavLink>
-                  ))}
+                <div className="flex flex-col gap-4">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                    Main Menu
+                  </h3>
+                  <div className="flex flex-col gap-3">
+                    {mobileMenuItems.map((item) => (
+                      <MobileNavLink
+                        key={item.to}
+                        to={item.to}
+                        icon={item.icon}
+                        onClick={closeSidebar}
+                      >
+                        {item.label}
+                      </MobileNavLink>
+                    ))}
+                  </div>
                 </div>
 
                 {/* Authentication links */}
-                <div className="flex flex-col gap-2">
-                  <MobileNavLink to="/login">Log In</MobileNavLink>
-                  <MobileNavLink to="/signup">Sign Up</MobileNavLink>
+                <div className="flex flex-col gap-4 mt-auto">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                    Account
+                  </h3>
+                  <div className="flex flex-col gap-3">
+                    <MobileNavLink to="/login" onClick={closeSidebar}>
+                      Log In
+                    </MobileNavLink>
+                    <MobileNavLink to="/signup" onClick={closeSidebar}>
+                      Sign Up
+                    </MobileNavLink>
+                  </div>
                 </div>
+
+                {/* Close button (additional way to close) */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute top-4 right-4"
+                  onClick={closeSidebar}
+                  aria-label="Close menu"
+                >
+                  <X className="h-5 w-5" />
+                </Button>
               </nav>
             </SheetContent>
           </Sheet>
@@ -306,7 +384,7 @@ const Navbar: React.FC = () => {
         {/* Right side: Search, theme toggle, and auth buttons */}
         <div className="flex items-center gap-2">
           {/* Desktop Inline Search */}
-          <div className="hidden md:block relative">
+          <div className="hidden md:block relative" ref={desktopSearchRef}>
             <Button
               variant="ghost"
               size="icon"
@@ -334,6 +412,7 @@ const Navbar: React.FC = () => {
                 placeholder="Search ByteForge..."
                 className={`pr-10 ${isSearchOpen ? "" : "cursor-pointer"}`}
                 aria-label="Search"
+                onClick={(e) => e.stopPropagation()}
               />
             </div>
           </div>
@@ -351,8 +430,14 @@ const Navbar: React.FC = () => {
 
           {/* Mobile Search Modal */}
           {isSearchOpen && (
-            <div className="md:hidden fixed inset-0 z-50 flex items-start justify-center bg-background/80 backdrop-blur-sm pt-16 px-4">
-              <div className="w-full max-w-md bg-background rounded-lg shadow-lg border p-4 animate-in slide-in-from-top">
+            <div
+              className="md:hidden fixed inset-0 z-50 flex items-start justify-center bg-background/80 backdrop-blur-sm pt-16 px-4"
+              onClick={() => setIsSearchOpen(false)}
+            >
+              <div
+                className="w-full max-w-md bg-background rounded-lg shadow-lg border p-4 animate-in slide-in-from-top"
+                onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the search box
+              >
                 <div className="flex items-center gap-2">
                   <Input
                     ref={searchInputRef}
@@ -364,7 +449,7 @@ const Navbar: React.FC = () => {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => setIsSearchOpen(false)}
+                    onClick={closeSearch}
                     aria-label="Close search"
                   >
                     <X className="h-5 w-5" />
@@ -386,6 +471,7 @@ const Navbar: React.FC = () => {
                           console.log(`Searching for ${term}`);
                           // You can implement the search logic here
                           // For example, update input value or navigate to search results
+                          closeSearch(); // Close search after selecting a suggestion
                         }}
                       >
                         {term}
