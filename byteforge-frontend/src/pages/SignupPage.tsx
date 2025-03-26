@@ -1,9 +1,8 @@
 "use client";
 
 import type React from "react";
-
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,25 +16,45 @@ import {
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Github, Code } from "lucide-react";
+import { register } from "@/services/authService";
+import { useToast } from "@/components/ui/use-toast"; // Updated import
 
 const SignupPage = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const { toast } = useToast(); // Use the hook
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      // Handle signup logic here
-      console.log("Signup attempt with:", { name, email, password });
-    }, 1500);
-  };
+    try {
+      await register({ name, email, password });
 
+      toast({
+        title: "Account created",
+        description: "You've successfully signed up and logged in.",
+        variant: "default",
+      });
+
+      navigate("/dashboard");
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      toast({
+        title: "Registration failed",
+        description:
+          error.response?.data?.message ||
+          "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
   return (
     <div className="container flex items-center justify-center min-h-[calc(100vh-8rem)] py-12">
       <Card className="mx-auto max-w-md w-full">
