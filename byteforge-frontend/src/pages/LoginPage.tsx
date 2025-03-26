@@ -1,8 +1,9 @@
 "use client";
 
 import type React from "react";
+
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,47 +18,22 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Github, Code } from "lucide-react";
 import { Logo } from "@/components/ui/icons";
-import { login } from "@/services/authService"; // Import the login function
-import { useToast } from "@/components/ui/toaster"; // Assuming you have toast component
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate(); // For redirecting after successful login
-
-  const { addToast } = useToast(); // Use the toast hook
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    try {
-      // Call the login function from authService
-      await login({ email, password });
-
-      // Show success message
-      addToast({
-        title: "Login successful",
-        description: "Welcome back to ByteForge!",
-        type: "success",
-      });
-
-      // Redirect to dashboard or home page
-      navigate("/dashboard");
-    } catch (error: any) {
-      // Handle errors
-      console.error("Login error:", error);
-      addToast({
-        title: "Login failed",
-        description:
-          error.response?.data?.message ||
-          "Invalid email or password. Please try again.",
-        type: "error",
-      });
-    } finally {
+    // Simulate API call
+    setTimeout(() => {
       setIsLoading(false);
-    }
+      // Handle login logic here
+      console.log("Login attempt with:", { email, password });
+    }, 1500);
   };
 
   return (

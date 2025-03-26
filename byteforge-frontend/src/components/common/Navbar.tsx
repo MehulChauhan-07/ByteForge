@@ -1,776 +1,505 @@
-import React from "react";
-import { Link, NavLink } from "react-router-dom";
-import { Code, Menu, X } from "lucide-react";
-import { useUser } from "@/contexts/UserContext";
+"use client";
+
+import { useState, useRef, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
+  Menu,
+  X,
+  Search,
+  Code,
+  BookOpen,
+  MessageSquare,
+  Save,
+  Users,
+} from "lucide-react";
+import { ModeToggle } from "@/components/common/ModeToggle";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "../ui/navigation-menu";
+import { Logo } from "@/components/ui/icons";
 
-const NavBar: React.FC = () => {
-  const { user, isAuthenticated, logoutUser } = useUser();
-  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+// Types for reusable components
+interface NavLinkProps {
+  to: string;
+  icon?: React.ReactNode;
+  children: React.ReactNode;
+  className?: string;
+  onClick?: () => void;
+}
 
-  const handleLogout = async () => {
-    await logoutUser();
-  };
+interface DropdownItemProps {
+  to: string;
+  title: string;
+  description: string;
+  icon?: React.ReactNode;
+}
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+// Reusable components
+const MobileNavLink: React.FC<NavLinkProps> = ({
+  to,
+  icon,
+  children,
+  onClick,
+}) => (
+  <Link
+    to={to}
+    className="flex items-center gap-2 text-lg font-medium transition-colors hover:text-primary"
+    onClick={onClick}
+  >
+    {icon}
+    <span>{children}</span>
+  </Link>
+);
+
+const DropdownItem: React.FC<DropdownItemProps> = ({
+  to,
+  title,
+  description,
+  icon,
+}) => (
+  <li>
+    <NavigationMenuLink asChild>
+      <Link
+        className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+        to={to}
+      >
+        <div className={`${icon ? "flex items-center gap-2" : ""}`}>
+          {icon}
+          <div className="text-sm font-medium leading-none">{title}</div>
+        </div>
+        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+          {description}
+        </p>
+      </Link>
+    </NavigationMenuLink>
+  </li>
+);
+
+const Navbar: React.FC = () => {
+  const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const desktopSearchRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Monitor location changes to close sidebar on navigation
+  useEffect(() => {
+    setIsSidebarOpen(false);
+    setIsSearchOpen(false);
+  }, [location]);
+
+  // Close search and sidebar on escape key press
+  useEffect(() => {
+    const handleEscKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        if (isSearchOpen) setIsSearchOpen(false);
+        if (isSidebarOpen) setIsSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleEscKey);
+    return () => window.removeEventListener("keydown", handleEscKey);
+  }, [isSearchOpen, isSidebarOpen]);
+
+  // Close search when clicking outside
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      // For desktop search
+      if (
+        isSearchOpen &&
+        desktopSearchRef.current &&
+        !desktopSearchRef.current.contains(e.target as Node) &&
+        // Make sure we're not closing when clicking the search button itself
+        !(e.target as Element).closest('button[aria-label*="search" i]')
+      ) {
+        setIsSearchOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, [isSearchOpen]);
+
+  // Focus search input when opened
+  useEffect(() => {
+    if (isSearchOpen && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [isSearchOpen]);
+
+  // Handle closing the sidebar
+  const closeSidebar = () => setIsSidebarOpen(false);
+
+  // Handle closing the search
+  const closeSearch = () => setIsSearchOpen(false);
+
+  // Menu items for reuse
+  const mobileMenuItems = [
+    {
+      to: "/courses",
+      label: "Courses",
+      icon: <BookOpen className="h-5 w-5" />,
+    },
+    { to: "/compiler", label: "Compiler", icon: <Code className="h-5 w-5" /> },
+    {
+      to: "/assistant",
+      label: "AI Assistant",
+      icon: <MessageSquare className="h-5 w-5" />,
+    },
+    { to: "/notes", label: "My Notes", icon: <Save className="h-5 w-5" /> },
+  ];
+
+  // Popular search suggestions
+  const popularSearches = [
+    "Java basics",
+    "OOP concepts",
+    "Collections",
+    "File handling",
+  ];
+
+  // Learning dropdown items
+  const learningItems = [
+    {
+      to: "/tutorials",
+      title: "Tutorials",
+      description: "Step-by-step guides for specific Java topics",
+    },
+    {
+      to: "/exercises",
+      title: "Exercises",
+      description: "Practice with coding challenges and projects",
+    },
+    {
+      to: "/certification",
+      title: "Certification",
+      description: "Earn certificates to showcase your Java skills",
+    },
+  ];
+
+  // Tools dropdown items
+  const toolItems = [
+    {
+      to: "/compiler",
+      title: "Java Compiler",
+      description: "Write, compile, and run Java code in your browser",
+      icon: <Code className="h-4 w-4" />,
+    },
+    {
+      to: "/assistant",
+      title: "AI Assistant",
+      description: "Get help with coding problems and concepts",
+      icon: <MessageSquare className="h-4 w-4" />,
+    },
+    {
+      to: "/notes",
+      title: "Note Taking",
+      description: "Save and organize important concepts and code snippets",
+      icon: <Save className="h-4 w-4" />,
+    },
+    {
+      to: "/community",
+      title: "Community",
+      description: "Connect with other learners and Java experts",
+      icon: <Users className="h-4 w-4" />,
+    },
+  ];
 
   return (
-    <header className="border-b bg-background sticky top-0 z-40">
-      <div className="container flex items-center justify-between h-16 px-4">
-        <Link to="/" className="flex items-center gap-2">
-          <Code className="h-6 w-6 text-primary" />
-          <span className="text-xl font-bold">ByteForge</span>
-        </Link>
-
-        {/* Mobile menu button */}
-        <button className="md:hidden" onClick={toggleMenu}>
-          {isMenuOpen ? (
-            <X className="h-6 w-6" />
-          ) : (
-            <Menu className="h-6 w-6" />
-          )}
-        </button>
-
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-6">
-          <NavLink
-            to="/topics"
-            className={({ isActive }) =>
-              isActive
-                ? "text-primary font-medium"
-                : "text-foreground hover:text-primary"
-            }
-          >
-            Topics
-          </NavLink>
-
-          <NavLink
-            to="/playground"
-            className={({ isActive }) =>
-              isActive
-                ? "text-primary font-medium"
-                : "text-foreground hover:text-primary"
-            }
-          >
-            Playground
-          </NavLink>
-
-          {isAuthenticated && (
-            <>
-              <NavLink
-                to="/notes"
-                className={({ isActive }) =>
-                  isActive
-                    ? "text-primary font-medium"
-                    : "text-foreground hover:text-primary"
-                }
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 items-center justify-between">
+        {/* Left side: Logo and navigation */}
+        <div className="flex items-center gap-2 md:gap-4">
+          {/* Mobile menu */}
+          <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
+            <SheetTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden"
+                aria-label="Open mobile menu"
+                onClick={() => setIsSidebarOpen(true)}
               >
-                My Notes
-              </NavLink>
-
-              <NavLink
-                to="/progress"
-                className={({ isActive }) =>
-                  isActive
-                    ? "text-primary font-medium"
-                    : "text-foreground hover:text-primary"
-                }
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Toggle menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[300px] sm:w-[400px] p-0">
+              <nav
+                className="flex h-full flex-col gap-6 p-6 overflow-auto"
+                aria-label="Mobile navigation"
               >
-                My Progress
-              </NavLink>
-            </>
-          )}
-
-          <NavLink
-            to="/chatbot"
-            className={({ isActive }) =>
-              isActive
-                ? "text-primary font-medium"
-                : "text-foreground hover:text-primary"
-            }
-          >
-            Chatbot
-          </NavLink>
-        </nav>
-
-        <div className="hidden md:flex items-center gap-4">
-          {isAuthenticated ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="relative h-10 w-10 rounded-full"
+                <Link
+                  to="/"
+                  className="flex items-center gap-2 text-lg font-bold"
+                  onClick={closeSidebar}
                 >
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage
-                      src="/placeholder-avatar.jpg"
-                      alt={user?.name}
-                    />
-                    <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <div className="flex items-center justify-start gap-2 p-2">
-                  <div className="flex flex-col space-y-1 leading-none">
-                    <p className="font-medium">{user?.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {user?.email}
-                    </p>
+                  <Logo className="h-10 w-10 md:block" aria-hidden="true" />
+                  <span>ByteForge</span>
+                </Link>
+
+                {/* Mobile menu links */}
+                <div className="flex flex-col gap-4">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                    Main Menu
+                  </h3>
+                  <div className="flex flex-col gap-3">
+                    {mobileMenuItems.map((item) => (
+                      <MobileNavLink
+                        key={item.to}
+                        to={item.to}
+                        icon={item.icon}
+                        onClick={closeSidebar}
+                      >
+                        {item.label}
+                      </MobileNavLink>
+                    ))}
                   </div>
                 </div>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link to="/profile">Profile</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/settings">Settings</Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={handleLogout}
-                  className="text-red-500"
+
+                {/* Authentication links */}
+                <div className="flex flex-col gap-4 mt-auto">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                    Account
+                  </h3>
+                  <div className="flex flex-col gap-3">
+                    <MobileNavLink to="/login" onClick={closeSidebar}>
+                      Log In
+                    </MobileNavLink>
+                    <MobileNavLink to="/signup" onClick={closeSidebar}>
+                      Sign Up
+                    </MobileNavLink>
+                  </div>
+                </div>
+
+                {/* Close button (additional way to close) */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute top-4 right-4"
+                  onClick={closeSidebar}
+                  aria-label="Close menu"
                 >
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <>
-              <Link to="/login">
-                <Button variant="ghost">Login</Button>
-              </Link>
-              <Link to="/signup">
-                <Button>Sign up</Button>
-              </Link>
-            </>
-          )}
+                  <X className="h-5 w-5" />
+                </Button>
+              </nav>
+            </SheetContent>
+          </Sheet>
+
+          {/* Logo */}
+          <Link
+            to="/"
+            className="flex items-center gap-2"
+            aria-label="ByteForge home"
+          >
+            <Logo className="h-9 w-9 md:block" aria-hidden="true" />
+            <span className="text-xl font-bold">ByteForge</span>
+          </Link>
+
+          {/* Desktop navigation */}
+          <NavigationMenu className="hidden md:flex">
+            <NavigationMenuList>
+              {/* Learn dropdown */}
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>Learn</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-2">
+                    <li className="row-span-3">
+                      <NavigationMenuLink asChild>
+                        <Link
+                          className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-primary/50 to-primary p-6 no-underline outline-none focus:shadow-md"
+                          to="/courses"
+                        >
+                          <BookOpen
+                            className="h-6 w-6 text-white"
+                            aria-hidden="true"
+                          />
+                          <div className="mb-2 mt-4 text-lg font-medium text-white">
+                            Java Courses
+                          </div>
+                          <p className="text-sm leading-tight text-white/90">
+                            Comprehensive Java learning paths for all skill
+                            levels
+                          </p>
+                        </Link>
+                      </NavigationMenuLink>
+                    </li>
+
+                    {/* Map learning dropdown items */}
+                    {learningItems.map((item) => (
+                      <DropdownItem
+                        key={item.to}
+                        to={item.to}
+                        title={item.title}
+                        description={item.description}
+                      />
+                    ))}
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+
+              {/* Tools dropdown */}
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>Tools</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                    {/* Map tool dropdown items */}
+                    {toolItems.map((item) => (
+                      <DropdownItem
+                        key={item.to}
+                        to={item.to}
+                        title={item.title}
+                        description={item.description}
+                        icon={item.icon}
+                      />
+                    ))}
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+
+              {/* Regular navigation links */}
+              <NavigationMenuItem>
+                <Link to="/topics" className={navigationMenuTriggerStyle()}>
+                  Topics
+                </Link>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link to="/about" className={navigationMenuTriggerStyle()}>
+                  About
+                </Link>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
         </div>
 
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="absolute top-16 left-0 right-0 bg-background border-b p-4 md:hidden">
-            <nav className="flex flex-col space-y-4">
-              <NavLink
-                to="/topics"
-                className={({ isActive }) =>
-                  isActive
-                    ? "text-primary font-medium"
-                    : "text-foreground hover:text-primary"
-                }
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Topics
-              </NavLink>
-
-              <NavLink
-                to="/playground"
-                className={({ isActive }) =>
-                  isActive
-                    ? "text-primary font-medium"
-                    : "text-foreground hover:text-primary"
-                }
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Playground
-              </NavLink>
-
-              {isAuthenticated && (
-                <>
-                  <NavLink
-                    to="/notes"
-                    className={({ isActive }) =>
-                      isActive
-                        ? "text-primary font-medium"
-                        : "text-foreground hover:text-primary"
-                    }
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    My Notes
-                  </NavLink>
-
-                  <NavLink
-                    to="/progress"
-                    className={({ isActive }) =>
-                      isActive
-                        ? "text-primary font-medium"
-                        : "text-foreground hover:text-primary"
-                    }
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    My Progress
-                  </NavLink>
-                </>
-              )}
-
-              <NavLink
-                to="/chatbot"
-                className={({ isActive }) =>
-                  isActive
-                    ? "text-primary font-medium"
-                    : "text-foreground hover:text-primary"
-                }
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Chatbot
-              </NavLink>
-
-              {isAuthenticated ? (
-                <>
-                  <NavLink
-                    to="/profile"
-                    className="text-foreground hover:text-primary"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Profile
-                  </NavLink>
-                  <button
-                    className="text-red-500 text-left"
-                    onClick={() => {
-                      handleLogout();
-                      setIsMenuOpen(false);
-                    }}
-                  >
-                    Logout
-                  </button>
-                </>
+        {/* Right side: Search, theme toggle, and auth buttons */}
+        <div className="flex items-center gap-2">
+          {/* Desktop Inline Search */}
+          <div className="hidden md:block relative" ref={desktopSearchRef}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              aria-label={isSearchOpen ? "Close search" : "Open search"}
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-10"
+            >
+              {isSearchOpen ? (
+                <X className="h-5 w-5" />
               ) : (
-                <div className="flex flex-col space-y-2 pt-2 border-t">
-                  <Link
-                    to="/login"
-                    className="bg-muted text-center py-2 rounded-md"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    to="/signup"
-                    className="bg-primary text-primary-foreground text-center py-2 rounded-md"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Sign up
-                  </Link>
-                </div>
+                <Search className="h-5 w-5" />
               )}
-            </nav>
+            </Button>
+
+            <div
+              className={`overflow-hidden transition-all duration-300 ${
+                isSearchOpen
+                  ? "w-[300px] opacity-100"
+                  : "w-10 opacity-0 pointer-events-none"
+              }`}
+            >
+              <Input
+                ref={searchInputRef}
+                type="search"
+                placeholder="Search ByteForge..."
+                className={`pr-10 ${isSearchOpen ? "" : "cursor-pointer"}`}
+                aria-label="Search"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
           </div>
-        )}
+
+          {/* Mobile Search Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsSearchOpen(true)}
+            aria-label="Open search"
+            className="md:hidden"
+          >
+            <Search className="h-5 w-5" />
+          </Button>
+
+          {/* Mobile Search Modal */}
+          {isSearchOpen && (
+            <div
+              className="md:hidden fixed inset-0 z-50 flex items-start justify-center bg-background/80 backdrop-blur-sm pt-16 px-4"
+              onClick={() => setIsSearchOpen(false)}
+            >
+              <div
+                className="w-full max-w-md bg-background rounded-lg shadow-lg border p-4 animate-in slide-in-from-top"
+                onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the search box
+              >
+                <div className="flex items-center gap-2">
+                  <Input
+                    ref={searchInputRef}
+                    type="search"
+                    placeholder="Search ByteForge..."
+                    className="flex-1"
+                    aria-label="Search"
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={closeSearch}
+                    aria-label="Close search"
+                  >
+                    <X className="h-5 w-5" />
+                  </Button>
+                </div>
+
+                {/* Quick suggestion links */}
+                <div className="mt-4 space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Popular searches:
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {popularSearches.map((term) => (
+                      <button
+                        key={term}
+                        className="px-3 py-1 text-sm bg-accent rounded-full hover:bg-accent/80 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        onClick={() => {
+                          // Logic to handle search for this term
+                          console.log(`Searching for ${term}`);
+                          // You can implement the search logic here
+                          // For example, update input value or navigate to search results
+                          closeSearch(); // Close search after selecting a suggestion
+                        }}
+                      >
+                        {term}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <ModeToggle />
+
+          <div className="hidden md:flex gap-2">
+            <Button variant="ghost" asChild>
+              <Link to="/login">Log In</Link>
+            </Button>
+            <Button asChild>
+              <Link to="/signup">Sign Up</Link>
+            </Button>
+          </div>
+        </div>
       </div>
     </header>
   );
 };
 
-export default NavBar;
-// "use client";
-
-// import { useState, useRef, useEffect } from "react";
-// import { Link, useNavigate, useLocation } from "react-router-dom";
-// import { Button } from "@/components/ui/button";
-// import { Input } from "@/components/ui/input";
-// import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-// import {
-//   Menu,
-//   X,
-//   Search,
-//   Code,
-//   BookOpen,
-//   MessageSquare,
-//   Save,
-//   Users,
-// } from "lucide-react";
-// import { ModeToggle } from "@/components/common/ModeToggle";
-// import {
-//   NavigationMenu,
-//   NavigationMenuContent,
-//   NavigationMenuItem,
-//   NavigationMenuLink,
-//   NavigationMenuList,
-//   NavigationMenuTrigger,
-//   navigationMenuTriggerStyle,
-// } from "../ui/navigation-menu";
-// import { Logo } from "@/components/ui/icons";
-
-// // Types for reusable components
-// interface NavLinkProps {
-//   to: string;
-//   icon?: React.ReactNode;
-//   children: React.ReactNode;
-//   className?: string;
-//   onClick?: () => void;
-// }
-// interface DropdownItemProps {
-//   to: string;
-//   title: string;
-//   description: string;
-//   icon?: React.ReactNode;
-// }
-// // Reusable components
-// const MobileNavLink: React.FC<NavLinkProps> = ({
-//   to,
-//   icon,
-//   children,
-//   onClick,
-// }) => (
-//   <Link
-//     to={to}
-//     className="flex items-center gap-2 text-lg font-medium transition-colors hover:text-primary"
-//     onClick={onClick}
-//   >
-//     {icon}
-//     <span>{children}</span>
-//   </Link>
-// );
-
-// const DropdownItem: React.FC<DropdownItemProps> = ({
-//   to,
-//   title,
-//   description,
-//   icon,
-// }) => (
-//   <li>
-//     <NavigationMenuLink asChild>
-//       <Link
-//         className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-//         to={to}
-//       >
-//         <div className={`${icon ? "flex items-center gap-2" : ""}`}>
-//           {icon}
-//           <div className="text-sm font-medium leading-none">{title}</div>
-//         </div>
-//         <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-//           {description}
-//         </p>
-//       </Link>
-//     </NavigationMenuLink>
-//   </li>
-// );
-
-// const Navbar: React.FC = () => {
-//   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
-//   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
-//   const searchInputRef = useRef<HTMLInputElement>(null);
-//   const desktopSearchRef = useRef<HTMLDivElement>(null);
-//   const navigate = useNavigate();
-//   const location = useLocation();
-
-//   // Monitor location changes to close sidebar on navigation
-//   useEffect(() => {
-//     setIsSidebarOpen(false);
-//     setIsSearchOpen(false);
-//   }, [location]);
-
-//   // Close search and sidebar on escape key press
-//   useEffect(() => {
-//     const handleEscKey = (e: KeyboardEvent) => {
-//       if (e.key === "Escape") {
-//         if (isSearchOpen) setIsSearchOpen(false);
-//         if (isSidebarOpen) setIsSidebarOpen(false);
-//       }
-//     };
-
-//     window.addEventListener("keydown", handleEscKey);
-//     return () => window.removeEventListener("keydown", handleEscKey);
-//   }, [isSearchOpen, isSidebarOpen]);
-
-//   // Close search when clicking outside
-//   useEffect(() => {
-//     const handleOutsideClick = (e: MouseEvent) => {
-//       // For desktop search
-//       if (
-//         isSearchOpen &&
-//         desktopSearchRef.current &&
-//         !desktopSearchRef.current.contains(e.target as Node) &&
-//         // Make sure we're not closing when clicking the search button itself
-//         !(e.target as Element).closest('button[aria-label*="search" i]')
-//       ) {
-//         setIsSearchOpen(false);
-//       }
-//     };
-
-//     document.addEventListener("mousedown", handleOutsideClick);
-//     return () => document.removeEventListener("mousedown", handleOutsideClick);
-//   }, [isSearchOpen]);
-
-//   // Focus search input when opened
-//   useEffect(() => {
-//     if (isSearchOpen && searchInputRef.current) {
-//       searchInputRef.current.focus();
-//     }
-//   }, [isSearchOpen]);
-
-//   // Handle closing the sidebar
-//   const closeSidebar = () => setIsSidebarOpen(false);
-
-//   // Handle closing the search
-//   const closeSearch = () => setIsSearchOpen(false);
-
-//   // Menu items for reuse
-//   const mobileMenuItems = [
-//     {
-//       to: "/courses",
-//       label: "Courses",
-//       icon: <BookOpen className="h-5 w-5" />,
-//     },
-//     { to: "/compiler", label: "Compiler", icon: <Code className="h-5 w-5" /> },
-//     {
-//       to: "/assistant",
-//       label: "AI Assistant",
-//       icon: <MessageSquare className="h-5 w-5" />,
-//     },
-//     { to: "/notes", label: "My Notes", icon: <Save className="h-5 w-5" /> },
-//   ];
-
-//   // Popular search suggestions
-//   const popularSearches = [
-//     "Java basics",
-//     "OOP concepts",
-//     "Collections",
-//     "File handling",
-//   ];
-
-//   // Learning dropdown items
-//   const learningItems = [
-//     {
-//       to: "/tutorials",
-//       title: "Tutorials",
-//       description: "Step-by-step guides for specific Java topics",
-//     },
-//     {
-//       to: "/exercises",
-//       title: "Exercises",
-//       description: "Practice with coding challenges and projects",
-//     },
-//     {
-//       to: "/certification",
-//       title: "Certification",
-//       description: "Earn certificates to showcase your Java skills",
-//     },
-//   ];
-
-//   // Tools dropdown items
-//   const toolItems = [
-//     {
-//       to: "/codeplayground",
-//       title: "Java Compiler",
-//       description: "Write, compile, and run Java code in your browser",
-//       icon: <Code className="h-4 w-4" />,
-//     },
-//     {
-//       to: "/assistant",
-//       title: "AI Assistant",
-//       description: "Get help with coding problems and concepts",
-//       icon: <MessageSquare className="h-4 w-4" />,
-//     },
-//     {
-//       to: "/notes",
-//       title: "Note Taking",
-//       description: "Save and organize important concepts and code snippets",
-//       icon: <Save className="h-4 w-4" />,
-//     },
-//     {
-//       to: "/community",
-//       title: "Community",
-//       description: "Connect with other learners and Java experts",
-//       icon: <Users className="h-4 w-4" />,
-//     },
-//   ];
-
-//   return (
-//     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-//       <div className="container flex h-16 items-center justify-between">
-//         {/* Left side: Logo and navigation */}
-//         <div className="flex items-center gap-2 md:gap-4">
-//           {/* Mobile menu */}
-//           <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
-//             <SheetTrigger asChild>
-//               <Button
-//                 variant="ghost"
-//                 size="icon"
-//                 className="md:hidden"
-//                 aria-label="Open mobile menu"
-//                 onClick={() => setIsSidebarOpen(true)}
-//               >
-//                 <Menu className="h-5 w-5" />
-//                 <span className="sr-only">Toggle menu</span>
-//               </Button>
-//             </SheetTrigger>
-//             <SheetContent side="left" className="w-[300px] sm:w-[400px] p-0">
-//               <nav
-//                 className="flex h-full flex-col gap-6 p-6 overflow-auto"
-//                 aria-label="Mobile navigation"
-//               >
-//                 <Link
-//                   to="/"
-//                   className="flex items-center gap-2 text-lg font-bold"
-//                   onClick={closeSidebar}
-//                 >
-//                   <Logo className="h-10 w-10 md:block" aria-hidden="true" />
-//                   <span>ByteForge</span>
-//                 </Link>
-
-//                 {/* Mobile menu links */}
-//                 <div className="flex flex-col gap-4">
-//                   <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-//                     Main Menu
-//                   </h3>
-//                   <div className="flex flex-col gap-3">
-//                     {mobileMenuItems.map((item) => (
-//                       <MobileNavLink
-//                         key={item.to}
-//                         to={item.to}
-//                         icon={item.icon}
-//                         onClick={closeSidebar}
-//                       >
-//                         {item.label}
-//                       </MobileNavLink>
-//                     ))}
-//                   </div>
-//                 </div>
-
-//                 {/* Authentication links */}
-//                 <div className="flex flex-col gap-4 mt-auto">
-//                   <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-//                     Account
-//                   </h3>
-//                   <div className="flex flex-col gap-3">
-//                     <MobileNavLink to="/login" onClick={closeSidebar}>
-//                       Log In
-//                     </MobileNavLink>
-//                     <MobileNavLink to="/signup" onClick={closeSidebar}>
-//                       Sign Up
-//                     </MobileNavLink>
-//                   </div>
-//                 </div>
-
-//                 {/* Close button (additional way to close) */}
-//                 <Button
-//                   variant="ghost"
-//                   size="icon"
-//                   className="absolute top-4 right-4"
-//                   onClick={closeSidebar}
-//                   aria-label="Close menu"
-//                 >
-//                   <X className="h-5 w-5" />
-//                 </Button>
-//               </nav>
-//             </SheetContent>
-//           </Sheet>
-
-//           {/* Logo */}
-//           <Link
-//             to="/"
-//             className="flex items-center gap-2"
-//             aria-label="ByteForge home"
-//           >
-//             <Logo className="h-9 w-9 md:block" aria-hidden="true" />
-//             <span className="text-xl font-bold">ByteForge</span>
-//           </Link>
-
-//           {/* Desktop navigation */}
-//           <NavigationMenu className="hidden md:flex">
-//             <NavigationMenuList>
-//               {/* Learn dropdown */}
-//               <NavigationMenuItem>
-//                 <NavigationMenuTrigger>Learn</NavigationMenuTrigger>
-//                 <NavigationMenuContent>
-//                   <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-2">
-//                     <li className="row-span-3">
-//                       <NavigationMenuLink asChild>
-//                         <Link
-//                           className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-primary/50 to-primary p-6 no-underline outline-none focus:shadow-md"
-//                           to="/courses"
-//                         >
-//                           <BookOpen
-//                             className="h-6 w-6 text-white"
-//                             aria-hidden="true"
-//                           />
-//                           <div className="mb-2 mt-4 text-lg font-medium text-white">
-//                             Java Courses
-//                           </div>
-//                           <p className="text-sm leading-tight text-white/90">
-//                             Comprehensive Java learning paths for all skill
-//                             levels
-//                           </p>
-//                         </Link>
-//                       </NavigationMenuLink>
-//                     </li>
-
-//                     {/* Map learning dropdown items */}
-//                     {learningItems.map((item) => (
-//                       <DropdownItem
-//                         key={item.to}
-//                         to={item.to}
-//                         title={item.title}
-//                         description={item.description}
-//                       />
-//                     ))}
-//                   </ul>
-//                 </NavigationMenuContent>
-//               </NavigationMenuItem>
-
-//               {/* Tools dropdown */}
-//               <NavigationMenuItem>
-//                 <NavigationMenuTrigger>Tools</NavigationMenuTrigger>
-//                 <NavigationMenuContent>
-//                   <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-//                     {/* Map tool dropdown items */}
-//                     {toolItems.map((item) => (
-//                       <DropdownItem
-//                         key={item.to}
-//                         to={item.to}
-//                         title={item.title}
-//                         description={item.description}
-//                         icon={item.icon}
-//                       />
-//                     ))}
-//                   </ul>
-//                 </NavigationMenuContent>
-//               </NavigationMenuItem>
-
-//               {/* Regular navigation links */}
-//               <NavigationMenuItem>
-//                 <Link to="/topics" className={navigationMenuTriggerStyle()}>
-//                   Topics
-//                 </Link>
-//               </NavigationMenuItem>
-//               <NavigationMenuItem>
-//                 <Link to="/about" className={navigationMenuTriggerStyle()}>
-//                   About
-//                 </Link>
-//               </NavigationMenuItem>
-//             </NavigationMenuList>
-//           </NavigationMenu>
-//         </div>
-
-//         {/* Right side: Search, theme toggle, and auth buttons */}
-//         <div className="flex items-center gap-2">
-//           {/* Desktop Inline Search */}
-//           <div className="hidden md:block relative" ref={desktopSearchRef}>
-//             <Button
-//               variant="ghost"
-//               size="icon"
-//               onClick={() => setIsSearchOpen(!isSearchOpen)}
-//               aria-label={isSearchOpen ? "Close search" : "Open search"}
-//               className="absolute right-2 top-1/2 -translate-y-1/2 z-10"
-//             >
-//               {isSearchOpen ? (
-//                 <X className="h-5 w-5" />
-//               ) : (
-//                 <Search className="h-5 w-5" />
-//               )}
-//             </Button>
-
-//             <div
-//               className={`overflow-hidden transition-all duration-300 ${
-//                 isSearchOpen
-//                   ? "w-[300px] opacity-100"
-//                   : "w-10 opacity-0 pointer-events-none"
-//               }`}
-//             >
-//               <Input
-//                 ref={searchInputRef}
-//                 type="search"
-//                 placeholder="Search ByteForge..."
-//                 className={`pr-10 ${isSearchOpen ? "" : "cursor-pointer"}`}
-//                 aria-label="Search"
-//                 onClick={(e) => e.stopPropagation()}
-//               />
-//             </div>
-//           </div>
-
-//           {/* Mobile Search Button */}
-//           <Button
-//             variant="ghost"
-//             size="icon"
-//             onClick={() => setIsSearchOpen(true)}
-//             aria-label="Open search"
-//             className="md:hidden"
-//           >
-//             <Search className="h-5 w-5" />
-//           </Button>
-
-//           {/* Mobile Search Modal */}
-//           {isSearchOpen && (
-//             <div
-//               className="md:hidden fixed inset-0 z-50 flex items-start justify-center bg-background/80 backdrop-blur-sm pt-16 px-4"
-//               onClick={() => setIsSearchOpen(false)}
-//             >
-//               <div
-//                 className="w-full max-w-md bg-background rounded-lg shadow-lg border p-4 animate-in slide-in-from-top"
-//                 onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the search box
-//               >
-//                 <div className="flex items-center gap-2">
-//                   <Input
-//                     ref={searchInputRef}
-//                     type="search"
-//                     placeholder="Search ByteForge..."
-//                     className="flex-1"
-//                     aria-label="Search"
-//                   />
-//                   <Button
-//                     variant="ghost"
-//                     size="icon"
-//                     onClick={closeSearch}
-//                     aria-label="Close search"
-//                   >
-//                     <X className="h-5 w-5" />
-//                   </Button>
-//                 </div>
-
-//                 {/* Quick suggestion links */}
-//                 <div className="mt-4 space-y-2">
-//                   <p className="text-sm font-medium text-muted-foreground">
-//                     Popular searches:
-//                   </p>
-//                   <div className="flex flex-wrap gap-2">
-//                     {popularSearches.map((term) => (
-//                       <button
-//                         key={term}
-//                         className="px-3 py-1 text-sm bg-accent rounded-full hover:bg-accent/80 focus:outline-none focus:ring-2 focus:ring-primary/50"
-//                         onClick={() => {
-//                           // Logic to handle search for this term
-//                           console.log(`Searching for ${term}`);
-//                           // You can implement the search logic here
-//                           // For example, update input value or navigate to search results
-//                           closeSearch(); // Close search after selecting a suggestion
-//                         }}
-//                       >
-//                         {term}
-//                       </button>
-//                     ))}
-//                   </div>
-//                 </div>
-//               </div>
-//             </div>
-//           )}
-
-//           <ModeToggle />
-
-//           <div className="hidden md:flex gap-2">
-//             <Button variant="ghost" asChild>
-//               <Link to="/login">Log In</Link>
-//             </Button>
-//             <Button asChild>
-//               <Link to="/signup">Sign Up</Link>
-//             </Button>
-//           </div>
-//         </div>
-//       </div>
-//     </header>
-//   );
-// };
-
-// export default Navbar;
+export default Navbar;
 
 // "use client";
 
