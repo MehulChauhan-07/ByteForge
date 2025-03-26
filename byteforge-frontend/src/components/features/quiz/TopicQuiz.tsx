@@ -7,7 +7,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+<<<<<<< Updated upstream
 import { useProgress } from "@/contexts/ProgressContex";
+=======
+import { useProgress } from "@/context/ProgressContex";
+>>>>>>> Stashed changes
 
 interface QuizQuestion {
   question: string;

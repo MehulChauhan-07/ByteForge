@@ -25,6 +25,8 @@
     "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",
     "react-router-dom": "^6.30.0",
+    "react-syntax-highlighter": "^5.8.0",
+    "reactflow": "^11.11.4",
     "tailwind-merge": "^2.1.0",
     "tailwindcss-animate": "^1.0.7"
   },
