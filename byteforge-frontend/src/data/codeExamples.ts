@@ -2,7 +2,7 @@ export const codeExamples = {
   introduction: `// Welcome to Java!
 // This is a simple Hello World program
 
-public class HelloWorld {
+public class HelloWorld { 
     public static void main(String[] args) {
         System.out.println("Hello, ByteForge!");
     }

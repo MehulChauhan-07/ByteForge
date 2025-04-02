@@ -1,7 +1,7 @@
 
 // Sample content for Java basics topics
 export const javaBasicsContent = {
-  introduction: {
+  introduction: { 
     title: "Introduction to Java",
     content: `Java is a high-level, class-based, object-oriented programming language that is designed to have as few implementation dependencies as possible. 
     

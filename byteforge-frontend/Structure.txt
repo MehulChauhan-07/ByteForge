@@ -19,23 +19,25 @@ ByteForge/
 │   │   ├── placeholder.jpg
 │   │   ├── placeholder.svg
 │   ├── src/
+│   │   ├── api/
+│   │   │   ├── api.ts
+│   │   │   ├── code.ts
+│   │   │   ├── httpClient.ts
+│   │   │   ├── notes.ts
 │   │   ├── App.tsx
 │   │   ├── components/
-│   │   │   ├── CommentsSection.tsx
-│   │   │   ├── common/
-│   │   │   │   ├── Footer.tsx
-│   │   │   │   ├── Layout.tsx
-│   │   │   │   ├── ModeToggle.tsx
-│   │   │   │   ├── motion-layout.tsx
-│   │   │   │   ├── Navbar.tsx
-│   │   │   │   ├── old_files/
-│   │   │   │   │   ├── old_navbar.tsx
-│   │   │   │   ├── ThemeProvider.tsx
 │   │   │   ├── diagrams/
 │   │   │   │   ├── MemoryAllocationDiagram.tsx
 │   │   │   ├── features/
+│   │   │   │   ├── chatbot/
+│   │   │   │   │   ├── ChatInput.tsx
+│   │   │   │   │   ├── ChatInterface.tsx
+│   │   │   │   │   ├── ChatMessage.tsx
 │   │   │   │   ├── code/
 │   │   │   │   │   ├── CodePlayground.tsx
+│   │   │   │   ├── community/
+│   │   │   │   │   ├── DiscussionThread.tsx
+│   │   │   │   │   ├── ForumList.tsx
 │   │   │   │   ├── diagram/
 │   │   │   │   │   ├── MemoryAllocationdiagram.tsx
 │   │   │   │   ├── home/
@@ -47,11 +49,32 @@ ByteForge/
 │   │   │   │   │   ├── CodePlayground.tsx
 │   │   │   │   │   ├── MultiFormatContent.tsx
 │   │   │   │   │   ├── Sidebar.tsx
+│   │   │   │   ├── learning-path/
+│   │   │   │   │   ├── NextLesson.tsx
+│   │   │   │   │   ├── PathOverview.tsx
+│   │   │   │   │   ├── PathProgress.tsx
 │   │   │   │   ├── notes/
+│   │   │   │   │   ├── NotesEditor.tsx
+│   │   │   │   │   ├── NoteSidebar.tsx
+│   │   │   │   │   ├── NotesList.tsx
+│   │   │   │   ├── progress/
+│   │   │   │   │   ├── AchievementBadges.tsx
+│   │   │   │   │   ├── ProgressDashboard.tsx
+│   │   │   │   │   ├── TopicProgress.tsx
 │   │   │   │   ├── quiz/
 │   │   │   │   │   ├── TopicQuiz.tsx
-│   │   │   │   ├── Topics/
-│   │   │   ├── MultiFormatContent.tsx
+│   │   │   ├── layout/
+│   │   │   │   ├── Footer.tsx
+│   │   │   │   ├── Layout.tsx
+│   │   │   │   ├── motion-layout.tsx
+│   │   │   │   ├── Navbar.tsx
+│   │   │   │   ├── old_files/
+│   │   │   │   │   ├── old_navbar.tsx
+│   │   │   │   ├── ThemeProvider.tsx
+│   │   │   ├── shared/
+│   │   │   │   ├── CommentsSection.tsx
+│   │   │   │   ├── ModeToggle.tsx
+│   │   │   │   ├── MultiFormatContent.tsx
 │   │   │   ├── ui/
 │   │   │   │   ├── avatar.tsx
 │   │   │   │   ├── badge.tsx
