@@ -7,7 +7,7 @@ import JavaTopics from "@/components/features/home/JavaTopics";
 
 const HomePage = () => {
   return (
-    <div className="flex flex-col min-h-screen ">
+    <div className="flex flex-col min-h-screen">
       <Hero />
 
       <main className="flex-1">
@@ -15,7 +15,7 @@ const HomePage = () => {
         <FeatureSection />
 
         {/* How it Works Section */}
-        <section className="py-16 bg-slate-50 dark:bg-slate-900 ">
+        <section className="py-16 bg-slate-50 dark:bg-slate-900">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
@@ -29,43 +29,45 @@ const HomePage = () => {
               </div>
             </div>
             <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-3 md:gap-12 pt-12">
-              <div className="flex flex-col items-center space-y-2 rounded-lg border p-4 dark:border-slate-800">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-                  <BookOpen className="h-8 w-8 text-primary" />
+              {[
+                {
+                  icon: <BookOpen className="h-8 w-8 text-primary" />,
+                  title: "Learn",
+                  description:
+                    "Start with interactive lessons designed for all skill levels",
+                },
+                {
+                  icon: <Code className="h-8 w-8 text-primary" />,
+                  title: "Practice",
+                  description:
+                    "Apply your knowledge with our integrated Java compiler",
+                },
+                {
+                  icon: <MessageSquare className="h-8 w-8 text-primary" />,
+                  title: "Get Help",
+                  description:
+                    "Stuck? Our AI assistant is available 24/7 to answer your questions",
+                },
+              ].map((feature, idx) => (
+                <div
+                  key={idx}
+                  className="flex flex-col items-center space-y-2 rounded-lg border p-4 dark:border-slate-800 hover:shadow-lg transition-shadow"
+                >
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                    {feature.icon}
+                  </div>
+                  <h3 className="text-xl font-bold">{feature.title}</h3>
+                  <p className="text-center text-slate-500 dark:text-slate-400">
+                    {feature.description}
+                  </p>
                 </div>
-                <h3 className="text-xl font-bold">Learn</h3>
-                <p className="text-center text-slate-500 dark:text-slate-400">
-                  Start with interactive lessons designed for all skill levels
-                </p>
-              </div>
-              <div className="flex flex-col items-center space-y-2 rounded-lg border p-4 dark:border-slate-800">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-                  <Code className="h-8 w-8 text-primary" />
-                </div>
-                <h3 className="text-xl font-bold">Practice</h3>
-                <p className="text-center text-slate-500 dark:text-slate-400">
-                  Apply your knowledge with our integrated Java compiler
-                </p>
-              </div>
-              <div className="flex flex-col items-center space-y-2 rounded-lg border p-4 dark:border-slate-800">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-                  <MessageSquare className="h-8 w-8 text-primary" />
-                </div>
-                <h3 className="text-xl font-bold">Get Help</h3>
-                <p className="text-center text-slate-500 dark:text-slate-400">
-                  Stuck? Our AI assistant is available 24/7 to answer your
-                  questions
-                </p>
-              </div>
+              ))}
             </div>
           </div>
         </section>
 
         {/* Java Topics Section */}
         <JavaTopics />
-
-        {/* Testimonials */}
-        {/* <TestimonialSection /> */}
 
         {/* CTA Section */}
         <section className="py-16 bg-primary text-primary-foreground">

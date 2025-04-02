@@ -6,8 +6,9 @@ import SignupPage from "@/pages/SignupPage";
 import AboutPage from "@/pages/About";
 import TopicsPage from "@/pages/TopicsPage";
 import NotFoundPage from "@/pages/NotFoundPage";
-
+import { AnimatedRoute } from "@/components/common/motion-layout";
 function App() {
+  ``;
   return (
     <Routes>
       <Route path="/" element={<Layout />}>

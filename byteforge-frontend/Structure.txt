@@ -1,553 +1,191 @@
-byteforge-homepage/
-├── .dependency-cruiser.cjs
-├── .gitignore
-├── components.json
-├── config/
-├── dependency-graph.dot
-├── dependency-graph.svg
-├── index.html
-├── package-lock.json
-├── package.json
-├── postcss.config.mjs
-├── Project_Graph/
+ByteForge/
+├── byteforge-frontend/
+│   ├── .dependency-cruiser.cjs
+│   ├── .env
+│   ├── .env.production
+│   ├── .gitignore
+│   ├── components.json
+│   ├── dependency-graph.dot
 │   ├── dependency-graph.svg
-├── public/
-│   ├── favicon.svg
-│   ├── placeholder-logo.png
-│   ├── placeholder-logo.svg
-│   ├── placeholder-user.jpg
-│   ├── placeholder.jpg
-│   ├── placeholder.svg
-├── src/
-│   ├── App.tsx
-│   ├── components/
-│   │   ├── FeatureSection.tsx
-│   │   ├── Footer.tsx
-│   │   ├── HeroSection.tsx
-│   │   ├── JavaTopics.tsx
-│   │   ├── Layout.tsx
-│   │   ├── ModeToggle.tsx
-│   │   ├── Navbar.tsx
-│   │   ├── TestimonialSection.tsx
-│   │   ├── Theme-Provider.tsx
-│   │   ├── ui/
-│   │   │   ├── avatar.tsx
-│   │   │   ├── badge.tsx
-│   │   │   ├── button.tsx
-│   │   │   ├── card.tsx
-│   │   │   ├── checkbox.tsx
-│   │   │   ├── dropdown-menu.tsx
-│   │   │   ├── icons.tsx
-│   │   │   ├── input.tsx
-│   │   │   ├── label.tsx
-│   │   │   ├── navigation-menu.tsx
-│   │   │   ├── sheet.tsx
-│   ├── index.css
-│   ├── lib/
-│   │   ├── utils.ts
-│   ├── main.tsx
-│   ├── pages/
-│   │   ├── About.tsx
-│   │   ├── Home.tsx
-│   │   ├── LoginPage.tsx
-│   │   ├── NotFoundPage.tsx
-│   │   ├── SignupPage.tsx
-│   │   ├── TopicsPage.tsx
-│   ├── types/
-│   │   ├── index.ts
-│   ├── types copy/
-│   │   ├── index.ts
-├── Structure.txt
-├── styles/
-│   ├── globals.css
-├── tailwind.config.js
-├── tsconfig.json
-├── vite.config.ts
+│   ├── index.html
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── postcss.config.mjs
+│   ├── public/
+│   │   ├── favicon.svg
+│   │   ├── placeholder-logo.png
+│   │   ├── placeholder-logo.svg
+│   │   ├── placeholder-user.jpg
+│   │   ├── placeholder.jpg
+│   │   ├── placeholder.svg
+│   ├── src/
+│   │   ├── App.tsx
+│   │   ├── components/
+│   │   │   ├── CommentsSection.tsx
+│   │   │   ├── common/
+│   │   │   │   ├── Footer.tsx
+│   │   │   │   ├── Layout.tsx
+│   │   │   │   ├── ModeToggle.tsx
+│   │   │   │   ├── motion-layout.tsx
+│   │   │   │   ├── Navbar.tsx
+│   │   │   │   ├── old_files/
+│   │   │   │   │   ├── old_navbar.tsx
+│   │   │   │   ├── ThemeProvider.tsx
+│   │   │   ├── diagrams/
+│   │   │   │   ├── MemoryAllocationDiagram.tsx
+│   │   │   ├── features/
+│   │   │   │   ├── code/
+│   │   │   │   │   ├── CodePlayground.tsx
+│   │   │   │   ├── diagram/
+│   │   │   │   │   ├── MemoryAllocationdiagram.tsx
+│   │   │   │   ├── home/
+│   │   │   │   │   ├── FeatureSection.tsx
+│   │   │   │   │   ├── HeroSection.tsx
+│   │   │   │   │   ├── JavaTopics.tsx
+│   │   │   │   │   ├── TestimonialSection.tsx
+│   │   │   │   ├── Java_Topics/
+│   │   │   │   │   ├── CodePlayground.tsx
+│   │   │   │   │   ├── MultiFormatContent.tsx
+│   │   │   │   │   ├── Sidebar.tsx
+│   │   │   │   ├── notes/
+│   │   │   │   ├── quiz/
+│   │   │   │   │   ├── TopicQuiz.tsx
+│   │   │   │   ├── Topics/
+│   │   │   ├── MultiFormatContent.tsx
+│   │   │   ├── ui/
+│   │   │   │   ├── avatar.tsx
+│   │   │   │   ├── badge.tsx
+│   │   │   │   ├── button.tsx
+│   │   │   │   ├── card.tsx
+│   │   │   │   ├── checkbox.tsx
+│   │   │   │   ├── dropdown-menu.tsx
+│   │   │   │   ├── icons.tsx
+│   │   │   │   ├── input.tsx
+│   │   │   │   ├── label.tsx
+│   │   │   │   ├── navigation-menu.tsx
+│   │   │   │   ├── sheet.tsx
+│   │   │   │   ├── tabs.tsx
+│   │   ├── context/
+│   │   │   ├── ProgressContex.tsx
+│   │   ├── data/
+│   │   │   ├── codeExamples.ts
+│   │   │   ├── javaBasicsContent.ts
+│   │   │   ├── topics.ts
+│   │   ├── index.css
+│   │   ├── lib/
+│   │   │   ├── utils.ts
+│   │   ├── main.tsx
+│   │   ├── pages/
+│   │   │   ├── About.tsx
+│   │   │   ├── Home.tsx
+│   │   │   ├── LoginPage.tsx
+│   │   │   ├── NotFoundPage.tsx
+│   │   │   ├── SignupPage.tsx
+│   │   │   ├── TopicsPage.tsx
+│   │   ├── types/
+│   │   │   ├── index.ts
+│   ├── Structure.txt
+│   ├── styles/
+│   │   ├── globals.css
+│   ├── tailwind.config.js
+│   ├── tsconfig.json
+│   ├── vite.config.ts
+├── README.md
 
+ByteForge Frontend - Detailed Overview & Setup Guide
+The frontend of ByteForge is designed to provide a seamless, beginner-friendly experience for learning Java online. It is developed using React (Vite + TypeScript) with Tailwind CSS, DaisyUI, Herui, and ShadCN for a modern, aesthetic UI.
 
-components.json:
+1️⃣ Features in Detail
+🎨 User Interface & Design
+ByteForge offers an intuitive and clean UI that is optimized for all devices.
 
-{
-  "$schema": "https://ui.shadcn.com/schema.json",
-  "style": "default",
-  "rsc": true,
-  "tsx": true,
-  "tailwind": {
-    "config": "tailwind.config.ts",
-    "css": "app/globals.css",
-    "baseColor": "neutral",
-    "cssVariables": true,
-    "prefix": ""
-  },
-  "aliases": {
-    "components": "@/components",
-    "utils": "@/lib/utils",
-    "ui": "@/components/ui",
-    "lib": "@/lib",
-    "hooks": "@/hooks"
-  },
-  "iconLibrary": "lucide"
-}
+    🔹 Tech Stack for UI
+            React (Vite + TypeScript) → Ensures better performance and type safety.
 
+            Tailwind CSS → Utility-first styling for rapid development.
 
-dependency-graph.dot:
+            DaisyUI, Herui, ShadCN → UI component libraries for a polished, modern look.
 
-strict digraph "dependency-cruiser output"{
-    rankdir="LR" splines="true" overlap="false" nodesep="0.16" ranksep="0.18" fontname="Helvetica-bold" fontsize="9" style="rounded,bold,filled" fillcolor="#ffffff" compound="true"
-    node [shape="box" style="rounded, filled" height="0.2" color="black" fillcolor="#ffffcc" fontcolor="black" fontname="Helvetica" fontsize="9"]
-    edge [arrowhead="normal" arrowsize="0.6" penwidth="2.0" color="#00000033" fontname="Helvetica" fontsize="9"]
+            Framer Motion (Optional) → Smooth animations and transitions.
 
+            Lucide-React Icons → High-quality icons for better visual representation.
 
-}
+    🔹 UI Components
+            Navbar → Dynamic navigation with authentication-based links.
 
+            Sidebar → Used for note-taking and editor settings.
 
-dependency-graph.svg:
+            Button Components → Reusable buttons with different variants (primary, secondary, etc.).
 
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
- "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 12.2.1 (20241206.2353)
- -->
-<!-- Title: dependency&#45;cruiser output Pages: 1 -->
-<svg width="8pt" height="8pt"
- viewBox="0.00 0.00 8.00 8.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 4)">
-<title>dependency&#45;cruiser output</title>
-<polygon fill="white" stroke="none" points="-4,4 -4,-4 4,-4 4,4 -4,4"/>
-</g>
-</svg>
+            Modals & Dialogs → Used for login, settings, and error messages.
 
+            Forms → Login, signup, and note creation.
 
+      🖊️ Code Editor
+      The platform includes an interactive Monaco Editor (VS Code's editor) to provide a real coding environment.
 
-index.html:
+    🔹 Key Features
+            Java Syntax Highlighting → Makes Java code easier to read.
 
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ByteForge - Master Java Programming</title>
-    <meta name="description" content="An intuitive platform for mastering Java programming with interactive lessons, integrated compiler, and AI-powered assistance." />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+            Auto-Completion → Suggests methods, variables, and Java keywords.
 
+            Error Highlighting → Helps users identify mistakes in real-time.
 
-package.json:
+            Theme Customization → Light/Dark mode for a comfortable coding experience.
 
-{
-  "name": "byteforge",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview",
-    "dep-graph": "npx depcruise --output-type dot src | dot -T svg -o dependency-graph.svg"
-  },
-  "dependencies": {
-    "@radix-ui/react-avatar": "^1.0.4",
-    "@radix-ui/react-checkbox": "^1.0.4",
-    "@radix-ui/react-dialog": "^1.0.5",
-    "@radix-ui/react-dropdown-menu": "^2.0.6",
-    "@radix-ui/react-label": "^2.0.2",
-    "@radix-ui/react-navigation-menu": "^1.1.4",
-    "@radix-ui/react-slot": "^1.0.2",
-    "class-variance-authority": "^0.7.0",
-    "clsx": "^2.0.0",
-    "lucide-react": "^0.294.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.30.0",
-    "tailwind-merge": "^2.1.0",
-    "tailwindcss-animate": "^1.0.7"
-  },
-  "devDependencies": {
-    "@types/node": "^20.10.4",
-    "@types/react": "^18.2.37",
-    "@types/react-dom": "^18.2.15",
-    "@typescript-eslint/eslint-plugin": "^6.10.0",
-    "@typescript-eslint/parser": "^6.10.0",
-    "@vitejs/plugin-react": "^4.2.0",
-    "autoprefixer": "^10.4.16",
-    "eslint": "^8.53.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.4.4",
-    "postcss": "^8.4.32",
-    "tailwindcss": "^3.3.6",
-    "typescript": "^5.8.2",
-    "vite": "^6.2.2"
-  }
-}
+            Run Button → Sends the Java code to the backend for execution.
 
+    🔹 How Code Execution Works
+            The user writes Java code inside Monaco Editor.
 
+            When they press the "Run" button, the code is sent to the backend API.
 
-postcss.config.mjs:
+            The backend runs the code inside a Docker container.
 
-/** @type {import('postcss-load-config').Config} */
-const config = {
-  plugins: {
-    tailwindcss: {},
-  },
-};
+            The output is sent back and displayed in the frontend.
 
-export default config;
+📝 Notes Keeper
+    ByteForge allows users to take notes while coding.
 
+    🔹 Key Features
+            Create, Edit, Delete Notes → Helps users save learning material.
 
+            Rich Text Formatting → Allows users to add headings, bold text, and lists.
 
-old Structure.txt:
+            Auto-Save Feature → Saves notes automatically in the database.
 
-byteforge-homepage/
-├── .gitignore
-├── components.json
-├── index.html
-├── package-lock.json
-├── package.json
-├── postcss.config.mjs
-├── public/
-│   ├── favicon.svg
-│   ├── placeholder-logo.png
-│   ├── placeholder-logo.svg
-│   ├── placeholder-user.jpg
-│   ├── placeholder.jpg
-│   ├── placeholder.svg
-├── src/
-│   ├── App.tsx
-│   ├── components/
-│   │   ├── FeatureSection.tsx
-│   │   ├── Footer.tsx
-│   │   ├── HeroSection.tsx
-│   │   ├── JavaTopics.tsx
-│   │   ├── Layout.tsx
-│   │   ├── ModeToggle.tsx
-│   │   ├── Navbar.tsx
-│   │   ├── TestimonialSection.tsx
-│   │   ├── Theme-Provider.tsx
-│   │   ├── ui/
-│   │   │   ├── avatar.tsx
-│   │   │   ├── badge.tsx
-│   │   │   ├── button.tsx
-│   │   │   ├── card.tsx
-│   │   │   ├── checkbox.tsx
-│   │   │   ├── dropdown-menu.tsx
-│   │   │   ├── icons.tsx
-│   │   │   ├── input.tsx
-│   │   │   ├── label.tsx
-│   │   │   ├── navigation-menu.tsx
-│   │   │   ├── sheet.tsx
-│   ├── index.css
-│   ├── lib/
-│   │   ├── utils.ts
-│   ├── main.tsx
-│   ├── pages/
-│   │   ├── About.tsx
-│   │   ├── Home.tsx
-│   │   ├── LoginPage.tsx
-│   │   ├── NotFoundPage.tsx
-│   │   ├── SignupPage.tsx
-│   │   ├── TopicsPage.tsx
-│   ├── types/
-│   │   ├── index.ts
-│   ├── types copy/
-│   │   ├── index.ts
-├── styles/
-│   ├── globals.css
-├── tailwind.config.js
-├── tsconfig.json
-├── vite.config.ts
+            Search Notes → Quickly find previous notes.
 
+🤖 AI Chatbot
+    ByteForge includes an AI chatbot to assist learners with Java concepts.
 
-index.html:
+    🔹 Key Features
+          Text-Based Chatbot → Users can type Java-related queries.
 
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ByteForge - Master Java Programming</title>
-    <meta name="description" content="An intuitive platform for mastering Java programming with interactive lessons, integrated compiler, and AI-powered assistance." />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+          Instant Answers → Provides explanations, example code, and debugging help.
 
+          Future Enhancements
 
-postcss.config.mjs:
+          Voice-based interaction
 
-/** @type {import('postcss-load-config').Config} */
-const config = {
-  plugins: {
-    tailwindcss: {},
-  },
-};
+          AI-powered code suggestions
 
-export default config;
+🔑 Authentication System
+    User authentication is implemented for secure access.
 
-tailwind.config.js:
+    🔹 Key Features
+          JWT/OAuth Authentication → Secure login & session management.
 
-/** @type {import('tailwindcss').Config} */
-module.exports = {
-  darkMode: ["class"],
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-    "*.{js,ts,jsx,tsx,mdx}",
-  ],
-  theme: {
-    container: {
-      center: true,
-      padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
-    },
-    extend: {
-      colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
-        primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
-        },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
-        },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
-        },
-        muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
-        },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
-        },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
-        },
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
-        },
-      },
-      borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
-      },
-      keyframes: {
-        "accordion-down": {
-          from: { height: 0 },
-          to: { height: "var(--radix-accordion-content-height)" },
-        },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: 0 },
-        },
-      },
-      animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
-      },
-    },
-  },
-  plugins: [require("tailwindcss-animate")],
-};
+          Google & GitHub Login (Planned Feature) → Social authentication for faster access.
 
+          Session Persistence → Users stay logged in even after refreshing the page.
 
-tsconfig.json:
+📱 Responsive Design
+    ByteForge is fully responsive across desktops, tablets, and mobile devices.
 
-{
-  "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "target": "ES6",
-    "skipLibCheck": true,
-    "strict": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
-    // this is for import alias
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    }
-  },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
-}
+    🔹 Mobile-Friendly Features
+          Collapsible Navigation Bar
 
+          Drawer Menu for Mobile
 
-vite.config.ts:
-
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import path from "path";
-
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [react()],
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
-  },
-});
-
-
-tailwind.config.js:
-
-/** @type {import('tailwindcss').Config} */
-module.exports = {
-  darkMode: ["class"],
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-    "*.{js,ts,jsx,tsx,mdx}",
-  ],
-  theme: {
-    container: {
-      center: true,
-      padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
-    },
-    extend: {
-      colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
-        primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
-        },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
-        },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
-        },
-        muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
-        },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
-        },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
-        },
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
-        },
-      },
-      borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
-      },
-      keyframes: {
-        "accordion-down": {
-          from: { height: 0 },
-          to: { height: "var(--radix-accordion-content-height)" },
-        },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: 0 },
-        },
-      },
-      animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
-      },
-    },
-  },
-  plugins: [require("tailwindcss-animate")],
-};
-
-
-tsconfig.json:
-
-{
-  "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "target": "ES6",
-    "skipLibCheck": true,
-    "strict": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
-    // this is for import alias
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    }
-  },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
-}
-
-
-
-vite.config.ts:
-
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import path from "path";
-
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [react()],
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
-  },
-});
-
-
+          Adaptive Code Editor for Small Screens
