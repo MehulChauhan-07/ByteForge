@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -14,10 +16,6 @@ import {
   Users,
   ChevronDown,
   ChevronRight,
-  Home,
-  Bookmark,
-  Info,
-  List,
 } from "lucide-react";
 import { ModeToggle } from "@/components/shared/ModeToggle";
 import {
@@ -49,13 +47,6 @@ interface DropdownItemProps {
   icon?: React.ReactNode;
 }
 
-interface CollapsibleSectionProps {
-  title: string;
-  icon?: React.ReactNode;
-  children: React.ReactNode;
-  defaultOpen?: boolean;
-}
-
 // Reusable components
 const MobileNavLink: React.FC<NavLinkProps> = ({
   to,
@@ -67,12 +58,12 @@ const MobileNavLink: React.FC<NavLinkProps> = ({
   <Link
     to={to}
     className={cn(
-      "flex items-center gap-3 text-lg font-medium p-3 rounded-lg transition-colors hover:bg-accent hover:text-primary group",
+      "flex items-center gap-2 text-lg font-medium transition-colors hover:text-primary group",
       className
     )}
     onClick={onClick}
   >
-    <div className="flex items-center justify-center w-8 h-8">{icon}</div>
+    {icon}
     <span>{children}</span>
     <motion.div
       className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity"
@@ -84,48 +75,6 @@ const MobileNavLink: React.FC<NavLinkProps> = ({
     </motion.div>
   </Link>
 );
-
-// New collapsible section component for mobile
-const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
-  title,
-  icon,
-  children,
-  defaultOpen = false,
-}) => {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
-
-  return (
-    <div className="border-b border-border/40 py-2">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center w-full gap-3 p-3 rounded-lg hover:bg-accent transition-colors"
-      >
-        <div className="flex items-center justify-center w-8 h-8">{icon}</div>
-        <span className="text-lg font-medium">{title}</span>
-        <motion.div
-          className="ml-auto"
-          animate={{ rotate: isOpen ? 180 : 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          <ChevronDown className="h-5 w-5" />
-        </motion.div>
-      </button>
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden pl-10"
-          >
-            <div className="py-2">{children}</div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-};
 
 const DropdownItem: React.FC<DropdownItemProps> = ({
   to,
@@ -158,8 +107,6 @@ const Navbar: React.FC = () => {
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const [scrolled, setScrolled] = useState<boolean>(false);
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
-  const [searchQuery, setSearchQuery] = useState<string>("");
   const searchInputRef = useRef<HTMLInputElement>(null);
   const desktopSearchRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -226,33 +173,28 @@ const Navbar: React.FC = () => {
   // Handle closing the search
   const closeSearch = () => setIsSearchOpen(false);
 
-  // Handle search submission
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (searchQuery.trim()) {
-      // Add to recent searches if not already there
-      if (!recentSearches.includes(searchQuery)) {
-        setRecentSearches((prev) => [searchQuery, ...prev.slice(0, 3)]);
-      }
-
-      // Navigate to search results
-      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
-      setIsSearchOpen(false);
-      setSearchQuery("");
-    }
-  };
-
-  // Quick links for mobile
-  const quickLinks = [
-    { to: "/", label: "Home", icon: <Home className="h-5 w-5" /> },
+  // Menu items for reuse
+  const mobileMenuItems = [
     {
       to: "/courses",
       label: "Courses",
       icon: <BookOpen className="h-5 w-5" />,
     },
     { to: "/compiler", label: "Compiler", icon: <Code className="h-5 w-5" /> },
-    { to: "/topics", label: "Topics", icon: <List className="h-5 w-5" /> },
+    {
+      to: "/assistant",
+      label: "AI Assistant",
+      icon: <MessageSquare className="h-5 w-5" />,
+    },
+    { to: "/notes", label: "My Notes", icon: <Save className="h-5 w-5" /> },
+  ];
+
+  // Popular search suggestions
+  const popularSearches = [
+    "Java basics",
+    "OOP concepts",
+    "Collections",
+    "File handling",
   ];
 
   // Learning dropdown items
@@ -261,19 +203,16 @@ const Navbar: React.FC = () => {
       to: "/tutorials",
       title: "Tutorials",
       description: "Step-by-step guides for specific Java topics",
-      icon: <Bookmark className="h-5 w-5" />,
     },
     {
       to: "/exercises",
       title: "Exercises",
       description: "Practice with coding challenges and projects",
-      icon: <Code className="h-5 w-5" />,
     },
     {
       to: "/certification",
       title: "Certification",
       description: "Earn certificates to showcase your Java skills",
-      icon: <BookOpen className="h-5 w-5" />,
     },
   ];
 
@@ -283,34 +222,26 @@ const Navbar: React.FC = () => {
       to: "/compiler",
       title: "Java Compiler",
       description: "Write, compile, and run Java code in your browser",
-      icon: <Code className="h-5 w-5" />,
+      icon: <Code className="h-4 w-4" />,
     },
     {
       to: "/assistant",
       title: "AI Assistant",
       description: "Get help with coding problems and concepts",
-      icon: <MessageSquare className="h-5 w-5" />,
+      icon: <MessageSquare className="h-4 w-4" />,
     },
     {
       to: "/notes",
       title: "Note Taking",
       description: "Save and organize important concepts and code snippets",
-      icon: <Save className="h-5 w-5" />,
+      icon: <Save className="h-4 w-4" />,
     },
     {
       to: "/community",
       title: "Community",
       description: "Connect with other learners and Java experts",
-      icon: <Users className="h-5 w-5" />,
+      icon: <Users className="h-4 w-4" />,
     },
-  ];
-
-  // Popular search suggestions
-  const popularSearches = [
-    "Java basics",
-    "OOP concepts",
-    "Collections",
-    "File handling",
   ];
 
   return (
@@ -340,165 +271,85 @@ const Navbar: React.FC = () => {
                 <span className="sr-only">Toggle menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent
-              side="left"
-              className="w-[300px] sm:w-[350px] p-0 overflow-hidden"
-            >
+            <SheetContent side="left" className="w-[300px] sm:w-[400px] p-0">
               <motion.nav
-                className="flex h-full flex-col gap-4 overflow-hidden"
+                className="flex h-full flex-col gap-6 p-6 overflow-auto"
                 aria-label="Mobile navigation"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                {/* Header with logo and close button */}
-                <div className="flex items-center justify-between p-4 border-b">
-                  <Link
-                    to="/"
-                    className="flex items-center gap-2 text-lg font-bold"
-                    onClick={closeSidebar}
-                  >
-                    <Logo className="h-8 w-8" aria-hidden="true" />
-                    <span>ByteForge</span>
-                  </Link>
+                <Link
+                  to="/"
+                  className="flex items-center gap-2 text-lg font-bold"
+                  onClick={closeSidebar}
+                >
+                  <Logo className="h-10 w-10 md:block" aria-hidden="true" />
+                  <span>ByteForge</span>
+                </Link>
 
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={closeSidebar}
-                    aria-label="Close menu"
-                  >
-                    <X className="h-5 w-5" />
-                  </Button>
-                </div>
-
-                {/* Quick search for mobile */}
-                <div className="px-4">
-                  <form onSubmit={handleSearch} className="relative">
-                    <Input
-                      type="search"
-                      placeholder="Search ByteForge..."
-                      className="pr-10"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                    <Button
-                      type="submit"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-0 top-0 h-full"
-                    >
-                      <Search className="h-4 w-4" />
-                    </Button>
-                  </form>
-                </div>
-
-                {/* Quick links */}
-                <div className="px-4 py-2">
-                  <div className="grid grid-cols-2 gap-2">
-                    {quickLinks.map((link) => (
+                {/* Mobile menu links */}
+                <div className="flex flex-col gap-4">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                    Main Menu
+                  </h3>
+                  <div className="flex flex-col gap-3">
+                    {mobileMenuItems.map((item, index) => (
                       <motion.div
-                        key={link.to}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
+                        key={item.to}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: index * 0.1 }}
                       >
-                        <Link
-                          to={link.to}
-                          className="flex flex-col items-center justify-center gap-1 p-3 bg-accent/50 rounded-lg hover:bg-accent transition-colors text-center"
+                        <MobileNavLink
+                          to={item.to}
+                          icon={item.icon}
                           onClick={closeSidebar}
                         >
-                          {link.icon}
-                          <span className="text-sm font-medium">
-                            {link.label}
-                          </span>
-                        </Link>
+                          {item.label}
+                        </MobileNavLink>
                       </motion.div>
                     ))}
                   </div>
                 </div>
 
-                {/* Menu with collapsible sections */}
-                <div className="flex-1 overflow-y-auto px-4 py-2">
-                  {/* Learn section */}
-                  <CollapsibleSection
-                    title="Learning"
-                    icon={<BookOpen className="h-5 w-5" />}
-                    defaultOpen={true}
-                  >
-                    <div className="flex flex-col gap-1">
-                      {learningItems.map((item) => (
-                        <Link
-                          key={item.to}
-                          to={item.to}
-                          className="flex items-center gap-2 p-2 rounded-md hover:bg-accent transition-colors"
-                          onClick={closeSidebar}
-                        >
-                          {item.icon}
-                          <div>
-                            <div className="text-sm font-medium">
-                              {item.title}
-                            </div>
-                            <p className="text-xs text-muted-foreground">
-                              {item.description}
-                            </p>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  </CollapsibleSection>
-
-                  {/* Tools section */}
-                  <CollapsibleSection
-                    title="Tools"
-                    icon={<Code className="h-5 w-5" />}
-                  >
-                    <div className="flex flex-col gap-1">
-                      {toolItems.map((item) => (
-                        <Link
-                          key={item.to}
-                          to={item.to}
-                          className="flex items-center gap-2 p-2 rounded-md hover:bg-accent transition-colors"
-                          onClick={closeSidebar}
-                        >
-                          {item.icon}
-                          <div>
-                            <div className="text-sm font-medium">
-                              {item.title}
-                            </div>
-                            <p className="text-xs text-muted-foreground">
-                              {item.description}
-                            </p>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  </CollapsibleSection>
-
-                  {/* Other links */}
-                  <div className="py-2">
-                    <MobileNavLink
-                      to="/about"
-                      icon={<Info className="h-5 w-5" />}
-                      onClick={closeSidebar}
+                {/* Authentication links */}
+                <div className="flex flex-col gap-4 mt-auto">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                    Account
+                  </h3>
+                  <div className="flex flex-col gap-3">
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, delay: 0.4 }}
                     >
-                      About
-                    </MobileNavLink>
+                      <MobileNavLink to="/login" onClick={closeSidebar}>
+                        Log In
+                      </MobileNavLink>
+                    </motion.div>
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.3, delay: 0.5 }}
+                    >
+                      <MobileNavLink to="/signup" onClick={closeSidebar}>
+                        Sign Up
+                      </MobileNavLink>
+                    </motion.div>
                   </div>
                 </div>
 
-                {/* Authentication links */}
-                <div className="p-4 border-t flex gap-2">
-                  <Button variant="outline" className="flex-1" asChild>
-                    <Link to="/login" onClick={closeSidebar}>
-                      Log In
-                    </Link>
-                  </Button>
-                  <Button className="flex-1" asChild>
-                    <Link to="/signup" onClick={closeSidebar}>
-                      Sign Up
-                    </Link>
-                  </Button>
-                </div>
+                {/* Close button (additional way to close) */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute top-4 right-4"
+                  onClick={closeSidebar}
+                  aria-label="Close menu"
+                >
+                  <X className="h-5 w-5" />
+                </Button>
               </motion.nav>
             </SheetContent>
           </Sheet>
@@ -531,7 +382,7 @@ const Navbar: React.FC = () => {
                     transition={{ duration: 0.2 }}
                     className="ml-1"
                   >
-                    <ChevronDown className="h-4 w-4" />
+                    {/* <ChevronDown className="h-4 w-4" /> */}
                   </motion.div>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -582,7 +433,6 @@ const Navbar: React.FC = () => {
                           to={item.to}
                           title={item.title}
                           description={item.description}
-                          icon={item.icon}
                         />
                       </motion.div>
                     ))}
@@ -599,7 +449,7 @@ const Navbar: React.FC = () => {
                     transition={{ duration: 0.2 }}
                     className="ml-1"
                   >
-                    <ChevronDown className="h-4 w-4" />
+                    {/* <ChevronDown className="h-4 w-4" /> */}
                   </motion.div>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -648,46 +498,38 @@ const Navbar: React.FC = () => {
         <div className="flex items-center gap-2">
           {/* Desktop Inline Search */}
           <div className="hidden md:block relative" ref={desktopSearchRef}>
-            <form onSubmit={handleSearch}>
-              <Button
-                type={isSearchOpen ? "submit" : "button"}
-                variant="ghost"
-                size="icon"
-                onClick={() => !isSearchOpen && setIsSearchOpen(true)}
-                aria-label={isSearchOpen ? "Submit search" : "Open search"}
-                className="absolute right-2 top-1/2 -translate-y-1/2 z-10"
-              >
-                {isSearchOpen ? (
-                  <Search className="h-5 w-5" />
-                ) : (
-                  <Search className="h-5 w-5" />
-                )}
-              </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              aria-label={isSearchOpen ? "Close search" : "Open search"}
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-10"
+            >
+              {isSearchOpen ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <Search className="h-5 w-5" />
+              )}
+            </Button>
 
-              <motion.div
-                className="overflow-hidden"
-                initial={{ width: "40px", opacity: 0 }}
-                animate={{
-                  width: isSearchOpen ? "300px" : "40px",
-                  opacity: isSearchOpen ? 1 : 0,
-                }}
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              >
-                <Input
-                  ref={searchInputRef}
-                  type="search"
-                  placeholder="Search ByteForge..."
-                  className={`pr-10 ${isSearchOpen ? "" : "cursor-pointer"}`}
-                  aria-label="Search"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (!isSearchOpen) setIsSearchOpen(true);
-                  }}
-                />
-              </motion.div>
-            </form>
+            <motion.div
+              className="overflow-hidden"
+              initial={{ width: "40px", opacity: 0 }}
+              animate={{
+                width: isSearchOpen ? "300px" : "40px",
+                opacity: isSearchOpen ? 1 : 0,
+              }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            >
+              <Input
+                ref={searchInputRef}
+                type="search"
+                placeholder="Search ByteForge..."
+                className={`pr-10 ${isSearchOpen ? "" : "cursor-pointer"}`}
+                aria-label="Search"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </motion.div>
           </div>
 
           {/* Mobile Search Button */}
@@ -714,98 +556,56 @@ const Navbar: React.FC = () => {
               >
                 <motion.div
                   className="w-full max-w-md bg-background rounded-lg shadow-lg border p-4"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the search box
                   initial={{ y: -20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: -20, opacity: 0 }}
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 >
-                  <form onSubmit={handleSearch}>
-                    <div className="flex items-center gap-2">
-                      <Input
-                        ref={searchInputRef}
-                        type="search"
-                        placeholder="Search ByteForge..."
-                        className="flex-1"
-                        aria-label="Search"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                      />
-                      <Button
-                        type="submit"
-                        variant="default"
-                        size="icon"
-                        aria-label="Search"
-                      >
-                        <Search className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={closeSearch}
-                        aria-label="Close search"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </form>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      ref={searchInputRef}
+                      type="search"
+                      placeholder="Search ByteForge..."
+                      className="flex-1"
+                      aria-label="Search"
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={closeSearch}
+                      aria-label="Close search"
+                    >
+                      <X className="h-5 w-5" />
+                    </Button>
+                  </div>
 
-                  {/* Recent & Popular searches */}
-                  <div className="mt-4 space-y-3">
-                    {recentSearches.length > 0 && (
-                      <div>
-                        <p className="text-sm font-medium text-muted-foreground mb-2">
-                          Recent searches:
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          {recentSearches.map((term, index) => (
-                            <motion.button
-                              key={`recent-${term}`}
-                              className="px-3 py-1 text-sm bg-secondary rounded-full hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-primary/50 flex items-center gap-1"
-                              onClick={() => {
-                                setSearchQuery(term);
-                                if (searchInputRef.current) {
-                                  searchInputRef.current.focus();
-                                }
-                              }}
-                              initial={{ opacity: 0, scale: 0.8 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              transition={{ delay: index * 0.05 }}
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                            >
-                              {term}
-                            </motion.button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground mb-2">
-                        Popular searches:
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {popularSearches.map((term, index) => (
-                          <motion.button
-                            key={`popular-${term}`}
-                            className="px-3 py-1 text-sm bg-accent rounded-full hover:bg-accent/80 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                            onClick={() => {
-                              setSearchQuery(term);
-                              if (searchInputRef.current) {
-                                searchInputRef.current.focus();
-                              }
-                            }}
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: index * 0.05 }}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                          >
-                            {term}
-                          </motion.button>
-                        ))}
-                      </div>
+                  {/* Quick suggestion links */}
+                  <div className="mt-4 space-y-2">
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Popular searches:
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {popularSearches.map((term, index) => (
+                        <motion.button
+                          key={term}
+                          className="px-3 py-1 text-sm bg-accent rounded-full hover:bg-accent/80 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                          onClick={() => {
+                            // Logic to handle search for this term
+                            console.log(`Searching for ${term}`);
+                            // You can implement the search logic here
+                            // For example, update input value or navigate to search results
+                            closeSearch(); // Close search after selecting a suggestion
+                          }}
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: index * 0.05 }}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          {term}
+                        </motion.button>
+                      ))}
                     </div>
                   </div>
                 </motion.div>
