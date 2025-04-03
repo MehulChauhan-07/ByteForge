@@ -5,15 +5,18 @@ import App from "@/App";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import "@/index.css";
 import { ProgressProvider } from "./context/ProgressContex";
+import { AuthProvider } from "./context/AuthContext";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <ThemeProvider defaultTheme="system" storageKey="byteforge-theme">
-        <ProgressProvider>
-          <App />
-        </ProgressProvider>
-      </ThemeProvider>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <ThemeProvider defaultTheme="system" storageKey="byteforge-theme">
+          <ProgressProvider>
+            <App />
+          </ProgressProvider>
+        </ThemeProvider>
+      </BrowserRouter>
+    </AuthProvider>
   </React.StrictMode>
 );

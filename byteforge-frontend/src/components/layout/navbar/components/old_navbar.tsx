@@ -12,8 +12,6 @@ import {
   MessageSquare,
   Save,
   Users,
-  ChevronDown,
-  ChevronRight,
   Home,
   Bookmark,
   Info,
@@ -33,126 +31,12 @@ import { Logo } from "@/components/ui/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-// Types for reusable components
-interface NavLinkProps {
-  to: string;
-  icon?: React.ReactNode;
-  children: React.ReactNode;
-  className?: string;
-  onClick?: () => void;
-}
-
-interface DropdownItemProps {
-  to: string;
-  title: string;
-  description: string;
-  icon?: React.ReactNode;
-}
-
-interface CollapsibleSectionProps {
-  title: string;
-  icon?: React.ReactNode;
-  children: React.ReactNode;
-  defaultOpen?: boolean;
-}
-
-// Reusable components
-const MobileNavLink: React.FC<NavLinkProps> = ({
-  to,
-  icon,
-  children,
-  onClick,
-  className,
-}) => (
-  <Link
-    to={to}
-    className={cn(
-      "flex items-center gap-3 text-lg font-medium p-3 rounded-lg transition-colors hover:bg-accent hover:text-primary group",
-      className
-    )}
-    onClick={onClick}
-  >
-    <div className="flex items-center justify-center w-8 h-8">{icon}</div>
-    <span>{children}</span>
-    <motion.div
-      className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity"
-      initial={{ x: -10, opacity: 0 }}
-      whileHover={{ x: 0, opacity: 1 }}
-      transition={{ type: "spring", stiffness: 300 }}
-    >
-      <ChevronRight className="h-4 w-4" />
-    </motion.div>
-  </Link>
-);
-
-// New collapsible section component for mobile
-const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
-  title,
-  icon,
-  children,
-  defaultOpen = false,
-}) => {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
-
-  return (
-    <div className="border-b border-border/40 py-2">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center w-full gap-3 p-3 rounded-lg hover:bg-accent transition-colors"
-      >
-        <div className="flex items-center justify-center w-8 h-8">{icon}</div>
-        <span className="text-lg font-medium">{title}</span>
-        <motion.div
-          className="ml-auto"
-          animate={{ rotate: isOpen ? 180 : 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          <ChevronDown className="h-5 w-5" />
-        </motion.div>
-      </button>
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden pl-10"
-          >
-            <div className="py-2">{children}</div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-};
-
-const DropdownItem: React.FC<DropdownItemProps> = ({
-  to,
-  title,
-  description,
-  icon,
-}) => (
-  <motion.li
-    whileHover={{ scale: 1.02 }}
-    transition={{ type: "spring", stiffness: 400, damping: 10 }}
-  >
-    <NavigationMenuLink asChild>
-      <Link
-        className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-        to={to}
-      >
-        <div className={`${icon ? "flex items-center gap-2" : ""}`}>
-          {icon}
-          <div className="text-sm font-medium leading-none">{title}</div>
-        </div>
-        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-          {description}
-        </p>
-      </Link>
-    </NavigationMenuLink>
-  </motion.li>
-);
+//  make the small components reusable
+import { CollapsibleSection } from "./CollapsibleSection";
+import { MobileNavLink } from "./MobileNavLink";
+import { DropdownItem } from "./DropdownItem";
+import { learningItems, toolItems } from "./navbar-Items";
+import { quickLinks } from "./mobile-navbar";
 
 const Navbar: React.FC = () => {
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
@@ -242,77 +126,12 @@ const Navbar: React.FC = () => {
       setSearchQuery("");
     }
   };
-
-  // Quick links for mobile
-  const quickLinks = [
-    { to: "/", label: "Home", icon: <Home className="h-5 w-5" /> },
-    {
-      to: "/courses",
-      label: "Courses",
-      icon: <BookOpen className="h-5 w-5" />,
-    },
-    { to: "/compiler", label: "Compiler", icon: <Code className="h-5 w-5" /> },
-    { to: "/topics", label: "Topics", icon: <List className="h-5 w-5" /> },
-  ];
-
-  // Learning dropdown items
-  const learningItems = [
-    {
-      to: "/tutorials",
-      title: "Tutorials",
-      description: "Step-by-step guides for specific Java topics",
-      icon: <Bookmark className="h-5 w-5" />,
-    },
-    {
-      to: "/exercises",
-      title: "Exercises",
-      description: "Practice with coding challenges and projects",
-      icon: <Code className="h-5 w-5" />,
-    },
-    {
-      to: "/certification",
-      title: "Certification",
-      description: "Earn certificates to showcase your Java skills",
-      icon: <BookOpen className="h-5 w-5" />,
-    },
-  ];
-
-  // Tools dropdown items
-  const toolItems = [
-    {
-      to: "/compiler",
-      title: "Java Compiler",
-      description: "Write, compile, and run Java code in your browser",
-      icon: <Code className="h-5 w-5" />,
-    },
-    {
-      to: "/assistant",
-      title: "AI Assistant",
-      description: "Get help with coding problems and concepts",
-      icon: <MessageSquare className="h-5 w-5" />,
-    },
-    {
-      to: "/notes",
-      title: "Note Taking",
-      description: "Save and organize important concepts and code snippets",
-      icon: <Save className="h-5 w-5" />,
-    },
-    {
-      to: "/community",
-      title: "Community",
-      description: "Connect with other learners and Java experts",
-      icon: <Users className="h-5 w-5" />,
-    },
-  ];
-
-  // Popular search suggestions
   const popularSearches = [
     "Java basics",
     "OOP concepts",
     "Collections",
     "File handling",
   ];
-
   return (
     <motion.header
       className={cn(
@@ -473,7 +292,6 @@ const Navbar: React.FC = () => {
                       ))}
                     </div>
                   </CollapsibleSection>
-
                   {/* Other links */}
                   <div className="py-2">
                     <MobileNavLink
@@ -530,9 +348,7 @@ const Navbar: React.FC = () => {
                     animate={{ rotate: isSidebarOpen ? 180 : 0 }}
                     transition={{ duration: 0.2 }}
                     className="ml-1"
-                  >
-                    <ChevronDown className="h-4 w-4" />
-                  </motion.div>
+                  ></motion.div>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <motion.ul
@@ -598,9 +414,7 @@ const Navbar: React.FC = () => {
                     animate={{ rotate: isSidebarOpen ? 180 : 0 }}
                     transition={{ duration: 0.2 }}
                     className="ml-1"
-                  >
-                    <ChevronDown className="h-4 w-4" />
-                  </motion.div>
+                  ></motion.div>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <motion.ul

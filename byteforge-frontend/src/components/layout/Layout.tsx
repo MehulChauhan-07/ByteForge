@@ -1,5 +1,5 @@
 import { Outlet, useLocation } from "react-router-dom";
-import Navbar from "./Navbar";
+import Navbar from "./navbar/Navbar";
 // import Navbar from "@components/temp/Navbar";
 import Footer from "./Footer";
 import { motion, AnimatePresence } from "framer-motion";

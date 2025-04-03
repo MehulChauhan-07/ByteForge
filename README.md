@@ -1,4 +1,4 @@
-## <p align="left"><img src="byteforge-frontend/src/assets/logos/logo-light.svg" alt="ByteForge Logo" width="60" style="vertical-align: middle;">&nbsp; &nbsp;<b style="font-size: 2em; vertical-align: middle;">ByteForge</b></p>
+## <p align="left"><img src="byteforge-frontend/src/assets/logo/logo-light.svg" alt="ByteForge Logo" width="60" style="vertical-align: middle;">&nbsp; &nbsp;<b style="font-size: 2em; vertical-align: middle;">ByteForge</b></p>
 
 <!-- # ByteForge -->
 
