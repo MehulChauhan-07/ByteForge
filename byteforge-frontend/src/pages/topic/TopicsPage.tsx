@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   ArrowRight,
   Clock,
@@ -375,17 +375,66 @@ const TopicsPage = () => {
   const [selectedSubtopic, setSelectedSubtopic] = useState<string | null>(null);
   const [showQuiz, setShowQuiz] = useState(false);
   const [activeTab, setActiveTab] = useState("content");
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const { progress, markSubtopicComplete, getCompletionPercentage } =
     useProgress();
 
-  // Handle card click
+  // Handle search from URL
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const search = params.get("q");
+    if (search) {
+      setSearchQuery(search);
+      // Find matching topic
+      const matchingTopic = topics.find(
+        (topic) =>
+          topic.title.toLowerCase().includes(search.toLowerCase()) ||
+          topic.description.toLowerCase().includes(search.toLowerCase()) ||
+          topic.topics.some((subtopic) =>
+            subtopic.toLowerCase().includes(search.toLowerCase())
+          )
+      );
+      if (matchingTopic) {
+        handleCardClick(matchingTopic);
+      }
+    }
+  }, [location.search]);
+
+  // Enhanced handleCardClick
   const handleCardClick = (topic: Topic) => {
     setSelectedTopic(topic);
     setSelectedSubtopic(topic.topics[0]);
     setShowQuiz(false);
     setActiveTab("content");
+    // Update URL without navigation
+    window.history.pushState({}, "", `/topics/${topic.id}`);
   };
+
+  // Enhanced handleBackClick
+  const handleBackClick = () => {
+    setSelectedTopic(null);
+    setSelectedSubtopic(null);
+    setShowQuiz(false);
+    // Update URL without navigation
+    window.history.pushState({}, "", "/topics");
+  };
+
+  // Enhanced search filtering
+  const filteredTopics = topics.filter((topic) => {
+    const matchesSearch = searchQuery
+      ? topic.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        topic.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        topic.topics.some((t) =>
+          t.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      : true;
+
+    const matchesLevel = levelFilter ? topic.level === levelFilter : true;
+
+    return matchesSearch && matchesLevel;
+  });
 
   // Handle subtopic selection
   const handleSubtopicClick = (subtopic: string) => {
@@ -394,13 +443,6 @@ const TopicsPage = () => {
       setShowQuiz(false);
       setActiveTab("content");
     }
-  };
-
-  // Return to the list view
-  const handleBackClick = () => {
-    setSelectedTopic(null);
-    setSelectedSubtopic(null);
-    setShowQuiz(false);
   };
 
   // Handle quiz completion
@@ -420,20 +462,6 @@ const TopicsPage = () => {
   const toggleQuiz = () => {
     setShowQuiz((prev) => !prev);
   };
-
-  // Filter topics based on search and level
-  const filteredTopics = topics.filter((topic) => {
-    const matchesSearch =
-      topic.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      topic.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      topic.topics.some((t) =>
-        t.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-
-    const matchesLevel = levelFilter ? topic.level === levelFilter : true;
-
-    return matchesSearch && matchesLevel;
-  });
 
   // Get the content data for the selected subtopic
   const getContentData = () => {
@@ -513,7 +541,15 @@ const TopicsPage = () => {
                 <Input
                   placeholder="Search topics..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    // Update URL with search query
+                    const params = new URLSearchParams();
+                    if (e.target.value) {
+                      params.set("q", e.target.value);
+                    }
+                    navigate(`/topics?${params.toString()}`);
+                  }}
                   className="pl-9"
                 />
               </div>

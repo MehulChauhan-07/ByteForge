@@ -7,6 +7,7 @@ import AboutPage from "@/pages/about/About";
 import TopicsPage from "@/pages/topic/TopicsPage";
 import NotFoundPage from "@/pages/NotFoundPage";
 import { AnimatedRoute } from "@/components/layout/motion-layout";
+import Navbar from "@components/layout/navbar/components/old_navbar";
 function App() {
   ``;
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="signup" element={<SignupPage />} />
         <Route path="about" element={<AboutPage />} />
         <Route path="topics" element={<TopicsPage />} />
+        <Route path="old" element={<Navbar />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
