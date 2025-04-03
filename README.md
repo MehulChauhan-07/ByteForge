@@ -1,6 +1,6 @@
 # ByteForge
 
-![ByteForge Logo](https://drive.google.com/file/d/1yxuyO4dLdaK_qVOkJU2QdS7Ec3i6plpm/view?usp=sharing)  
+![ByteForge Logo](byteforge-frontend/src/assets/logos/background-black.svg)  
 **An Online Java Learning Platform for Beginners**
 
 ## 🚀 Introduction
@@ -39,7 +39,7 @@ ByteForge is an interactive Java learning platform designed for beginners. It pr
 
 - Spring Boot
 - Docker
-- SQL Database (PostgreSQL/MySQL)
+- SQL Database (MySQL)
 - REST API
 
 ### Additional Technologies
@@ -47,26 +47,6 @@ ByteForge is an interactive Java learning platform designed for beginners. It pr
 - JWT/OAuth Authentication
 - Cloud Deployment (Future Enhancement)
 - AI-based Chatbot System
-
-## 📂 Project Structure
-
-```
-byteforge/
-│── frontend/    # React frontend
-│   │── src/     # Source code
-│   │── public/  # Static assets
-│   │── components/ # UI Components
-│   │── pages/   # Page structure
-│
-│── backend/     # Spring Boot backend
-│   │── src/     # Backend source code
-│   │── config/  # Backend configurations
-│   │── controllers/ # API Controllers
-│
-│── docs/        # Documentation
-│── docker/      # Docker setup
-│── README.md    # Project documentation
-```
 
 ## 🎯 Setup & Installation
 
@@ -110,7 +90,7 @@ docker-compose up --build
 ## 🤝 Contributors
 
 - **Mehulsinh Chauhan** - Frontend Developer
-- **Akash Panchal** - Frontend Developer
+- **Akash Panchal** - Educational Content Designer
 - **Rana** - Backend Developer
 
 ## 📞 Contact
