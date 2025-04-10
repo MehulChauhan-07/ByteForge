@@ -1358,17 +1358,16 @@ const Navbar: React.FC = () => {
                         </h4>
                         <div className="p-1">
                           {recentSearches.map((search, index) => (
-                            <motion.div
+                            <div
                               key={`recent-${index}`}
-                              className="p-2 hover:bg-accent rounded-md cursor-pointer flex items-center gap-2"
-                              whileHover={{ x: 5 }}
+                              className="p-2 hover:bg-accent rounded-md cursor-pointer flex items-center gap-2 transition-transform hover:translate-x-1"
                               onClick={() => {
                                 setSearchQuery(search);
                               }}
                             >
                               <History className="h-4 w-4 text-muted-foreground" />
                               <span className="text-sm">{search}</span>
-                            </motion.div>
+                            </div>
                           ))}
                         </div>
                       </div>
@@ -1680,14 +1679,13 @@ const Navbar: React.FC = () => {
                 </>
               ) : (
                 <>
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                  <Button
+                    variant="ghost"
+                    asChild
+                    className="transition-transform hover:scale-105 active:scale-95"
                   >
-                    <Button variant="ghost" asChild>
-                      <Link to="/login">Log In</Link>
-                    </Button>
-                  </motion.div>
+                    <Link to="/login">Log In</Link>
+                  </Button>
                   <motion.div
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
