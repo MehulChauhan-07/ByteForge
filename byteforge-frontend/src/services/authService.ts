@@ -1,4 +1,5 @@
 import api from "./api";
+import { User } from "@/context/AuthContext";
 
 export interface LoginCredentials {
   email: string;
@@ -7,17 +8,13 @@ export interface LoginCredentials {
 
 export interface LoginResponse {
   token: string;
-  user: {
-    id: number;
-    email: string;
-    name: string;
-  };
+  user: User;
 }
 
 export interface SignupCredentials {
+  name: string;
   email: string;
   password: string;
-  name: string;
 }
 
 const authService = {
@@ -43,12 +40,15 @@ const authService = {
     localStorage.removeItem("user");
   },
 
-  getCurrentUser: (): { id: number; email: string; name: string } | null => {
-    const userString = localStorage.getItem("user");
-    if (userString) {
+  getCurrentUser: (): User | null => {
+    try {
+      const userString = localStorage.getItem("user");
+      if (!userString) return null;
       return JSON.parse(userString);
+    } catch (error) {
+      console.error("Error parsing user data:", error);
+      return null;
     }
-    return null;
   },
 
   isAuthenticated: (): boolean => {

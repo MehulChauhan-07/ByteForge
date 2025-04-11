@@ -10,7 +10,7 @@ import authService from "@/services/authService";
 import axios from "axios";
 
 const LoginPage = () => {
-  const [email, setEmail] = useState("");
+  const [usernameOrEmail, setUsernameOrEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -20,7 +20,7 @@ const LoginPage = () => {
   const location = useLocation();
 
   // Get the redirect path from location state or default to dashboard
-  const from = location.state?.from?.pathname || "/";
+  const from = location.state?.from?.pathname || "/dashboard";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +29,7 @@ const LoginPage = () => {
 
     try {
       // Call the authService login method
-      await authService.login({ email, password });
+      await authService.login({ usernameOrEmail, password });
       // After successful login, navigate to the intended page
       navigate(from, { replace: true });
     } catch (err) {
@@ -51,7 +51,6 @@ const LoginPage = () => {
   };
 
   return (
-    // The rest of your component remains the same
     <div className="container max-w-md mx-auto py-10 px-4 min-h-[calc(100vh-8rem)]">
       <div className="text-center mb-6">
         <h1 className="text-3xl font-bold">Welcome back</h1>
@@ -77,20 +76,20 @@ const LoginPage = () => {
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email" className="font-medium">
-                Email
+              <Label htmlFor="usernameOrEmail" className="font-medium">
+                Username or Email
               </Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  id="email"
-                  type="email"
+                  id="usernameOrEmail"
+                  type="text"
                   className="pl-10"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="username or email@example.com"
+                  value={usernameOrEmail}
+                  onChange={(e) => setUsernameOrEmail(e.target.value)}
                   required
-                  autoComplete="email"
+                  autoComplete="username"
                 />
               </div>
             </div>
@@ -134,19 +133,17 @@ const LoginPage = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-between mt-4">
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="rememberMe"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="rounded border-input h-4 w-4 text-primary focus:ring-primary"
-                />
-                <label htmlFor="rememberMe" className="text-sm text-foreground">
-                  Remember me
-                </label>
-              </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="rememberMe"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="rounded border-input h-4 w-4 text-primary focus:ring-primary"
+              />
+              <label htmlFor="rememberMe" className="text-sm text-foreground">
+                Remember me
+              </label>
             </div>
 
             <Button type="submit" className="w-full mt-6" disabled={isLoading}>

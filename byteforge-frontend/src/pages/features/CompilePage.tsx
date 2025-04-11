@@ -1,124 +1,193 @@
 // src/pages/features/CompilerPage.jsx
-import { SetStateAction, useState } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  executeCode,
+  saveCode,
+  getSavedCodes,
+  deleteCode,
+} from "@/services/codeEditorService";
+import { toast } from "sonner";
 
-const CompilerPage = () => {
-  const [code, setCode] = useState('console.log("Hello, world!");');
+const languages = [
+  { value: "java", label: "Java" },
+  { value: "python", label: "Python" },
+  { value: "javascript", label: "JavaScript" },
+  { value: "cpp", label: "C++" },
+];
+
+export default function CompilerPage() {
+  const [code, setCode] = useState("");
+  const [language, setLanguage] = useState("java");
+  const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
-  const [language, setLanguage] = useState("javascript");
-  const [isCompiling, setIsCompiling] = useState(false);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [savedCodes, setSavedCodes] = useState<
+    Array<{ id: string; title: string; code: string }>
+  >([]);
 
-  const handleCodeChange = (e: {
-    target: { value: SetStateAction<string> };
-  }) => {
+  useEffect(() => {
+    loadSavedCodes();
+  }, []);
+
+  const loadSavedCodes = async () => {
+    try {
+      const codes = await getSavedCodes();
+      setSavedCodes(codes);
+    } catch (error) {
+      toast.error("Failed to load saved codes");
+    }
+  };
+
+  const handleExecute = async () => {
+    setIsLoading(true);
+    setError("");
+    setOutput("");
+
+    try {
+      const result = await executeCode({ code, language, input });
+      setOutput(result.output);
+      if (result.error) {
+        setError(result.error);
+      }
+    } catch (error) {
+      toast.error("Failed to execute code");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    const title = prompt("Enter a title for your code:");
+    if (!title) return;
+
+    try {
+      await saveCode(code, title);
+      toast.success("Code saved successfully");
+      loadSavedCodes();
+    } catch (error) {
+      toast.error("Failed to save code");
+    }
+  };
+
+  const handleLoadCode = (savedCode: string) => {
+    setCode(savedCode);
+  };
+
+  const handleDeleteCode = async (id: string) => {
+    try {
+      await deleteCode(id);
+      toast.success("Code deleted successfully");
+      loadSavedCodes();
+    } catch (error) {
+      toast.error("Failed to delete code");
+    }
+  };
+
+  const handleCodeChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setCode(e.target.value);
   };
 
-  const handleLanguageChange = (e: {
-    target: { value: SetStateAction<string> };
-  }) => {
-    setLanguage(e.target.value);
-  };
-
-  const handleRunCode = () => {
-    setIsCompiling(true);
-    // Simulate compilation/execution
-    setTimeout(() => {
-      try {
-        if (language === "javascript") {
-          // For demo purposes, we're using eval - in a real implementation,
-          // you would use a secure sandbox or backend service
-          let consoleOutput = "";
-          const originalConsoleLog = console.log;
-
-          // Override console.log to capture output
-          console.log = (...args) => {
-            consoleOutput += args.join(" ") + "\n";
-          };
-
-          // Execute code
-          eval(code);
-
-          // Restore console.log
-          console.log = originalConsoleLog;
-
-          setOutput(
-            consoleOutput || "Code executed successfully with no output."
-          );
-        } else {
-          setOutput(
-            `Compilation for ${language} would be handled on the backend.`
-          );
-        }
-      } catch (error) {
-        setOutput(
-          `Error: ${
-            error instanceof Error ? error.message : "An unknown error occurred"
-          }`
-        );
-      }
-      setIsCompiling(false);
-    }, 1000);
+  const handleInputChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value);
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Code Compiler</h1>
-
-      <div className="flex mb-4">
-        <select
-          value={language}
-          onChange={handleLanguageChange}
-          className="px-4 py-2 border rounded-md mr-4"
-        >
-          <option value="javascript">JavaScript</option>
-          <option value="python">Python</option>
-          <option value="java">Java</option>
-          <option value="cpp">C++</option>
-        </select>
-
-        <button
-          onClick={handleRunCode}
-          disabled={isCompiling}
-          className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-400"
-        >
-          {isCompiling ? "Running..." : "Run Code"}
-        </button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="border rounded-md">
-          <div className="bg-gray-800 text-white px-4 py-2 rounded-t-md">
-            Code Editor
+    <div className="container mx-auto p-4 space-y-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>Code Editor</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex gap-4">
+            <Select value={language} onValueChange={setLanguage}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select language" />
+              </SelectTrigger>
+              <SelectContent>
+                {languages.map((lang) => (
+                  <SelectItem key={lang.value} value={lang.value}>
+                    {lang.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button onClick={handleExecute} disabled={isLoading}>
+              {isLoading ? "Executing..." : "Execute"}
+            </Button>
+            <Button variant="outline" onClick={handleSave}>
+              Save Code
+            </Button>
           </div>
-          <textarea
-            value={code}
-            onChange={handleCodeChange}
-            className="w-full h-80 p-4 font-mono text-sm border-0 focus:ring-0"
-            placeholder="Write your code here..."
-          />
-        </div>
 
-        <div className="border rounded-md">
-          <div className="bg-gray-800 text-white px-4 py-2 rounded-t-md">
-            Output
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold">Code</h3>
+              <Textarea
+                value={code}
+                onChange={handleCodeChange}
+                className="h-[400px] font-mono"
+                placeholder="Enter your code here..."
+              />
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold">Input</h3>
+              <Textarea
+                value={input}
+                onChange={handleInputChange}
+                className="h-[200px]"
+                placeholder="Enter input here..."
+              />
+              <h3 className="text-lg font-semibold">Output</h3>
+              <div className="h-[200px] p-2 border rounded-md bg-gray-50">
+                <pre className="whitespace-pre-wrap">{output}</pre>
+                {error && <pre className="text-red-500">{error}</pre>}
+              </div>
+            </div>
           </div>
-          <div className="h-80 p-4 font-mono text-sm bg-gray-100 overflow-auto">
-            {output || "Run your code to see output here..."}
-          </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
-      <div className="mt-8">
-        <h2 className="text-xl font-semibold mb-4">Compiler Features</h2>
-        <ul className="list-disc pl-6 space-y-2">
-          <li>Real-time syntax highlighting (not implemented in this demo)</li>
-          <li>Multiple language support</li>
-          <li>Error reporting</li>
-          <li>Save and share your code snippets (premium feature)</li>
-        </ul>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Saved Codes</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {savedCodes.map((savedCode) => (
+              <Card key={savedCode.id}>
+                <CardHeader>
+                  <CardTitle className="text-lg">{savedCode.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => handleLoadCode(savedCode.code)}
+                  >
+                    Load
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={() => handleDeleteCode(savedCode.id)}
+                  >
+                    Delete
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
-};
-
-export default CompilerPage;
+}

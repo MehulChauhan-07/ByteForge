@@ -5,7 +5,17 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AlertCircle, Eye, EyeOff, Mail, Lock, User, Github, Check, X } from "lucide-react";
+import {
+  AlertCircle,
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  User,
+  Github,
+  Check,
+  X,
+} from "lucide-react";
 
 const SignupPage = () => {
   const [username, setUsername] = useState("");
@@ -78,7 +88,10 @@ const SignupPage = () => {
         <h1 className="text-3xl font-bold">Create an Account</h1>
         <p className="text-sm text-muted-foreground mt-2">
           Already have an account?{" "}
-          <Link to="/login" className="text-primary hover:underline font-medium">
+          <Link
+            to="/login"
+            className="text-primary hover:underline font-medium"
+          >
             Sign in
           </Link>
         </p>
@@ -315,7 +328,11 @@ const SignupPage = () => {
             <Button
               type="submit"
               className="w-full mt-6"
-              disabled={isLoading || password !== confirmPassword || passwordStrength < 3}
+              disabled={
+                isLoading ||
+                password !== confirmPassword ||
+                passwordStrength < 3
+              }
             >
               {isLoading ? (
                 <div className="flex items-center justify-center gap-2">

@@ -18,7 +18,7 @@ import {
   Bookmark,
   Info,
   List,
-  User,
+  User as UserIcon,
   Bell,
   Globe,
   Loader2,
@@ -40,6 +40,23 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { useOnClickOutside } from "@/hooks/useOnClickOutside";
 import { useAuth } from "@context/AuthContext";
 import React from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Settings, LogOut, History, HelpCircle } from "lucide-react";
+
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  avatar?: string;
+}
 
 // Constants
 const QUICK_LINKS = [
@@ -322,7 +339,8 @@ const Navbar: React.FC = () => {
   const handleLogout = useCallback(() => {
     logout();
     closeSidebar();
-  }, [logout, closeSidebar]);
+    navigate("/login");
+  }, [logout, closeSidebar, navigate]);
 
   // Skip to content link for accessibility
   const SkipToContentLink = () => (
@@ -511,7 +529,7 @@ const Navbar: React.FC = () => {
                       <>
                         <Button variant="outline" className="flex-1" asChild>
                           <Link to="/profile" onClick={closeSidebar}>
-                            <User className="h-4 w-4 mr-2" />
+                            <UserIcon className="h-4 w-4 mr-2" />
                             Profile
                           </Link>
                         </Button>
@@ -897,45 +915,57 @@ const Navbar: React.FC = () => {
             {/* Desktop Auth Buttons */}
             <div className="hidden md:flex gap-2">
               {user ? (
-                <>
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Button variant="ghost" asChild>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="relative h-8 w-8 rounded-full"
+                    >
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={user.avatar} alt={user.name} />
+                        <AvatarFallback>{user.name[0]}</AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">
+                          {user.name}
+                        </p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user.email}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/dashboard">
+                        <UserIcon className="mr-2 h-4 w-4" />
+                        Dashboard
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
                       <Link to="/profile">
-                        <User className="h-4 w-4 mr-2" />
+                        <Settings className="mr-2 h-4 w-4" />
                         Profile
                       </Link>
-                    </Button>
-                  </motion.div>
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Button variant="outline" onClick={handleLogout}>
-                      Logout
-                    </Button>
-                  </motion.div>
-                </>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Log out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               ) : (
                 <>
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Button variant="ghost" asChild>
-                      <Link to="/login">Log In</Link>
-                    </Button>
-                  </motion.div>
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Button asChild>
-                      <Link to="/signup">Sign Up</Link>
-                    </Button>
-                  </motion.div>
+                  <Button variant="ghost" asChild>
+                    <Link to="/login">Log In</Link>
+                  </Button>
+                  <Button asChild>
+                    <Link to="/signup">Sign Up</Link>
+                  </Button>
                 </>
               )}
             </div>

@@ -7,6 +7,12 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true,
+    strictPort: false,
+    hmr: {
+      protocol: "ws",
+      host: "localhost",
+      port: 5173, // Explicitly match your dev server port
+    },
   },
   plugins: [react()],
   resolve: {

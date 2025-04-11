@@ -8,8 +8,8 @@ import SignupPage from "@/pages/auth/SignupPage";
 // import ForgotPasswordPage from "@/pages/auth/ForgotPasswordPage";
 
 import HomePage from "@/pages/home/Home";
-// import DashboardPage from "@/pages/dashboard/DashboardPage";
-// import ProfilePage from "@/pages/dashboard/ProfilePage";
+import DashboardPage from "@/pages/DashboardPage";
+import ProfilePage from "@/pages/ProfilePage";
 import TopicsPage from "@/pages/topic/TopicsPage";
 import NotFoundPage from "@/pages/NotFoundPage";
 import AboutPage from "@/pages/about/About";
@@ -28,7 +28,7 @@ const AppRoutes = () => {
       {/* Public routes that don't require authentication */}
       <Route path="/" element={<HomePage />} />
       <Route path="/about" element={<AboutPage />} />
-      <Route path="/topics" element={<TopicsPage />} />
+      <Route path="/dashboard" element={<DashboardPage />} />
 
       {/* Public routes that should redirect authenticated users */}
       <Route element={<PublicOnlyRoute />}>
@@ -39,8 +39,8 @@ const AppRoutes = () => {
 
       {/* Protected routes - require authentication */}
       <Route element={<ProtectedRoute />}>
-        {/* <Route path="/dashboard" element={<DashboardPage />} /> */}
-        {/* <Route path="/profile" element={<ProfilePage />} /> */}
+        <Route path="/topics" element={<TopicsPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
 
         {/* Protected learning feature routes */}
         <Route path="/tutorials" element={<TutorialsPage />} />
@@ -48,7 +48,7 @@ const AppRoutes = () => {
         {/* <Route path="/certification" element={<CertificationPage />} /> */}
 
         {/* Protected tool feature routes */}
-        <Route path="/compiler" element={<CompilerPage />} />
+        {/* <Route path="/compiler" element={<CompilerPage />} /> */}
         <Route path="/notes" element={<NotesPage />} />
         <Route path="/assistant" element={<ChatbotPage />} />
         <Route path="/community" element={<CommunityPage />} />
