@@ -1,150 +1,138 @@
-// src/context/AuthContext.tsx
-import {
+import React, {
   createContext,
-  useContext,
-  ReactNode,
   useState,
   useEffect,
+  useContext,
+  ReactNode,
 } from "react";
-import { useNavigate } from "react-router-dom";
+import api from "@/services/api";
 
+// Types
 export interface User {
   id: string;
   name: string;
   email: string;
-  role: "student" | "admin";
   avatar?: string;
-  preferences?: {
-    theme: "light" | "dark" | "system";
-    language: string;
-    notifications: boolean;
-  };
-  progress?: {
-    completedTopics: string[];
-    currentTopic?: string;
-    quizScores: Record<string, number>;
-  };
 }
 
 interface AuthContextType {
+  isAuthenticated: boolean;
   user: User | null;
   isLoading: boolean;
-  error: string | null;
-  login: (userData: User) => Promise<void>;
-  logout: () => Promise<void>;
-  updateUser: (updates: Partial<User>) => Promise<void>;
-  isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  signup: (name: string, email: string, password: string) => Promise<void>;
+  logout: () => void;
 }
 
+// Create the context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+// Provider component
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
 
-  // Load user from localStorage on mount
+  // Check if user is already logged in on mount
   useEffect(() => {
-    const loadUser = async () => {
+    const checkAuth = async () => {
       try {
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-          const parsedUser = JSON.parse(storedUser);
-          setUser(parsedUser);
+        const token = localStorage.getItem("token");
+
+        if (token) {
+          // Verify token with the backend
+          const response = await api.get("/auth/me");
+          setUser(response.data.user);
         }
-      } catch (err) {
-        setError("Failed to load user data");
-        console.error("Error loading user:", err);
+      } catch (error) {
+        // Token invalid or expired
+        localStorage.removeItem("token");
+        console.error("Authentication error:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadUser();
+    checkAuth();
   }, []);
 
-  const login = async (userData: User) => {
+  // Login function
+  const login = async (email: string, password: string) => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      setError(null);
+      const response = await api.post("/auth/login", { email, password });
+      const { token, user } = response.data;
 
-      // Here you would typically make an API call to your backend
-      // For now, we'll just store in localStorage
-      localStorage.setItem("user", JSON.stringify(userData));
-      setUser(userData);
+      // Save token to localStorage
+      localStorage.setItem("token", token);
 
-      // Redirect to dashboard or home
-      navigate("/dashboard");
-    } catch (err) {
-      setError("Login failed");
-      console.error("Login error:", err);
-      throw err;
+      // Set user in state
+      setUser(user);
+    } catch (error) {
+      console.error("Login error:", error);
+      throw error;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const logout = async () => {
+  // Signup function
+  const signup = async (name: string, email: string, password: string) => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      setError(null);
+      const response = await api.post("/auth/register", {
+        name,
+        email,
+        password,
+      });
+      const { token, user } = response.data;
 
-      // Here you would typically make an API call to your backend
-      localStorage.removeItem("user");
-      setUser(null);
+      // Save token to localStorage
+      localStorage.setItem("token", token);
 
-      // Redirect to home
-      navigate("/");
-    } catch (err) {
-      setError("Logout failed");
-      console.error("Logout error:", err);
-      throw err;
+      // Set user in state
+      setUser(user);
+    } catch (error) {
+      console.error("Signup error:", error);
+      throw error;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const updateUser = async (updates: Partial<User>) => {
-    try {
-      setIsLoading(true);
-      setError(null);
+  // Logout function
+  const logout = () => {
+    // Clear token from localStorage
+    localStorage.removeItem("token");
 
-      if (!user) throw new Error("No user logged in");
-
-      const updatedUser = { ...user, ...updates };
-      localStorage.setItem("user", JSON.stringify(updatedUser));
-      setUser(updatedUser);
-    } catch (err) {
-      setError("Failed to update user");
-      console.error("Update user error:", err);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
+    // Reset user state
+    setUser(null);
   };
 
   return (
     <AuthContext.Provider
       value={{
+        isAuthenticated: !!user,
         user,
         isLoading,
-        error,
         login,
+        signup,
         logout,
-        updateUser,
-        isAuthenticated: !!user,
       }}
     >
       {children}
     </AuthContext.Provider>
   );
-}
+};
 
-export function useAuth() {
+// Custom hook to use the auth context
+export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
-}
+};

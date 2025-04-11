@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AlertCircle, Eye, EyeOff, Mail, Lock, Github } from "lucide-react";
+import authService from "@/services/authService";
+import axios from "axios";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -26,18 +28,20 @@ const LoginPage = () => {
     setIsLoading(true);
 
     try {
-      // Simulate API call - replace with actual authentication
-      setTimeout(() => {
-        setIsLoading(false);
-        // Replace with actual login logic when implemented
-        console.log("Login attempt with:", { email, password });
-        // After successful login, navigate to the intended page
-        navigate(from, { replace: true });
-      }, 1500);
+      // Call the authService login method
+      await authService.login({ email, password });
+      // After successful login, navigate to the intended page
+      navigate(from, { replace: true });
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Login failed. Please try again."
-      );
+      if (axios.isAxiosError(err) && err.response) {
+        // Handle specific error messages from the server
+        setError(
+          err.response.data.message ||
+            "Login failed. Please check your credentials."
+        );
+      } else {
+        setError("Login failed. Please try again later.");
+      }
       setIsLoading(false);
     }
   };
@@ -47,6 +51,7 @@ const LoginPage = () => {
   };
 
   return (
+    // The rest of your component remains the same
     <div className="container max-w-md mx-auto py-10 px-4 min-h-[calc(100vh-8rem)]">
       <div className="text-center mb-6">
         <h1 className="text-3xl font-bold">Welcome back</h1>

@@ -115,6 +115,156 @@ ByteForge/
 │   ├── vite.config.ts
 ├── README.md
 
+byteforge - backend: 
+byteforge-backend/
+├── .idea/
+│   ├── compiler.xml
+│   ├── encodings.xml
+│   ├── jarRepositories.xml
+│   ├── misc.xml
+│   ├── vcs.xml
+│   ├── workspace.xml
+├── byteforge/
+│   ├── .gitattributes
+│   ├── .gitignore
+│   ├── .idea/
+│   │   ├── .gitignore
+│   │   ├── compiler.xml
+│   │   ├── encodings.xml
+│   │   ├── jarRepositories.xml
+│   │   ├── misc.xml
+│   │   ├── vcs.xml
+│   │   ├── workspace.xml
+│   ├── .mvn/
+│   │   ├── wrapper/
+│   │   │   ├── maven-wrapper.properties
+│   ├── mvnw
+│   ├── mvnw.cmd
+│   ├── pom.xml
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/
+│   │   │   │   ├── com/
+│   │   │   │   │   ├── byteforge/
+│   │   │   │   │   │   ├── auth/
+│   │   │   │   │   │   │   ├── config/
+│   │   │   │   │   │   │   │   ├── JwtRequestFilter.java
+│   │   │   │   │   │   │   │   ├── SecurityConfig.java
+│   │   │   │   │   │   │   ├── controller/
+│   │   │   │   │   │   │   │   ├── AuthController.java
+│   │   │   │   │   │   │   ├── dto/
+│   │   │   │   │   │   │   │   ├── AuthRequest.java
+│   │   │   │   │   │   │   │   ├── AuthResponse.java
+│   │   │   │   │   │   │   │   ├── RegisterRequest.java
+│   │   │   │   │   │   │   ├── model/
+│   │   │   │   │   │   │   │   ├── BlacklistedToken.java
+│   │   │   │   │   │   │   │   ├── User.java
+│   │   │   │   │   │   │   ├── repository/
+│   │   │   │   │   │   │   │   ├── BlacklistedTokenRepository.java
+│   │   │   │   │   │   │   │   ├── UserRepository.java
+│   │   │   │   │   │   │   ├── service/
+│   │   │   │   │   │   │   │   ├── AuthService.java
+│   │   │   │   │   │   │   │   ├── UserDetailsServiceImpl.java
+│   │   │   │   │   │   │   ├── util/
+│   │   │   │   │   │   │   │   ├── JwtTokenUtil.java
+│   │   │   │   │   │   ├── ByteforgeApplication.java
+│   │   │   │   │   │   ├── codeEditorAndCompiler/
+│   │   │   │   │   │   │   ├── controller/
+│   │   │   │   │   │   │   │   ├── CodeEditorController.java
+│   │   │   │   │   │   │   ├── dto/
+│   │   │   │   │   │   │   │   ├── CompileRequest.java
+│   │   │   │   │   │   │   │   ├── CompileResponse.java
+│   │   │   │   │   │   │   ├── service/
+│   │   │   │   │   │   │   │   ├── CodeEditorService.java
+│   │   │   │   │   │   ├── exception/
+│   │   │   │   │   │   │   ├── BadRequestException.java
+│   │   │   │   │   │   │   ├── CustomException.java
+│   │   │   │   │   │   │   ├── ErrorResponse.java
+│   │   │   │   │   │   │   ├── GlobalExceptionHandler.java
+│   │   │   │   │   │   │   ├── ResourceAlreadyExistsException.java
+│   │   │   │   │   │   │   ├── ResourceNotFoundException.java
+│   │   │   │   │   │   │   ├── UnauthorizedException.java
+│   │   │   │   │   │   ├── notes/
+│   │   │   │   │   │   │   ├── controller/
+│   │   │   │   │   │   │   │   ├── NoteController.java
+│   │   │   │   │   │   │   ├── dto/
+│   │   │   │   │   │   │   │   ├── NoteDTO.java
+│   │   │   │   │   │   │   ├── mapper/
+│   │   │   │   │   │   │   │   ├── NoteMapper.java
+│   │   │   │   │   │   │   ├── model/
+│   │   │   │   │   │   │   │   ├── Note.java
+│   │   │   │   │   │   │   ├── repository/
+│   │   │   │   │   │   │   │   ├── NoteRepository.java
+│   │   │   │   │   │   │   ├── service/
+│   │   │   │   │   │   │   │   ├── NoteService.java
+│   │   │   ├── resources/
+│   │   │   │   ├── application.properties
+│   │   ├── test/
+│   │   │   ├── java/
+│   │   │   │   ├── com/
+│   │   │   │   │   ├── byteforge/
+│   │   │   │   │   │   ├── ByteforgeApplicationTests.java
+│   ├── target/
+│   │   ├── classes/
+│   │   │   ├── application.properties
+│   │   │   ├── com/
+│   │   │   │   ├── byteforge/
+│   │   │   │   │   ├── auth/
+│   │   │   │   │   │   ├── config/
+│   │   │   │   │   │   │   ├── JwtRequestFilter.class
+│   │   │   │   │   │   │   ├── SecurityConfig.class
+│   │   │   │   │   │   ├── controller/
+│   │   │   │   │   │   │   ├── AuthController.class
+│   │   │   │   │   │   ├── dto/
+│   │   │   │   │   │   │   ├── AuthRequest.class
+│   │   │   │   │   │   │   ├── AuthResponse.class
+│   │   │   │   │   │   │   ├── RegisterRequest.class
+│   │   │   │   │   │   ├── model/
+│   │   │   │   │   │   │   ├── BlacklistedToken.class
+│   │   │   │   │   │   │   ├── User.class
+│   │   │   │   │   │   ├── repository/
+│   │   │   │   │   │   │   ├── BlacklistedTokenRepository.class
+│   │   │   │   │   │   │   ├── UserRepository.class
+│   │   │   │   │   │   ├── service/
+│   │   │   │   │   │   │   ├── AuthService.class
+│   │   │   │   │   │   │   ├── UserDetailsServiceImpl.class
+│   │   │   │   │   │   ├── util/
+│   │   │   │   │   │   │   ├── JwtTokenUtil.class
+│   │   │   │   │   ├── ByteforgeApplication.class
+│   │   │   │   │   ├── codeEditorAndCompiler/
+│   │   │   │   │   │   ├── controller/
+│   │   │   │   │   │   │   ├── CodeEditorController.class
+│   │   │   │   │   │   ├── dto/
+│   │   │   │   │   │   │   ├── CompileRequest.class
+│   │   │   │   │   │   │   ├── CompileResponse.class
+│   │   │   │   │   │   ├── service/
+│   │   │   │   │   │   │   ├── CodeEditorService.class
+│   │   │   │   │   ├── exception/
+│   │   │   │   │   │   ├── BadRequestException.class
+│   │   │   │   │   │   ├── CustomException.class
+│   │   │   │   │   │   ├── ErrorResponse.class
+│   │   │   │   │   │   ├── GlobalExceptionHandler.class
+│   │   │   │   │   │   ├── ResourceAlreadyExistsException.class
+│   │   │   │   │   │   ├── ResourceNotFoundException.class
+│   │   │   │   │   │   ├── UnauthorizedException.class
+│   │   │   │   │   ├── notes/
+│   │   │   │   │   │   ├── controller/
+│   │   │   │   │   │   │   ├── NoteController.class
+│   │   │   │   │   │   ├── dto/
+│   │   │   │   │   │   │   ├── NoteDTO.class
+│   │   │   │   │   │   ├── mapper/
+│   │   │   │   │   │   │   ├── NoteMapper.class
+│   │   │   │   │   │   ├── model/
+│   │   │   │   │   │   │   ├── Note.class
+│   │   │   │   │   │   ├── repository/
+│   │   │   │   │   │   │   ├── NoteRepository.class
+│   │   │   │   │   │   ├── service/
+│   │   │   │   │   │   │   ├── NoteService.class
+│   │   ├── generated-sources/
+│   │   │   ├── annotations/
+
+
+
 ByteForge Frontend - Detailed Overview & Setup Guide
 The frontend of ByteForge is designed to provide a seamless, beginner-friendly experience for learning Java online. It is developed using React (Vite + TypeScript) with Tailwind CSS, DaisyUI, Herui, and ShadCN for a modern, aesthetic UI.
 

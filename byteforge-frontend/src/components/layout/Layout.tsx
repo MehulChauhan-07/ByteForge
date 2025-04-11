@@ -5,7 +5,10 @@ import Footer from "./Footer";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect } from "react";
 
-const Layout = () => {
+interface LayoutProps {
+  children: React.ReactNode;
+}
+const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
 
   // Scroll to top on route change
@@ -31,7 +34,7 @@ const Layout = () => {
           >
             <Navbar />
             <main className="flex-1">
-              <Outlet />
+              <Outlet /> {children}
             </main>
             <Footer />
           </motion.div>
