@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "@/App";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
-import "@/index.css";
+import "./index.css";
 import { ProgressProvider } from "./context/ProgressContex";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

@@ -30,6 +30,7 @@ const LoginPage = () => {
     try {
       // Call the authService login method
       await authService.login({ usernameOrEmail, password });
+
       // After successful login, navigate to the intended page
       navigate(from, { replace: true });
     } catch (err) {

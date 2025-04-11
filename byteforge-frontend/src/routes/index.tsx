@@ -8,7 +8,7 @@ import SignupPage from "@/pages/auth/SignupPage";
 // import ForgotPasswordPage from "@/pages/auth/ForgotPasswordPage";
 
 import HomePage from "@/pages/home/Home";
-import DashboardPage from "@/pages/DashboardPage";
+import DashboardPage from "@/pages/dashboard/DashboardPage";
 import ProfilePage from "@/pages/ProfilePage";
 import TopicsPage from "@/pages/topic/TopicsPage";
 import NotFoundPage from "@/pages/NotFoundPage";

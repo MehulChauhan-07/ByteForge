@@ -1,126 +1,75 @@
-import React, {
-  createContext,
-  useState,
-  useEffect,
-  useContext,
-  ReactNode,
-} from "react";
-import api from "@/services/api";
+import React, { createContext, useState, useContext, useEffect } from "react";
+import authService from "@/services/authService";
 
-// Types
-export interface User {
-  id: string;
-  name: string;
+// Define user type based on your JWT response
+interface User {
+  id: number;
+  username: string;
   email: string;
+  name: string;
   avatar?: string;
+  token: string;
+  type: string;
 }
 
 interface AuthContextType {
-  isAuthenticated: boolean;
   user: User | null;
-  isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  signup: (name: string, email: string, password: string) => Promise<void>;
+  loading: boolean;
+  login: (credentials: {
+    usernameOrEmail: string;
+    password: string;
+  }) => Promise<void>;
   logout: () => void;
+  isAuthenticated: () => boolean;
 }
 
-// Create the context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Provider component
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
-  // Check if user is already logged in on mount
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const token = localStorage.getItem("token");
-
-        if (token) {
-          // Verify token with the backend
-          const response = await api.get("/auth/me");
-          setUser(response.data.user);
-        }
-      } catch (error) {
-        // Token invalid or expired
-        localStorage.removeItem("token");
-        console.error("Authentication error:", error);
-      } finally {
-        setIsLoading(false);
+    // Check if user is already logged in
+    const initAuth = () => {
+      const storedUser = authService.getCurrentUser();
+      if (storedUser) {
+        setUser(storedUser);
+        authService.setAuthHeader(storedUser.token);
       }
+      setLoading(false);
     };
 
-    checkAuth();
+    initAuth();
   }, []);
 
-  // Login function
-  const login = async (email: string, password: string) => {
-    setIsLoading(true);
-    try {
-      const response = await api.post("/auth/login", { email, password });
-      const { token, user } = response.data;
-
-      // Save token to localStorage
-      localStorage.setItem("token", token);
-
-      // Set user in state
-      setUser(user);
-    } catch (error) {
-      console.error("Login error:", error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
+  const login = async (credentials: {
+    usernameOrEmail: string;
+    password: string;
+  }) => {
+    const userData = await authService.login(credentials);
+    setUser(userData);
   };
 
-  // Signup function
-  const signup = async (name: string, email: string, password: string) => {
-    setIsLoading(true);
-    try {
-      const response = await api.post("/auth/register", {
-        name,
-        email,
-        password,
-      });
-      const { token, user } = response.data;
-
-      // Save token to localStorage
-      localStorage.setItem("token", token);
-
-      // Set user in state
-      setUser(user);
-    } catch (error) {
-      console.error("Signup error:", error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Logout function
   const logout = () => {
-    // Clear token from localStorage
-    localStorage.removeItem("token");
-
-    // Reset user state
+    authService.logout();
     setUser(null);
+  };
+
+  const isAuthenticated = () => {
+    return !!user;
   };
 
   return (
     <AuthContext.Provider
       value={{
-        isAuthenticated: !!user,
         user,
-        isLoading,
+        loading,
         login,
-        signup,
         logout,
+        isAuthenticated,
       }}
     >
       {children}

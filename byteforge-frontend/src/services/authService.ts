@@ -1,59 +1,72 @@
-import api from "./api";
-import { User } from "@/context/AuthContext";
+import axios from "axios";
 
-export interface LoginCredentials {
-  email: string;
-  password: string;
-}
+const API_URL = "http://localhost:8080/api/auth/";
 
-export interface LoginResponse {
-  token: string;
-  user: User;
-}
-
-export interface SignupCredentials {
-  name: string;
-  email: string;
-  password: string;
-}
-
-const authService = {
-  login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
-    const response = await api.post<LoginResponse>("/auth/login", credentials);
-    localStorage.setItem("token", response.data.token);
-    localStorage.setItem("user", JSON.stringify(response.data.user));
-    return response.data;
-  },
-
-  signup: async (credentials: SignupCredentials): Promise<LoginResponse> => {
-    const response = await api.post<LoginResponse>(
-      "/auth/register",
-      credentials
-    );
-    localStorage.setItem("token", response.data.token);
-    localStorage.setItem("user", JSON.stringify(response.data.user));
-    return response.data;
-  },
-
-  logout: (): void => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-  },
-
-  getCurrentUser: (): User | null => {
+class AuthService {
+  async login(credentials: { usernameOrEmail: any; password: any }) {
     try {
-      const userString = localStorage.getItem("user");
-      if (!userString) return null;
-      return JSON.parse(userString);
-    } catch (error) {
-      console.error("Error parsing user data:", error);
-      return null;
-    }
-  },
+      const response = await axios.post(API_URL + "login", {
+        usernameOrEmail: credentials.usernameOrEmail,
+        password: credentials.password,
+      });
 
-  isAuthenticated: (): boolean => {
-    return localStorage.getItem("token") !== null;
-  },
-};
+      if (response.data.token) {
+        // Store user details and JWT token in localStorage
+        localStorage.setItem("user", JSON.stringify(response.data));
+
+        // Set the authorization header for subsequent requests
+        this.setAuthHeader(response.data.token);
+      }
+
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  logout() {
+    localStorage.removeItem("user");
+    this.removeAuthHeader();
+  }
+
+  register(username: any, email: any, password: any, name: any) {
+    return axios.post(API_URL + "signup", {
+      username,
+      email,
+      password,
+      name,
+    });
+  }
+
+  getCurrentUser() {
+    const user = localStorage.getItem("user");
+    return user ? JSON.parse(user) : null;
+  }
+
+  isAuthenticated(): boolean {
+    const user = this.getCurrentUser();
+    return !!user && !!user.token;
+  }
+
+  setAuthHeader(token: string) {
+    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  }
+
+  removeAuthHeader() {
+    delete axios.defaults.headers.common["Authorization"];
+  }
+
+  // Initialize auth header if user is already logged in
+  initAuthHeader() {
+    const user = this.getCurrentUser();
+    if (user && user.token) {
+      this.setAuthHeader(user.token);
+    }
+  }
+}
+
+const authService = new AuthService();
+// Initialize auth header on service creation
+authService.initAuthHeader();
 
 export default authService;
