@@ -1430,13 +1430,13 @@ const Navbar: React.FC = () => {
           </div>
 
           {/* Right side: Search, theme toggle, and auth buttons */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-3">
             {/* Desktop Search Button and Dropdown */}
             <div className="hidden md:block relative" ref={desktopSearchRef}>
               <Button
                 variant="ghost"
                 size="icon"
-                className="block"
+                className="flex items-center justify-center"
                 onClick={() => setDesktopSearchOpen(!desktopSearchOpen)}
                 aria-label="Toggle search"
               >
@@ -1451,7 +1451,7 @@ const Navbar: React.FC = () => {
                     exit={{ opacity: 0, y: -10 }}
                   >
                     <div className="relative">
-                      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/70" />
                       <Input
                         ref={searchInputRef}
                         type="search"
@@ -1518,7 +1518,7 @@ const Navbar: React.FC = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="block"
+                className="flex items-center justify-center"
                 onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
                 aria-label="Toggle search"
               >
@@ -1716,13 +1716,14 @@ const Navbar: React.FC = () => {
               </AnimatePresence>
             </div>
 
-            {/* Notification and language buttons */}
+            {/* Notification buttons */}
             {isAuthenticated && user && (
               <>
                 <div className="relative" ref={notificationRef}>
                   <Button
                     variant="ghost"
                     size="icon"
+                    className="flex items-center justify-center"
                     onClick={() => setIsNotificationOpen(!isNotificationOpen)}
                     aria-label="Notifications"
                     aria-expanded={isNotificationOpen}
@@ -1747,7 +1748,7 @@ const Navbar: React.FC = () => {
                   </AnimatePresence>
                 </div>
 
-                <div className="relative" ref={languageMenuRef}>
+                {/* <div className="relative" ref={languageMenuRef}>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -1765,7 +1766,7 @@ const Navbar: React.FC = () => {
                       />
                     )}
                   </AnimatePresence>
-                </div>
+                </div> */}
 
                 <div className="flex items-center">
                   <DropdownMenu>
@@ -1831,7 +1832,21 @@ const Navbar: React.FC = () => {
                 </div>
               </>
             )}
-
+            {/* Add this right before the ModeToggle */}
+            {!isAuthenticated && !isLoading && (
+              <div className="hidden md:flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  onClick={() => navigate("/login")}
+                  className="text-sm"
+                >
+                  Log in
+                </Button>
+                <Button onClick={() => navigate("/signup")} className="text-sm">
+                  Sign up
+                </Button>
+              </div>
+            )}
             <ModeToggle />
           </div>
         </div>
