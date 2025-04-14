@@ -29,34 +29,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const currentUser = authService.getCurrentUser();
-        const isAuth = authService.isAuthenticated();
-
-        setUser(currentUser);
-        setIsAuthenticated(isAuth);
-      } catch (error) {
-        console.error("Error checking auth status:", error);
-        setUser(null);
-        setIsAuthenticated(false);
-      } finally {
-        setIsLoading(false);
-      }
+    const checkAuth = () => {
+      const currentUser = authService.getCurrentUser();
+      const isAuth = authService.isAuthenticated();
+      setUser(currentUser);
+      setIsAuthenticated(isAuth);
+      setIsLoading(false);
     };
 
+    // Initial check
     checkAuth();
+
+    // Subscribe to auth changes
+    const unsubscribe = authService.addListener((newUser) => {
+      setUser(newUser);
+      setIsAuthenticated(!!newUser);
+    });
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   const login = async (email: string, password: string) => {
     try {
       setIsLoading(true);
-      const userData = await authService.login(email, password);
-      setUser(userData);
-      setIsAuthenticated(true);
+      await authService.login(email, password);
+      // The listener will update the state
     } catch (error) {
-      setUser(null);
-      setIsAuthenticated(false);
       throw error;
     } finally {
       setIsLoading(false);
@@ -66,12 +66,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const signup = async (name: string, email: string, password: string) => {
     try {
       setIsLoading(true);
-      const userData = await authService.signup(name, email, password);
-      setUser(userData);
-      setIsAuthenticated(true);
+      await authService.signup(name, email, password);
+      // The listener will update the state
     } catch (error) {
-      setUser(null);
-      setIsAuthenticated(false);
       throw error;
     } finally {
       setIsLoading(false);
@@ -80,8 +77,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const logout = () => {
     authService.logout();
-    setUser(null);
-    setIsAuthenticated(false);
+    // The listener will update the state
   };
 
   return (

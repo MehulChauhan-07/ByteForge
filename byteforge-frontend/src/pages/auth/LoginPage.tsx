@@ -1,28 +1,45 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AlertCircle, Eye, EyeOff, Mail, Lock, Github } from "lucide-react";
+import {
+  AlertCircle,
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  Github,
+  Loader2,
+} from "lucide-react";
 import authService from "@/services/authService";
 import axios from "axios";
+import { useAuth } from "@/context/AuthContext";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
-const LoginPage = () => {
+const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   // Get the redirect path from location state or default to dashboard
   const from = location.state?.from?.pathname || "/dashboard";
+
+  React.useEffect(() => {
+    // Redirect if already authenticated
+    if (isAuthenticated) {
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, navigate, from]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,22 +48,21 @@ const LoginPage = () => {
 
     try {
       // Call the authService login method
-      await authService.login(email, password);
+      await login(email, password);
 
       // After successful login, navigate to the intended page
       navigate(from, { replace: true });
-    } catch (err) {
+    } catch (err: any) {
       if (axios.isAxiosError(err) && err.response) {
         // Handle specific error messages from the server
         setError(
           err.response.data.message ||
             "Login failed. Please check your credentials."
         );
-      } else {
-        setError("Login failed. Please try again later.");
       }
-      setIsLoading(false);
-    }
+    }finally {
+        setIsLoading(false);
+      }
   };
 
   const togglePasswordVisibility = () => {

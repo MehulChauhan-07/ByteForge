@@ -5,16 +5,30 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
 class AuthService {
   private token: string | null = null;
+  private user: User | null = null;
+  private listeners: ((user: User | null) => void)[] = [];
 
   constructor() {
     this.initializeAuth();
   }
 
   private initializeAuth() {
-    // Initialize token from localStorage
+    // Initialize token and user from localStorage
     this.token = localStorage.getItem("token");
-    if (this.token) {
+    const userStr = localStorage.getItem("user");
+    if (userStr) {
+      try {
+        this.user = JSON.parse(userStr);
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+        this.clearAuth();
+      }
+    }
+
+    if (this.token && this.user) {
       this.setAuthHeader(this.token);
+    } else {
+      this.clearAuth();
     }
   }
 
@@ -24,9 +38,22 @@ class AuthService {
 
   private clearAuth() {
     this.token = null;
+    this.user = null;
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     delete axios.defaults.headers.common["Authorization"];
+    this.notifyListeners(null);
+  }
+
+  private notifyListeners(user: User | null) {
+    this.listeners.forEach((listener) => listener(user));
+  }
+
+  addListener(listener: (user: User | null) => void) {
+    this.listeners.push(listener);
+    return () => {
+      this.listeners = this.listeners.filter((l) => l !== listener);
+    };
   }
 
   async login(email: string, password: string): Promise<User> {
@@ -62,19 +89,13 @@ class AuthService {
         roles: response.data.roles || [],
       };
 
+      this.user = userData;
       localStorage.setItem("user", JSON.stringify(userData));
+      this.notifyListeners(userData);
       return userData;
     } catch (error: any) {
       this.clearAuth();
-
-      if (error.response) {
-        const errorMessage = error.response.data?.message || "Login failed";
-        throw new Error(errorMessage);
-      } else if (error.request) {
-        throw new Error("No response from server");
-      } else {
-        throw new Error("Login request failed");
-      }
+      throw error;
     }
   }
 
@@ -133,34 +154,7 @@ class AuthService {
   }
 
   getCurrentUser(): User | null {
-    try {
-      const userStr = localStorage.getItem("user");
-      if (!userStr) return null;
-
-      const user = JSON.parse(userStr);
-      if (!this.isValidUser(user)) {
-        this.clearAuth();
-        return null;
-      }
-
-      return user;
-    } catch (error) {
-      console.error("Error getting current user:", error);
-      this.clearAuth();
-      return null;
-    }
-  }
-
-  private isValidUser(user: any): user is User {
-    return (
-      user &&
-      typeof user === "object" &&
-      typeof user.id === "string" &&
-      typeof user.name === "string" &&
-      typeof user.email === "string" &&
-      typeof user.username === "string" &&
-      Array.isArray(user.roles)
-    );
+    return this.user;
   }
 
   getToken(): string | null {
@@ -168,7 +162,7 @@ class AuthService {
   }
 
   isAuthenticated(): boolean {
-    return !!this.token && !!this.getCurrentUser();
+    return !!this.token && !!this.user;
   }
 }
 
