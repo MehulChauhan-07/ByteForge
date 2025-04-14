@@ -7,8 +7,8 @@ const PublicOnlyRoute = () => {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
 
-  // Get the redirect path from location state or default to home
-  const from = location.state?.from?.pathname || "/";
+  // Get the redirect path from location state or default to dashboard
+  const from = location.state?.from?.pathname || "/dashboard";
 
   if (isLoading) {
     return (
@@ -21,8 +21,8 @@ const PublicOnlyRoute = () => {
     );
   }
 
-  // If user is authenticated, redirect to the intended destination or home
-  if (isAuthenticated) {
+  // If user is authenticated, redirect to the intended destination or dashboard
+  if (isAuthenticated()) {
     return <Navigate to={from} replace />;
   }
 

@@ -12,16 +12,23 @@ import {
   MessageSquare,
   Save,
   Users,
-  ChevronDown,
-  ChevronRight,
   Home,
   Bookmark,
   Info,
   List,
-  User as UserIcon,
+  User,
   Bell,
   Globe,
   Loader2,
+  CheckCircle,
+  AlertTriangle,
+  XCircle,
+  Badge,
+  ChevronDown,
+  FileText,
+  GraduationCap,
+  Hash,
+  ArrowLeft,
 } from "lucide-react";
 import { ModeToggle } from "@/components/shared/ModeToggle";
 import {
@@ -36,8 +43,8 @@ import {
 import { Logo } from "@/components/ui/icons";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { useDebounce } from "@/hooks/useDebounce";
-import { useOnClickOutside } from "@/hooks/useOnClickOutside";
+import { useDebounce } from "@hooks/useDebounce";
+import { useOnClickOutside } from "@hooks/useOnClickOutside";
 import { useAuth } from "@context/AuthContext";
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -50,13 +57,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Settings, LogOut, History, HelpCircle } from "lucide-react";
-
-interface User {
-  id: number;
-  username: string;
-  email: string;
-  avatar?: string;
-}
 
 // Constants
 const QUICK_LINKS = [
@@ -121,6 +121,19 @@ const POPULAR_SEARCHES = [
   "File handling",
 ];
 
+const NOTIFICATION_TYPES = {
+  info: { icon: <Info className="h-4 w-4" />, color: "text-blue-500" },
+  success: {
+    icon: <CheckCircle className="h-4 w-4" />,
+    color: "text-green-500",
+  },
+  warning: {
+    icon: <AlertTriangle className="h-4 w-4" />,
+    color: "text-yellow-500",
+  },
+  error: { icon: <XCircle className="h-4 w-4" />, color: "text-red-500" },
+};
+
 // Types
 interface NavLinkProps {
   to: string;
@@ -144,6 +157,65 @@ interface CollapsibleSectionProps {
   defaultOpen?: boolean;
 }
 
+interface SearchSuggestion {
+  id: string;
+  title: string;
+  type: "topic" | "course" | "article";
+  url: string;
+}
+
+interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  type: "info" | "success" | "warning" | "error";
+  read: boolean;
+  timestamp: Date;
+  url: string;
+}
+
+interface UserProfileDropdownProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+interface SearchResultsProps {
+  searchQuery: string;
+  searchSuggestions: SearchSuggestion[];
+  isLoadingSuggestions: boolean;
+  selectedSuggestionIndex: number;
+  handleSuggestionClick: (suggestion: SearchSuggestion) => void;
+  handleViewAllResults: () => void;
+  containerStyle?: string;
+}
+
+// Helper functions
+const getSuggestionIcon = (type: string) => {
+  switch (type) {
+    case "topic":
+      return <Hash className="h-4 w-4 text-primary" />;
+    case "course":
+      return <GraduationCap className="h-4 w-4 text-green-500" />;
+    case "article":
+      return <FileText className="h-4 w-4 text-blue-500" />;
+    default:
+      return <Info className="h-4 w-4" />;
+  }
+};
+
+const getBadgeVariant = (type: string): "default" | "secondary" | "outline" => {
+  switch (type) {
+    case "topic":
+      return "default";
+    case "course":
+      return "secondary";
+    case "article":
+      return "outline";
+    default:
+      return "default";
+  }
+};
+
 // Reusable Components
 const MobileNavLink = React.memo(
   ({ to, icon, children, onClick, className }: NavLinkProps) => (
@@ -162,9 +234,7 @@ const MobileNavLink = React.memo(
         initial={{ x: -10, opacity: 0 }}
         whileHover={{ x: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 300 }}
-      >
-        <ChevronRight className="h-4 w-4" />
-      </motion.div>
+      ></motion.div>
     </Link>
   )
 );
@@ -232,26 +302,355 @@ const DropdownItem = React.memo(
   )
 );
 
+const SearchResults = ({
+  searchQuery,
+  searchSuggestions,
+  isLoadingSuggestions,
+  selectedSuggestionIndex,
+  handleSuggestionClick,
+  handleViewAllResults,
+  containerStyle,
+}: SearchResultsProps) => {
+  const [activeFilter, setActiveFilter] = useState<string | null>(null);
+
+  const filteredSuggestions = activeFilter
+    ? searchSuggestions.filter((s) => s.type === activeFilter)
+    : searchSuggestions;
+
+  if (!searchQuery.trim() && !isLoadingSuggestions) return null;
+
+  return (
+    <motion.div
+      className={cn(
+        "absolute top-full left-0 w-full bg-popover rounded-md shadow-lg border mt-2 max-h-[80vh] overflow-hidden",
+        containerStyle
+      )}
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+    >
+      {searchQuery.length > 2 && !isLoadingSuggestions && (
+        <div className="p-2 border-b flex gap-1 overflow-x-auto">
+          <Button
+            variant={activeFilter === null ? "secondary" : "ghost"}
+            size="sm"
+            onClick={() => setActiveFilter(null)}
+            className="whitespace-nowrap"
+          >
+            All Results
+          </Button>
+          {["topic", "course", "article"].map((type) => (
+            <Button
+              key={type}
+              variant={activeFilter === type ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => setActiveFilter(type)}
+              className="whitespace-nowrap"
+            >
+              {type.charAt(0).toUpperCase() + type.slice(1)}s
+            </Button>
+          ))}
+        </div>
+      )}
+
+      <div className="overflow-y-auto max-h-[60vh]">
+        {isLoadingSuggestions ? (
+          <div className="p-6 flex flex-col items-center justify-center">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            >
+              <Loader2 className="h-6 w-6 text-muted-foreground" />
+            </motion.div>
+            <span className="mt-2 text-sm text-muted-foreground">
+              Searching...
+            </span>
+          </div>
+        ) : filteredSuggestions.length > 0 ? (
+          <div className="p-2">
+            {filteredSuggestions.map((suggestion, index) => (
+              <motion.div
+                key={suggestion.id}
+                className={`p-3 hover:bg-accent rounded-md cursor-pointer transition-colors ${
+                  selectedSuggestionIndex === index
+                    ? "bg-accent text-accent-foreground"
+                    : "hover:bg-accent/50"
+                }`}
+                whileHover={{ x: 5, backgroundColor: "var(--accent)" }}
+                transition={{
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 20,
+                  delay: index * 0.05,
+                }}
+                onClick={() => handleSuggestionClick(suggestion)}
+                // Staggered animation for results
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 flex-1">
+                    {getSuggestionIcon(suggestion.type)}
+                    <div className="text-sm font-medium">
+                      {suggestion.title}
+                    </div>
+                  </div>
+                  <Badge
+                    className={`ml-auto ${getBadgeVariant(suggestion.type)}`}
+                  >
+                    {suggestion.type}
+                  </Badge>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          searchQuery.length > 0 && (
+            <div className="p-6 text-center space-y-3">
+              <p className="text-muted-foreground">
+                No results found for "{searchQuery}"
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Try a different search term or browse topics
+              </p>
+            </div>
+          )
+        )}
+      </div>
+
+      {searchQuery.length > 0 && (
+        <div className="border-t p-2">
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-primary hover:text-primary"
+            onClick={handleViewAllResults}
+          >
+            <Search className="h-4 w-4 mr-2" />
+            View all results for "{searchQuery}"
+          </Button>
+        </div>
+      )}
+    </motion.div>
+  );
+};
+
+const UserProfileDropdown = ({ isOpen, onClose }: UserProfileDropdownProps) => {
+  const { user, logout } = useAuth();
+
+  if (!user) return null;
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          className="absolute right-0 mt-2 w-64 bg-popover rounded-md shadow-lg border z-50"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+        >
+          <div className="p-4 border-b">
+            <div className="flex items-center gap-3">
+              <Avatar>
+                <AvatarImage src={user.avatar} />
+                <AvatarFallback>
+                  {user.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <h3 className="font-medium">{user.name}</h3>
+                <p className="text-sm text-muted-foreground">{user.email}</p>
+              </div>
+            </div>
+          </div>
+          <div className="p-2">
+            <DropdownMenuItem>
+              <User className="mr-2 h-4 w-4" />
+              Profile
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Settings className="mr-2 h-4 w-4" />
+              Settings
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Bookmark className="mr-2 h-4 w-4" />
+              Saved Items
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <History className="mr-2 h-4 w-4" />
+              History
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+              <HelpCircle className="mr-2 h-4 w-4" />
+              Help & Support
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={logout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Logout
+            </DropdownMenuItem>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+const NotificationDropdown = ({
+  notifications,
+  handleNotificationClick,
+  handleMarkAllAsRead,
+}: {
+  notifications: Notification[];
+  handleNotificationClick: (notification: Notification) => void;
+  handleMarkAllAsRead: () => void;
+}) => (
+  <motion.div
+    className="absolute right-0 mt-2 w-80 bg-popover rounded-md shadow-lg border z-50"
+    initial={{ opacity: 0, y: -10 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -10 }}
+  >
+    <div className="p-2 border-b">
+      <div className="flex items-center justify-between">
+        <h3 className="font-medium">Notifications</h3>
+        <Button variant="ghost" size="sm" onClick={handleMarkAllAsRead}>
+          Mark all as read
+        </Button>
+      </div>
+    </div>
+    <div className="max-h-96 overflow-y-auto">
+      {notifications.length === 0 ? (
+        <div className="p-4 text-center text-muted-foreground">
+          No notifications
+        </div>
+      ) : (
+        notifications.map((notification) => (
+          <motion.div
+            key={notification.id}
+            className={`p-3 border-b cursor-pointer hover:bg-accent transition-colors ${
+              !notification.read ? "bg-accent/50" : ""
+            }`}
+            onClick={() => handleNotificationClick(notification)}
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.99 }}
+          >
+            <div className="flex items-start gap-2">
+              <div className={NOTIFICATION_TYPES[notification.type].color}>
+                {NOTIFICATION_TYPES[notification.type].icon}
+              </div>
+              <div className="flex-1">
+                <h4 className="font-medium">{notification.title}</h4>
+                <p className="text-sm text-muted-foreground">
+                  {notification.message}
+                </p>
+                <time className="text-xs text-muted-foreground">
+                  {new Date(notification.timestamp).toLocaleString()}
+                </time>
+              </div>
+              {!notification.read && (
+                <div className="h-2 w-2 rounded-full bg-primary" />
+              )}
+            </div>
+          </motion.div>
+        ))
+      )}
+    </div>
+  </motion.div>
+);
+
+const LanguageMenu = ({
+  activeLanguage,
+  handleLanguageChange,
+}: {
+  activeLanguage: string;
+  handleLanguageChange: (lang: string) => void;
+}) => (
+  <motion.div
+    className="absolute right-0 mt-2 w-48 bg-popover rounded-md shadow-lg border z-50"
+    initial={{ opacity: 0, y: -10 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -10 }}
+  >
+    <div className="p-2">
+      {["en", "es", "fr", "de", "ja"].map((lang) => (
+        <button
+          key={lang}
+          className={`w-full text-left px-3 py-2 rounded-md hover:bg-accent transition-colors ${
+            activeLanguage === lang ? "bg-accent" : ""
+          }`}
+          onClick={() => handleLanguageChange(lang)}
+        >
+          {lang.toUpperCase()}
+        </button>
+      ))}
+    </div>
+  </motion.div>
+);
+
+// Skip to content link for accessibility
+const SkipToContentLink = () => (
+  <a
+    href="#main-content"
+    className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:bg-background focus:px-4 focus:py-2 focus:rounded focus:ring-2 focus:ring-primary"
+  >
+    Skip to content
+  </a>
+);
+
 const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  // Search state variables - separate for different UI contexts
+  const [searchQuery, setSearchQuery] = useState("");
+  const [desktopSearchOpen, setDesktopSearchOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [sidebarSearchOpen, setSidebarSearchOpen] = useState(false);
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
+
+  // Other UI state variables
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchSuggestions, setSearchSuggestions] = useState<string[]>([]);
+  const [searchSuggestions, setSearchSuggestions] = useState<
+    SearchSuggestion[]
+  >([]);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [activeLanguage, setActiveLanguage] = useState("en");
+  const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
+  const [userProfileOpen, setUserProfileOpen] = useState(false);
 
+  // Debounced search query for API calls
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
+
+  // Refs
   const searchInputRef = useRef<HTMLInputElement>(null);
   const desktopSearchRef = useRef<HTMLDivElement>(null);
+  const mobileSearchRef = useRef<HTMLDivElement>(null);
+  const sidebarSearchRef = useRef<HTMLDivElement>(null);
+  const notificationRef = useRef<HTMLDivElement>(null);
+  const languageMenuRef = useRef<HTMLDivElement>(null);
+  const userProfileRef = useRef<HTMLDivElement>(null);
+
+  // Router hooks
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Close search and sidebar when route changes
+  // Close UI elements when route changes
   useEffect(() => {
     setIsSidebarOpen(false);
-    setIsSearchOpen(false);
+    setDesktopSearchOpen(false);
+    setMobileSearchOpen(false);
+    setSidebarSearchOpen(false);
+    setIsNotificationOpen(false);
+    setIsLanguageMenuOpen(false);
+    setUserProfileOpen(false);
   }, [location]);
 
   // Handle scroll for navbar styling
@@ -264,93 +663,285 @@ const Navbar: React.FC = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Load recent searches from localStorage
+  useEffect(() => {
+    const storedSearches = localStorage.getItem("recentSearches");
+    if (storedSearches) {
+      try {
+        setRecentSearches(JSON.parse(storedSearches));
+      } catch (error) {
+        console.error("Failed to parse recent searches:", error);
+      }
+    }
+  }, []);
+
   // Fetch search suggestions
   useEffect(() => {
     if (debouncedSearchQuery.trim()) {
       setIsLoadingSuggestions(true);
+      setSelectedSuggestionIndex(-1);
+
       // Simulate API call
       setTimeout(() => {
-        setSearchSuggestions(
-          POPULAR_SEARCHES.filter((item) =>
-            item.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
-          ).slice(0, 5)
+        // First try to match exactly with POPULAR_SEARCHES
+        const exact = POPULAR_SEARCHES.filter(
+          (item) => item.toLowerCase() === debouncedSearchQuery.toLowerCase()
         );
+
+        // Then get partial matches
+        const partial = POPULAR_SEARCHES.filter(
+          (item) =>
+            item.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) &&
+            !exact.includes(item)
+        );
+
+        // Combine and create suggestion objects
+        const matches = [...exact, ...partial];
+
+        // Create a mix of different types
+        const suggestions: SearchSuggestion[] = [
+          ...matches.map((item) => ({
+            id: `topic-${item}`,
+            title: item,
+            type: "topic" as const,
+            url: `/topics?q=${encodeURIComponent(item)}`,
+          })),
+          // Add some course results
+          ...(debouncedSearchQuery.toLowerCase().includes("java")
+            ? [
+                {
+                  id: "course-java-basics",
+                  title: "Java Programming Basics",
+                  type: "course" as const,
+                  url: "/courses/java-basics",
+                },
+                {
+                  id: "course-java-advanced",
+                  title: "Advanced Java Concepts",
+                  type: "course" as const,
+                  url: "/courses/java-advanced",
+                },
+              ]
+            : []),
+          // Add some article results
+          ...(debouncedSearchQuery.toLowerCase().includes("oop")
+            ? [
+                {
+                  id: "article-oop-principles",
+                  title: "OOP Principles in Java",
+                  type: "article" as const,
+                  url: "/articles/oop-principles",
+                },
+                {
+                  id: "article-inheritance",
+                  title: "Understanding Inheritance",
+                  type: "article" as const,
+                  url: "/articles/inheritance",
+                },
+              ]
+            : []),
+        ].slice(0, 6);
+
+        setSearchSuggestions(suggestions);
         setIsLoadingSuggestions(false);
-      }, 300);
+      }, 500);
     } else {
       setSearchSuggestions([]);
+      setIsLoadingSuggestions(false);
     }
   }, [debouncedSearchQuery]);
 
-  // Close on escape key
+  // Load notifications
+  useEffect(() => {
+    const loadNotifications = async () => {
+      try {
+        const storedNotifications = localStorage.getItem("notifications");
+        if (storedNotifications) {
+          const parsedNotifications = JSON.parse(storedNotifications);
+          setNotifications(parsedNotifications);
+          setUnreadCount(
+            parsedNotifications.filter((n: Notification) => !n.read).length
+          );
+        } else {
+          // Create sample notifications if none exist
+          const sampleNotifications: Notification[] = [
+            {
+              id: "1",
+              title: "New Course Available",
+              message: "Check out our new Advanced Java Collections course!",
+              type: "info",
+              read: false,
+              timestamp: new Date(),
+              url: "/courses/java-collections",
+            },
+            {
+              id: "2",
+              title: "Quiz Completed",
+              message: "You scored 85% in Java Basics Quiz",
+              type: "success",
+              read: true,
+              timestamp: new Date(Date.now() - 86400000), // 1 day ago
+              url: "/topics/java-basics",
+            },
+          ];
+          setNotifications(sampleNotifications);
+          setUnreadCount(sampleNotifications.filter((n) => !n.read).length);
+          localStorage.setItem(
+            "notifications",
+            JSON.stringify(sampleNotifications)
+          );
+        }
+      } catch (err) {
+        console.error("Error loading notifications:", err);
+      }
+    };
+
+    loadNotifications();
+  }, []);
+
+  // Handle escape key for closing UI elements
   useEffect(() => {
     const handleEscKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        if (isSearchOpen) setIsSearchOpen(false);
+        if (desktopSearchOpen) setDesktopSearchOpen(false);
+        if (mobileSearchOpen) setMobileSearchOpen(false);
+        if (sidebarSearchOpen) setSidebarSearchOpen(false);
         if (isSidebarOpen) setIsSidebarOpen(false);
+        if (isNotificationOpen) setIsNotificationOpen(false);
+        if (isLanguageMenuOpen) setIsLanguageMenuOpen(false);
+        if (userProfileOpen) setUserProfileOpen(false);
       }
     };
 
     window.addEventListener("keydown", handleEscKey);
     return () => window.removeEventListener("keydown", handleEscKey);
-  }, [isSearchOpen, isSidebarOpen]);
+  }, [
+    desktopSearchOpen,
+    mobileSearchOpen,
+    sidebarSearchOpen,
+    isSidebarOpen,
+    isNotificationOpen,
+    isLanguageMenuOpen,
+    userProfileOpen,
+  ]);
 
-  // Close search when clicking outside
-  useOnClickOutside(desktopSearchRef, () => {
-    if (isSearchOpen) setIsSearchOpen(false);
-  });
+  // Click outside handlers
+  useOnClickOutside(desktopSearchRef, () => setDesktopSearchOpen(false));
+  useOnClickOutside(mobileSearchRef, () => setMobileSearchOpen(false));
+  useOnClickOutside(notificationRef, () => setIsNotificationOpen(false));
+  useOnClickOutside(languageMenuRef, () => setIsLanguageMenuOpen(false));
+  useOnClickOutside(userProfileRef, () => setUserProfileOpen(false));
 
   // Focus search input when opened
   useEffect(() => {
-    if (isSearchOpen && searchInputRef.current) {
-      searchInputRef.current.focus();
-    }
-  }, [isSearchOpen]);
-
-  const closeSidebar = useCallback(() => setIsSidebarOpen(false), []);
-  const closeSearch = useCallback(() => setIsSearchOpen(false), []);
-
-  const handleSearch = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault();
-
-      if (searchQuery.trim()) {
-        // Add to recent searches if not already there
-        if (!recentSearches.includes(searchQuery)) {
-          setRecentSearches((prev) => [searchQuery, ...prev.slice(0, 3)]);
-        }
-
-        navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
-        setIsSearchOpen(false);
-        setSearchQuery("");
-        setSearchSuggestions([]);
+    const timer = setTimeout(() => {
+      if (desktopSearchOpen && searchInputRef.current) {
+        searchInputRef.current.focus();
       }
-    },
-    [searchQuery, recentSearches, navigate]
-  );
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [desktopSearchOpen]);
 
-  const handleSuggestionClick = useCallback((suggestion: string) => {
-    setSearchQuery(suggestion);
-    if (searchInputRef.current) {
-      searchInputRef.current.focus();
-    }
+  // Callback functions
+  const closeSidebar = useCallback(() => setIsSidebarOpen(false), []);
+
+  const clearSearch = useCallback(() => {
+    setSearchQuery("");
+    setSearchSuggestions([]);
+    setDesktopSearchOpen(false);
+    setMobileSearchOpen(false);
+    setSidebarSearchOpen(false);
   }, []);
+
+  const handleSearchQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    if (e.target.value.length > 2) {
+      setIsLoadingSuggestions(true);
+    } else {
+      setSearchSuggestions([]);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion: SearchSuggestion) => {
+    // Add to recent searches
+    const updatedRecentSearches = [
+      suggestion.title,
+      ...recentSearches.filter((s) => s !== suggestion.title),
+    ].slice(0, 5); // Keep only 5 recent searches
+
+    setRecentSearches(updatedRecentSearches);
+    localStorage.setItem(
+      "recentSearches",
+      JSON.stringify(updatedRecentSearches)
+    );
+
+    // Navigate and close search
+    navigate(suggestion.url);
+    clearSearch();
+  };
+
+  const handleViewAllResults = () => {
+    navigate(`/topics?q=${encodeURIComponent(searchQuery)}`);
+    clearSearch();
+  };
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent) => {
+    if (!searchSuggestions.length) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setSelectedSuggestionIndex((prev) =>
+        prev < searchSuggestions.length - 1 ? prev + 1 : 0
+      );
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setSelectedSuggestionIndex((prev) =>
+        prev > 0 ? prev - 1 : searchSuggestions.length - 1
+      );
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (selectedSuggestionIndex >= 0) {
+        handleSuggestionClick(searchSuggestions[selectedSuggestionIndex]);
+      } else if (searchQuery.trim()) {
+        handleViewAllResults();
+      }
+    }
+  };
+
+  const handleNotificationClick = (notification: Notification) => {
+    if (!notification.read) {
+      const updatedNotifications = notifications.map((n) =>
+        n.id === notification.id ? { ...n, read: true } : n
+      );
+      setNotifications(updatedNotifications);
+      setUnreadCount((prev) => prev - 1);
+      localStorage.setItem(
+        "notifications",
+        JSON.stringify(updatedNotifications)
+      );
+    }
+    // Navigate to the notification's target
+    navigate(notification.url);
+    setIsNotificationOpen(false);
+  };
+
+  const handleMarkAllAsRead = () => {
+    const allRead = notifications.map((n) => ({ ...n, read: true }));
+    setNotifications(allRead);
+    setUnreadCount(0);
+    localStorage.setItem("notifications", JSON.stringify(allRead));
+  };
+
+  const handleLanguageChange = (language: string) => {
+    setActiveLanguage(language);
+    setIsLanguageMenuOpen(false);
+    localStorage.setItem("language", language);
+  };
 
   const handleLogout = useCallback(() => {
     logout();
     closeSidebar();
-    navigate("/login");
-  }, [logout, closeSidebar, navigate]);
-
-  // Skip to content link for accessibility
-  const SkipToContentLink = () => (
-    <a
-      href="#main-content"
-      className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:bg-background focus:px-4 focus:py-2 focus:rounded focus:ring-2 focus:ring-primary"
-    >
-      Skip to content
-    </a>
-  );
+  }, [logout, closeSidebar]);
 
   return (
     <>
@@ -410,27 +1001,44 @@ const Navbar: React.FC = () => {
                     </Button>
                   </div>
 
-                  {/* Quick search for mobile */}
-                  <div className="px-4">
-                    <form onSubmit={handleSearch} className="relative">
-                      <Input
-                        type="search"
-                        placeholder="Search ByteForge..."
-                        className="pr-10"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        aria-label="Search"
-                      />
-                      <Button
-                        type="submit"
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-0 top-0 h-full"
-                        aria-label="Search"
-                      >
-                        <Search className="h-4 w-4" />
-                      </Button>
-                    </form>
+                  {/* Quick search for mobile sidebar */}
+                  <div className="px-4" ref={sidebarSearchRef}>
+                    <div className="relative flex-1 max-w-md">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                          type="search"
+                          placeholder="Search topics, courses, articles..."
+                          className="pl-9"
+                          value={searchQuery}
+                          onChange={handleSearchQueryChange}
+                          onFocus={() => setSidebarSearchOpen(true)}
+                          onKeyDown={handleSearchKeyDown}
+                        />
+                        {searchQuery && (
+                          <button
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                            onClick={() => setSearchQuery("")}
+                            aria-label="Clear search"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        )}
+                      </div>
+                      <AnimatePresence>
+                        {sidebarSearchOpen && (
+                          <SearchResults
+                            searchQuery={searchQuery}
+                            searchSuggestions={searchSuggestions}
+                            isLoadingSuggestions={isLoadingSuggestions}
+                            selectedSuggestionIndex={selectedSuggestionIndex}
+                            handleSuggestionClick={handleSuggestionClick}
+                            handleViewAllResults={handleViewAllResults}
+                            containerStyle="z-50"
+                          />
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </div>
 
                   {/* Quick links */}
@@ -529,7 +1137,7 @@ const Navbar: React.FC = () => {
                       <>
                         <Button variant="outline" className="flex-1" asChild>
                           <Link to="/profile" onClick={closeSidebar}>
-                            <UserIcon className="h-4 w-4 mr-2" />
+                            <User className="h-4 w-4 mr-2" />
                             Profile
                           </Link>
                         </Button>
@@ -588,7 +1196,7 @@ const Navbar: React.FC = () => {
                       transition={{ duration: 0.2 }}
                       className="ml-1"
                     >
-                      {/* <ChevronDown className="h-4 w-4" /> */}
+                      <ChevronDown className="h-4 w-4" />
                     </motion.div>
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
@@ -655,7 +1263,7 @@ const Navbar: React.FC = () => {
                       transition={{ duration: 0.2 }}
                       className="ml-1"
                     >
-                      {/* <ChevronDown className="h-4 w-4" /> */}
+                      <ChevronDown className="h-4 w-4" />
                     </motion.div>
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
@@ -701,212 +1309,341 @@ const Navbar: React.FC = () => {
 
           {/* Right side: Search, theme toggle, and auth buttons */}
           <div className="flex items-center gap-2">
-            {/* Desktop Inline Search */}
+            {/* Desktop Search Button and Dropdown */}
             <div className="hidden md:block relative" ref={desktopSearchRef}>
-              <form onSubmit={handleSearch}>
-                <Button
-                  type={isSearchOpen ? "submit" : "button"}
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => !isSearchOpen && setIsSearchOpen(true)}
-                  aria-label={isSearchOpen ? "Submit search" : "Open search"}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 z-10"
-                >
-                  <Search className="h-5 w-5" />
-                </Button>
-
-                <motion.div
-                  className="overflow-hidden"
-                  initial={{ width: "40px", opacity: 0 }}
-                  animate={{
-                    width: isSearchOpen ? "300px" : "40px",
-                    opacity: isSearchOpen ? 1 : 0,
-                  }}
-                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                >
-                  <Input
-                    ref={searchInputRef}
-                    type="search"
-                    placeholder="Search ByteForge..."
-                    className={`pr-10 ${isSearchOpen ? "" : "cursor-pointer"}`}
-                    aria-label="Search"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (!isSearchOpen) setIsSearchOpen(true);
-                    }}
-                  />
-                </motion.div>
-
-                {/* Search suggestions dropdown */}
-                {isSearchOpen && searchQuery && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="block"
+                onClick={() => setDesktopSearchOpen(!desktopSearchOpen)}
+                aria-label="Toggle search"
+              >
+                <Search className="h-5 w-5" />
+              </Button>
+              <AnimatePresence>
+                {desktopSearchOpen && (
                   <motion.div
-                    className="absolute z-50 mt-1 w-full bg-popover shadow-lg rounded-md border"
+                    className="absolute right-0 top-full mt-2 w-80 bg-popover rounded-md shadow-lg border p-2 z-50"
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                   >
-                    {isLoadingSuggestions ? (
-                      <div className="p-4 flex justify-center">
-                        <Loader2 className="h-5 w-5 animate-spin" />
-                      </div>
-                    ) : searchSuggestions.length > 0 ? (
-                      <ul>
-                        {searchSuggestions.map((suggestion, index) => (
-                          <motion.li
-                            key={index}
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.05 }}
-                            whileHover={{ backgroundColor: "rgba(0,0,0,0.05)" }}
-                          >
-                            <button
-                              className="w-full text-left p-3 hover:bg-accent"
-                              onClick={() => handleSuggestionClick(suggestion)}
-                            >
-                              {suggestion}
-                            </button>
-                          </motion.li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <div className="p-3 text-sm text-muted-foreground">
-                        No suggestions found
-                      </div>
-                    )}
-                  </motion.div>
-                )}
-              </form>
-            </div>
-
-            {/* Mobile Search Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsSearchOpen(true)}
-              aria-label="Open search"
-              className="md:hidden"
-            >
-              <Search className="h-5 w-5" />
-            </Button>
-
-            {/* Mobile Search Modal */}
-            <AnimatePresence>
-              {isSearchOpen && (
-                <motion.div
-                  className="md:hidden fixed inset-0 z-50 flex items-start justify-center bg-background/80 backdrop-blur-sm pt-16 px-4"
-                  onClick={() => setIsSearchOpen(false)}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <motion.div
-                    className="w-full max-w-md bg-background rounded-lg shadow-lg border p-4"
-                    onClick={(e) => e.stopPropagation()}
-                    initial={{ y: -20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: -20, opacity: 0 }}
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  >
-                    <form onSubmit={handleSearch}>
-                      <div className="flex items-center gap-2">
-                        <Input
-                          ref={searchInputRef}
-                          type="search"
-                          placeholder="Search ByteForge..."
-                          className="flex-1"
-                          aria-label="Search"
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                        <Button
-                          type="submit"
-                          variant="default"
-                          size="icon"
-                          aria-label="Search"
-                        >
-                          <Search className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={closeSearch}
-                          aria-label="Close search"
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        ref={searchInputRef}
+                        type="search"
+                        placeholder="Search topics, courses, articles..."
+                        className="pl-9 pr-8"
+                        value={searchQuery}
+                        onChange={handleSearchQueryChange}
+                        onKeyDown={handleSearchKeyDown}
+                      />
+                      {searchQuery && (
+                        <button
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                          onClick={() => setSearchQuery("")}
+                          aria-label="Clear search"
                         >
                           <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </form>
-
-                    {/* Recent & Popular searches */}
-                    <div className="mt-4 space-y-3">
-                      {recentSearches.length > 0 && (
-                        <div>
-                          <p className="text-sm font-medium text-muted-foreground mb-2">
-                            Recent searches:
-                          </p>
-                          <div className="flex flex-wrap gap-2">
-                            {recentSearches.map((term, index) => (
-                              <motion.button
-                                key={`recent-${term}`}
-                                className="px-3 py-1 text-sm bg-secondary rounded-full hover:bg-secondary/80 focus:outline-none focus:ring-2 focus:ring-primary/50 flex items-center gap-1"
-                                onClick={() => handleSuggestionClick(term)}
-                                initial={{ opacity: 0, scale: 0.8 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: index * 0.05 }}
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                              >
-                                {term}
-                              </motion.button>
-                            ))}
-                          </div>
-                        </div>
+                        </button>
                       )}
+                    </div>
 
-                      <div>
-                        <p className="text-sm font-medium text-muted-foreground mb-2">
-                          Popular searches:
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          {POPULAR_SEARCHES.map((term, index) => (
-                            <motion.button
-                              key={`popular-${term}`}
-                              className="px-3 py-1 text-sm bg-accent rounded-full hover:bg-accent/80 focus:outline-none focus:ring-2 focus:ring-primary/50"
-                              onClick={() => handleSuggestionClick(term)}
-                              initial={{ opacity: 0, scale: 0.8 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              transition={{ delay: index * 0.05 }}
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
+                    {/* Show recent searches when no query */}
+                    {!searchQuery.trim() && recentSearches.length > 0 && (
+                      <div className="mt-2">
+                        <h4 className="text-xs uppercase text-muted-foreground px-2 py-1 border-b">
+                          Recent Searches
+                        </h4>
+                        <div className="p-1">
+                          {recentSearches.map((search, index) => (
+                            <div
+                              key={`recent-${index}`}
+                              className="p-2 hover:bg-accent rounded-md cursor-pointer flex items-center gap-2 transition-transform hover:translate-x-1"
+                              onClick={() => {
+                                setSearchQuery(search);
+                              }}
                             >
-                              {term}
-                            </motion.button>
+                              <History className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-sm">{search}</span>
+                            </div>
                           ))}
                         </div>
                       </div>
+                    )}
+
+                    <AnimatePresence>
+                      {(searchQuery || isLoadingSuggestions) && (
+                        <SearchResults
+                          searchQuery={searchQuery}
+                          searchSuggestions={searchSuggestions}
+                          isLoadingSuggestions={isLoadingSuggestions}
+                          selectedSuggestionIndex={selectedSuggestionIndex}
+                          handleSuggestionClick={handleSuggestionClick}
+                          handleViewAllResults={handleViewAllResults}
+                          containerStyle="relative top-1 left-0 w-full"
+                        />
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Mobile Search Button and Popup */}
+            <div className="md:hidden relative" ref={mobileSearchRef}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="block"
+                onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
+                aria-label="Toggle search"
+              >
+                <Search className="h-5 w-5" />
+              </Button>
+              <AnimatePresence>
+                {mobileSearchOpen && (
+                  <motion.div
+                    className="fixed inset-0 bg-background/95 backdrop-blur-sm z-50 p-4 flex flex-col"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <div className="flex items-center gap-2 pb-4 border-b">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setMobileSearchOpen(false)}
+                        aria-label="Close search"
+                      >
+                        <ArrowLeft className="h-5 w-5" />
+                      </Button>
+                      <h2 className="text-lg font-medium">Search</h2>
+                    </div>
+
+                    <div className="relative my-4">
+                      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        type="search"
+                        placeholder="Search topics, courses, articles..."
+                        className="pl-9 pr-8"
+                        value={searchQuery}
+                        onChange={handleSearchQueryChange}
+                        onKeyDown={handleSearchKeyDown}
+                        autoFocus
+                      />
+                      {searchQuery && (
+                        <button
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                          onClick={() => setSearchQuery("")}
+                          aria-label="Clear search"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto">
+                      {!searchQuery.trim() && (
+                        <>
+                          {/* Recent searches */}
+                          {recentSearches.length > 0 && (
+                            <div className="mb-4">
+                              <h3 className="text-sm font-medium mb-2">
+                                Recent Searches
+                              </h3>
+                              <div className="space-y-2">
+                                {recentSearches.map((search, index) => (
+                                  <motion.div
+                                    key={`recent-${index}`}
+                                    className="p-3 bg-accent/30 rounded-md cursor-pointer flex items-center gap-2"
+                                    whileHover={{ x: 5 }}
+                                    onClick={() => {
+                                      setSearchQuery(search);
+                                    }}
+                                  >
+                                    <History className="h-4 w-4 text-muted-foreground" />
+                                    <span>{search}</span>
+                                  </motion.div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Popular categories */}
+                          <div>
+                            <h3 className="text-sm font-medium mb-2">
+                              Popular Categories
+                            </h3>
+                            <div className="grid grid-cols-2 gap-2">
+                              {[
+                                "Java Basics",
+                                "OOP",
+                                "Collections",
+                                "Multithreading",
+                                "IO",
+                                "Exceptions",
+                              ].map((category) => (
+                                <motion.div
+                                  key={category}
+                                  className="p-3 bg-accent/30 rounded-md cursor-pointer flex flex-col items-center justify-center"
+                                  whileHover={{ scale: 1.02 }}
+                                  whileTap={{ scale: 0.98 }}
+                                  onClick={() => {
+                                    setSearchQuery(category);
+                                  }}
+                                >
+                                  <span className="text-sm font-medium">
+                                    {category}
+                                  </span>
+                                </motion.div>
+                              ))}
+                            </div>
+                          </div>
+                        </>
+                      )}
+
+                      {/* Search results */}
+                      {(searchQuery.trim() || isLoadingSuggestions) && (
+                        <div className="mt-2">
+                          {isLoadingSuggestions ? (
+                            <div className="py-8 flex flex-col items-center justify-center">
+                              <motion.div
+                                animate={{ rotate: 360 }}
+                                transition={{
+                                  duration: 1,
+                                  repeat: Infinity,
+                                  ease: "linear",
+                                }}
+                              >
+                                <Loader2 className="h-8 w-8 text-primary" />
+                              </motion.div>
+                              <span className="mt-4 text-muted-foreground">
+                                Searching...
+                              </span>
+                            </div>
+                          ) : searchSuggestions.length > 0 ? (
+                            <div className="space-y-4">
+                              {/* Group by type */}
+                              {(["topic", "course", "article"] as const).map(
+                                (type) => {
+                                  const items = searchSuggestions.filter(
+                                    (s) => s.type === type
+                                  );
+                                  if (!items.length) return null;
+
+                                  return (
+                                    <div key={type}>
+                                      <h3 className="text-sm font-medium mb-2 flex items-center gap-2">
+                                        {getSuggestionIcon(type)}
+                                        {type.charAt(0).toUpperCase() +
+                                          type.slice(1)}
+                                        s
+                                      </h3>
+                                      <div className="space-y-2">
+                                        {items.map((suggestion, index) => (
+                                          <motion.div
+                                            key={suggestion.id}
+                                            className={`p-3 bg-accent/30 rounded-md cursor-pointer ${
+                                              selectedSuggestionIndex ===
+                                              searchSuggestions.indexOf(
+                                                suggestion
+                                              )
+                                                ? "bg-accent"
+                                                : ""
+                                            }`}
+                                            whileHover={{ x: 5 }}
+                                            whileTap={{ scale: 0.98 }}
+                                            onClick={() =>
+                                              handleSuggestionClick(suggestion)
+                                            }
+                                          >
+                                            <div className="font-medium">
+                                              {suggestion.title}
+                                            </div>
+                                          </motion.div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  );
+                                }
+                              )}
+                            </div>
+                          ) : (
+                            <div className="py-8 text-center">
+                              <p className="text-muted-foreground">
+                                No results found for "{searchQuery}"
+                              </p>
+                              <p className="text-sm text-muted-foreground mt-2">
+                                Try a different search term or browse topics
+                              </p>
+                              <Button
+                                className="mt-4"
+                                onClick={handleViewAllResults}
+                              >
+                                Browse Topics
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </motion.div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                )}
+              </AnimatePresence>
+            </div>
 
             {/* Notification and language buttons */}
             {user && (
               <>
-                <Button variant="ghost" size="icon" aria-label="Notifications">
-                  <div className="relative">
-                    <Bell className="h-5 w-5" />
-                    <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center">
-                      3
-                    </span>
-                  </div>
-                </Button>
-                <Button variant="ghost" size="icon" aria-label="Language">
-                  <Globe className="h-5 w-5" />
-                </Button>
+                <div className="relative" ref={notificationRef}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                    aria-label="Notifications"
+                    aria-expanded={isNotificationOpen}
+                  >
+                    <div className="relative">
+                      <Bell className="h-5 w-5" />
+                      {unreadCount > 0 && (
+                        <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center">
+                          {unreadCount}
+                        </span>
+                      )}
+                    </div>
+                  </Button>
+                  <AnimatePresence>
+                    {isNotificationOpen && (
+                      <NotificationDropdown
+                        notifications={notifications}
+                        handleNotificationClick={handleNotificationClick}
+                        handleMarkAllAsRead={handleMarkAllAsRead}
+                      />
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                <div className="relative" ref={languageMenuRef}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setIsLanguageMenuOpen(!isLanguageMenuOpen)}
+                    aria-label="Language"
+                    aria-expanded={isLanguageMenuOpen}
+                  >
+                    <Globe className="h-5 w-5" />
+                  </Button>
+                  <AnimatePresence>
+                    {isLanguageMenuOpen && (
+                      <LanguageMenu
+                        activeLanguage={activeLanguage}
+                        handleLanguageChange={handleLanguageChange}
+                      />
+                    )}
+                  </AnimatePresence>
+                </div>
               </>
             )}
 
@@ -915,57 +1652,48 @@ const Navbar: React.FC = () => {
             {/* Desktop Auth Buttons */}
             <div className="hidden md:flex gap-2">
               {user ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
+                <>
+                  <div className="relative" ref={userProfileRef}>
                     <Button
                       variant="ghost"
-                      className="relative h-8 w-8 rounded-full"
+                      size="sm"
+                      className="flex items-center gap-2"
+                      onClick={() => setUserProfileOpen(!userProfileOpen)}
                     >
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src={user.avatar} alt={user.name} />
-                        <AvatarFallback>{user.name[0]}</AvatarFallback>
+                      <Avatar className="h-6 w-6">
+                        <AvatarImage src={user.avatar} />
+                        <AvatarFallback>
+                          {user.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")}
+                        </AvatarFallback>
                       </Avatar>
+                      <span className="hidden lg:inline-block">Profile</span>
                     </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end" forceMount>
-                    <DropdownMenuLabel className="font-normal">
-                      <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">
-                          {user.name}
-                        </p>
-                        <p className="text-xs leading-none text-muted-foreground">
-                          {user.email}
-                        </p>
-                      </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link to="/dashboard">
-                        <UserIcon className="mr-2 h-4 w-4" />
-                        Dashboard
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/profile">
-                        <Settings className="mr-2 h-4 w-4" />
-                        Profile
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout}>
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Log out
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                    <UserProfileDropdown
+                      isOpen={userProfileOpen}
+                      onClose={() => setUserProfileOpen(false)}
+                    />
+                  </div>
+                </>
               ) : (
                 <>
-                  <Button variant="ghost" asChild>
+                  <Button
+                    variant="ghost"
+                    asChild
+                    className="transition-transform hover:scale-105 active:scale-95"
+                  >
                     <Link to="/login">Log In</Link>
                   </Button>
-                  <Button asChild>
-                    <Link to="/signup">Sign Up</Link>
-                  </Button>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Button asChild>
+                      <Link to="/signup">Sign Up</Link>
+                    </Button>
+                  </motion.div>
                 </>
               )}
             </div>

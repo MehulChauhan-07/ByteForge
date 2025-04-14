@@ -1,72 +1,181 @@
 import axios from "axios";
+import { User } from "../types/auth";
 
-const API_URL = "http://localhost:8080/api/auth/";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
 class AuthService {
-  async login(credentials: { usernameOrEmail: any; password: any }) {
-    try {
-      const response = await axios.post(API_URL + "login", {
-        usernameOrEmail: credentials.usernameOrEmail,
-        password: credentials.password,
-      });
+  private token: string | null = null;
 
-      if (response.data.token) {
-        // Store user details and JWT token in localStorage
-        localStorage.setItem("user", JSON.stringify(response.data));
+  constructor() {
+    this.initializeAuth();
+  }
 
-        // Set the authorization header for subsequent requests
-        this.setAuthHeader(response.data.token);
-      }
-
-      return response.data;
-    } catch (error) {
-      throw error;
+  private initializeAuth() {
+    // Initialize token from localStorage
+    this.token = localStorage.getItem("token");
+    if (this.token) {
+      this.setAuthHeader(this.token);
     }
   }
 
-  logout() {
-    localStorage.removeItem("user");
-    this.removeAuthHeader();
-  }
-
-  register(username: any, email: any, password: any, name: any) {
-    return axios.post(API_URL + "signup", {
-      username,
-      email,
-      password,
-      name,
-    });
-  }
-
-  getCurrentUser() {
-    const user = localStorage.getItem("user");
-    return user ? JSON.parse(user) : null;
-  }
-
-  isAuthenticated(): boolean {
-    const user = this.getCurrentUser();
-    return !!user && !!user.token;
-  }
-
-  setAuthHeader(token: string) {
+  private setAuthHeader(token: string) {
     axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   }
 
-  removeAuthHeader() {
+  private clearAuth() {
+    this.token = null;
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     delete axios.defaults.headers.common["Authorization"];
   }
 
-  // Initialize auth header if user is already logged in
-  initAuthHeader() {
-    const user = this.getCurrentUser();
-    if (user && user.token) {
-      this.setAuthHeader(user.token);
+  async login(email: string, password: string): Promise<User> {
+    try {
+      // Clear any existing auth data
+      this.clearAuth();
+
+      const response = await axios.post(`${API_URL}/auth/login`, {
+        usernameOrEmail: email,
+        password: password,
+      });
+
+      if (!response.data || !response.data.token) {
+        throw new Error("Invalid response format: Missing token");
+      }
+
+      // Store token
+      const token = response.data.token;
+      if (!token) {
+        throw new Error("Invalid token received");
+      }
+
+      this.token = token;
+      localStorage.setItem("token", token);
+      this.setAuthHeader(token);
+
+      // Create and store user data
+      const userData: User = {
+        id: "0", // Backend doesn't provide ID in response
+        name: response.data.username,
+        email: response.data.email,
+        username: response.data.username,
+        roles: ["USER"], // Default role
+        token: token,
+        type: "user",
+      };
+
+      localStorage.setItem("user", JSON.stringify(userData));
+      return userData;
+    } catch (error: any) {
+      this.clearAuth();
+
+      if (error.response) {
+        const errorMessage = error.response.data?.message || "Login failed";
+        throw new Error(errorMessage);
+      } else if (error.request) {
+        throw new Error("No response from server");
+      } else {
+        throw new Error("Login request failed");
+      }
     }
+  }
+
+  async signup(name: string, email: string, password: string): Promise<User> {
+    try {
+      // Clear any existing auth data
+      this.clearAuth();
+
+      const response = await axios.post(`${API_URL}/auth/register`, {
+        username: name,
+        email: email,
+        password: password,
+      });
+
+      if (!response.data || !response.data.token) {
+        throw new Error("Invalid response format: Missing token");
+      }
+
+      // Store token
+      const token = response.data.token;
+      if (!token) {
+        throw new Error("Invalid token received");
+      }
+
+      this.token = token;
+      localStorage.setItem("token", token);
+      this.setAuthHeader(token);
+
+      // Create and store user data
+      const userData: User = {
+        id: "0", // Backend doesn't provide ID in response
+        name: response.data.username,
+        email: response.data.email,
+        username: response.data.username,
+        roles: ["USER"], // Default role
+        token: token,
+        type: "user",
+      };
+
+      localStorage.setItem("user", JSON.stringify(userData));
+      return userData;
+    } catch (error: any) {
+      this.clearAuth();
+
+      if (error.response) {
+        const errorMessage = error.response.data?.message || "Signup failed";
+        throw new Error(errorMessage);
+      } else if (error.request) {
+        throw new Error("No response from server");
+      } else {
+        throw new Error("Signup request failed");
+      }
+    }
+  }
+
+  logout(): void {
+    this.clearAuth();
+  }
+
+  getCurrentUser(): User | null {
+    try {
+      const userStr = localStorage.getItem("user");
+      if (!userStr) return null;
+
+      const user = JSON.parse(userStr);
+      if (!this.isValidUser(user)) {
+        this.clearAuth();
+        return null;
+      }
+
+      return user;
+    } catch (error) {
+      console.error("Error getting current user:", error);
+      this.clearAuth();
+      return null;
+    }
+  }
+
+  private isValidUser(user: any): user is User {
+    return (
+      user &&
+      typeof user === "object" &&
+      typeof user.id === "string" &&
+      typeof user.name === "string" &&
+      typeof user.email === "string" &&
+      typeof user.username === "string" &&
+      Array.isArray(user.roles) &&
+      typeof user.token === "string" &&
+      typeof user.type === "string"
+    );
+  }
+
+  getToken(): string | null {
+    return this.token;
+  }
+
+  isAuthenticated(): boolean {
+    return !!this.token && !!this.getCurrentUser();
   }
 }
 
-const authService = new AuthService();
-// Initialize auth header on service creation
-authService.initAuthHeader();
-
-export default authService;
+export default new AuthService();

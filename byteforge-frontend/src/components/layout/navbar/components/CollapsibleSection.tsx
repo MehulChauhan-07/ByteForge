@@ -1,51 +1,49 @@
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown } from "lucide-react";
-import { useState } from "react";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { ChevronDown, ChevronUp } from "lucide-react";
+
+interface NavItem {
+  title: string;
+  href: string;
+  description?: string;
+}
 
 interface CollapsibleSectionProps {
   title: string;
-  icon?: React.ReactNode;
-  children: React.ReactNode;
-  defaultOpen?: boolean;
+  items: NavItem[];
 }
-// New collapsible section component for mobile
-export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
-  title,
-  icon,
-  children,
-  defaultOpen = false,
-}) => {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+
+export function CollapsibleSection({ title, items }: CollapsibleSectionProps) {
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="border-b border-border/40 py-2">
+    <div className="relative">
       <button
+        className="flex items-center space-x-2 text-foreground hover:text-primary transition-colors"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center w-full gap-3 p-3 rounded-lg hover:bg-accent transition-colors"
       >
-        <div className="flex items-center justify-center w-8 h-8">{icon}</div>
-        <span className="text-lg font-medium">{title}</span>
-        <motion.div
-          className="ml-auto"
-          animate={{ rotate: isOpen ? 180 : 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          <ChevronDown className="h-5 w-5" />
-        </motion.div>
+        <span>{title}</span>
+        {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
       </button>
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden pl-10"
-          >
-            <div className="py-2">{children}</div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+
+      {isOpen && (
+        <div className="absolute top-full left-0 mt-2 w-64 rounded-lg bg-background shadow-lg border border-border p-2">
+          {items.map((item) => (
+            <Link
+              key={item.href}
+              to={item.href}
+              className="block px-4 py-2 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
+            >
+              <div className="font-medium">{item.title}</div>
+              {item.description && (
+                <div className="text-sm text-muted-foreground">
+                  {item.description}
+                </div>
+              )}
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   );
-};
+}

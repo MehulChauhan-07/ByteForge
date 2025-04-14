@@ -48,9 +48,9 @@ const AppRoutes = () => {
         {/* <Route path="/certification" element={<CertificationPage />} /> */}
 
         {/* Protected tool feature routes */}
-        {/* <Route path="/compiler" element={<CompilerPage />} /> */}
-        <Route path="/notes" element={<NotesPage />} />
-        <Route path="/assistant" element={<ChatbotPage />} />
+        <Route path="/tools/compiler" element={<CompilerPage />} />
+        <Route path="/tools/assistant" element={<ChatbotPage />} />
+        <Route path="/tools/notes" element={<NotesPage />} />
         <Route path="/community" element={<CommunityPage />} />
       </Route>
 

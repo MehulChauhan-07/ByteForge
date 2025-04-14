@@ -57,6 +57,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Settings, LogOut, History, HelpCircle } from "lucide-react";
+import authService from "@/services/authService";
 
 // Constants
 const QUICK_LINKS = [
@@ -436,8 +437,15 @@ const SearchResults = ({
 
 const UserProfileDropdown = ({ isOpen, onClose }: UserProfileDropdownProps) => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   if (!user) return null;
+
+  const handleLogout = () => {
+    authService.logout();
+    logout();
+    navigate("/login");
+  };
 
   return (
     <AnimatePresence>
@@ -448,51 +456,44 @@ const UserProfileDropdown = ({ isOpen, onClose }: UserProfileDropdownProps) => {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
         >
-          <div className="p-4 border-b">
-            <div className="flex items-center gap-3">
-              <Avatar>
-                <AvatarImage src={user.avatar} />
-                <AvatarFallback>
-                  {user.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h3 className="font-medium">{user.name}</h3>
-                <p className="text-sm text-muted-foreground">{user.email}</p>
-              </div>
-            </div>
-          </div>
-          <div className="p-2">
-            <DropdownMenuItem>
-              <User className="mr-2 h-4 w-4" />
-              Profile
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Settings className="mr-2 h-4 w-4" />
-              Settings
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Bookmark className="mr-2 h-4 w-4" />
-              Saved Items
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <History className="mr-2 h-4 w-4" />
-              History
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <HelpCircle className="mr-2 h-4 w-4" />
-              Help & Support
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={logout}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Logout
-            </DropdownMenuItem>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuContent className="w-64">
+              <DropdownMenuLabel className="flex items-center gap-3 p-4 border-b">
+                <Avatar>
+                  <AvatarImage src={user.avatar} />
+                  <AvatarFallback>
+                    {user.name
+                      ? user.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                      : "U"}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <h3 className="font-medium">{user.name}</h3>
+                  <p className="text-sm text-muted-foreground">{user.email}</p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => navigate("/dashboard")}>
+                <User className="mr-2 h-4 w-4" />
+                Dashboard
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/profile")}>
+                <Settings className="mr-2 h-4 w-4" />
+                Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/notes")}>
+                <Bookmark className="mr-2 h-4 w-4" />
+                Notes
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </motion.div>
       )}
     </AnimatePresence>
@@ -602,7 +603,8 @@ const SkipToContentLink = () => (
 );
 
 const Navbar: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
 
   // Search state variables - separate for different UI contexts
   const [searchQuery, setSearchQuery] = useState("");
@@ -638,8 +640,6 @@ const Navbar: React.FC = () => {
   const languageMenuRef = useRef<HTMLDivElement>(null);
   const userProfileRef = useRef<HTMLDivElement>(null);
 
-  // Router hooks
-  const navigate = useNavigate();
   const location = useLocation();
 
   // Close UI elements when route changes
@@ -941,7 +941,17 @@ const Navbar: React.FC = () => {
   const handleLogout = useCallback(() => {
     logout();
     closeSidebar();
+    navigate("/login");
   }, [logout, closeSidebar]);
+
+  const getInitials = (name: string) => {
+    if (!name) return "U";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
+  };
 
   return (
     <>
@@ -1649,52 +1659,67 @@ const Navbar: React.FC = () => {
 
             <ModeToggle />
 
-            {/* Desktop Auth Buttons */}
-            <div className="hidden md:flex gap-2">
-              {user ? (
-                <>
-                  <div className="relative" ref={userProfileRef}>
+            <div className="flex items-center gap-4">
+              {isAuthenticated() && user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
                     <Button
                       variant="ghost"
-                      size="sm"
-                      className="flex items-center gap-2"
-                      onClick={() => setUserProfileOpen(!userProfileOpen)}
+                      className="relative h-8 w-8 rounded-full"
                     >
-                      <Avatar className="h-6 w-6">
-                        <AvatarImage src={user.avatar} />
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage
+                          src={`https://ui-avatars.com/api/?name=${
+                            user.name || "User"
+                          }&background=random`}
+                          alt={user.name || "User"}
+                        />
                         <AvatarFallback>
-                          {user.name
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")}
+                          {getInitials(user.name)}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="hidden lg:inline-block">Profile</span>
                     </Button>
-                    <UserProfileDropdown
-                      isOpen={userProfileOpen}
-                      onClose={() => setUserProfileOpen(false)}
-                    />
-                  </div>
-                </>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">
+                          {user.name || "User"}
+                        </p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user.email || ""}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/dashboard">
+                        <User className="mr-2 h-4 w-4" />
+                        Dashboard
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/profile">
+                        <Settings className="mr-2 h-4 w-4" />
+                        Profile
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Log out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               ) : (
-                <>
-                  <Button
-                    variant="ghost"
-                    asChild
-                    className="transition-transform hover:scale-105 active:scale-95"
-                  >
+                <div className="flex space-x-4">
+                  <Button variant="ghost" asChild>
                     <Link to="/login">Log In</Link>
                   </Button>
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Button asChild>
-                      <Link to="/signup">Sign Up</Link>
-                    </Button>
-                  </motion.div>
-                </>
+                  <Button asChild>
+                    <Link to="/signup">Sign Up</Link>
+                  </Button>
+                </div>
               )}
             </div>
           </div>
