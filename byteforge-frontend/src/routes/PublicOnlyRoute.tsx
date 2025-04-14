@@ -22,7 +22,7 @@ const PublicOnlyRoute = () => {
   }
 
   // If user is authenticated, redirect to the intended destination or dashboard
-  if (isAuthenticated()) {
+  if (isAuthenticated) {
     return <Navigate to={from} replace />;
   }
 

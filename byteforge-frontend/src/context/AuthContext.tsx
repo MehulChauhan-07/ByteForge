@@ -1,87 +1,101 @@
-import React, { createContext, useState, useContext, useEffect } from "react";
-import authService from "@/services/authService";
-
-// Define user type based on your JWT response
-interface User {
-  id: number;
-  username: string;
-  email: string;
-  name: string;
-  avatar?: string;
-  token: string;
-  type: string;
-}
+import React, { createContext, useContext, useState, useEffect } from "react";
+import authService from "../services/authService";
+import { User } from "../types/auth";
 
 interface AuthContextType {
   user: User | null;
-  loading: boolean;
-  login: (credentials: {
-    usernameOrEmail: string;
-    password: string;
-  }) => Promise<void>;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  signup: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
-  isAuthenticated: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+};
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is already logged in
-    const initAuth = () => {
-      const storedUser = authService.getCurrentUser();
-      if (storedUser) {
-        setUser(storedUser);
-        authService.setAuthHeader(storedUser.token);
+    const checkAuth = async () => {
+      try {
+        const currentUser = authService.getCurrentUser();
+        const isAuth = authService.isAuthenticated();
+
+        setUser(currentUser);
+        setIsAuthenticated(isAuth);
+      } catch (error) {
+        console.error("Error checking auth status:", error);
+        setUser(null);
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
       }
-      setLoading(false);
     };
 
-    initAuth();
+    checkAuth();
   }, []);
 
-  const login = async (credentials: {
-    usernameOrEmail: string;
-    password: string;
-  }) => {
-    const userData = await authService.login(credentials);
-    setUser(userData);
+  const login = async (email: string, password: string) => {
+    try {
+      setIsLoading(true);
+      const userData = await authService.login(email, password);
+      setUser(userData);
+      setIsAuthenticated(true);
+    } catch (error) {
+      setUser(null);
+      setIsAuthenticated(false);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const signup = async (name: string, email: string, password: string) => {
+    try {
+      setIsLoading(true);
+      const userData = await authService.signup(name, email, password);
+      setUser(userData);
+      setIsAuthenticated(true);
+    } catch (error) {
+      setUser(null);
+      setIsAuthenticated(false);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const logout = () => {
     authService.logout();
     setUser(null);
-  };
-
-  const isAuthenticated = () => {
-    return !!user;
+    setIsAuthenticated(false);
   };
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        loading,
-        login,
-        logout,
         isAuthenticated,
+        isLoading,
+        login,
+        signup,
+        logout,
       }}
     >
       {children}
     </AuthContext.Provider>
   );
-};
-
-// Custom hook to use the auth context
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
 };

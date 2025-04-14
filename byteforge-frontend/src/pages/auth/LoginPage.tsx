@@ -1,23 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AlertCircle, Eye, EyeOff, Mail, Lock, Github } from "lucide-react";
 import authService from "@/services/authService";
 import axios from "axios";
-import { useAuth } from "../../context/AuthContext";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -27,7 +19,10 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const location = useLocation();
+
+  // Get the redirect path from location state or default to dashboard
+  const from = location.state?.from?.pathname || "/dashboard";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,13 +30,21 @@ const LoginPage = () => {
     setIsLoading(true);
 
     try {
-      const user = await authService.login(email, password);
-      login(user);
-      navigate("/dashboard");
-    } catch (err: any) {
-      console.error("Login error:", err);
-      setError(err.message || "Failed to login. Please try again.");
-    } finally {
+      // Call the authService login method
+      await authService.login(email, password);
+
+      // After successful login, navigate to the intended page
+      navigate(from, { replace: true });
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response) {
+        // Handle specific error messages from the server
+        setError(
+          err.response.data.message ||
+            "Login failed. Please check your credentials."
+        );
+      } else {
+        setError("Login failed. Please try again later.");
+      }
       setIsLoading(false);
     }
   };
@@ -51,78 +54,135 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">
-            Sign in to your account
-          </CardTitle>
-          <CardDescription className="text-center">
-            Enter your email and password to access your account
-          </CardDescription>
-        </CardHeader>
+    <div className="container max-w-md mx-auto py-10 px-4 min-h-[calc(100vh-8rem)]">
+      <div className="text-center mb-6">
+        <h1 className="text-3xl font-bold">Welcome back</h1>
+        <p className="text-sm text-muted-foreground mt-2">
+          Don&apos;t have an account yet?{" "}
+          <Link
+            to="/signup"
+            className="text-primary hover:underline font-medium"
+          >
+            Sign up
+          </Link>
+        </p>
+      </div>
+
+      <div className="w-full rounded-md border bg-card text-card-foreground shadow-md p-6">
         <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
-            {error && (
-              <div className="bg-red-50 text-red-500 p-3 rounded-md text-sm flex items-center gap-2">
-                <AlertCircle className="h-4 w-4" />
-                <span>{error}</span>
-              </div>
-            )}
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                placeholder="Enter your email"
-              />
+          {error && (
+            <div className="flex items-center gap-2 p-4 mb-4 text-destructive bg-destructive/10 rounded-md border border-destructive/20">
+              <AlertCircle className="h-4 w-4" />
+              <p className="text-sm">{error}</p>
             </div>
+          )}
+
+          <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                placeholder="Enter your password"
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="remember"
-                  checked={rememberMe}
-                  onCheckedChange={(checked) =>
-                    setRememberMe(checked as boolean)
-                  }
+              <Label htmlFor="email" className="font-medium">
+                Email
+              </Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="email"
+                  type="email"
+                  className="pl-10"
+                  placeholder="email@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoComplete="email"
                 />
-                <Label htmlFor="remember">Remember me</Label>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password" className="font-medium">
+                  Password
+                </Label>
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="text-sm text-muted-foreground hover:text-foreground"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  className="pl-10"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  autoComplete="current-password"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="rememberMe"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                />
+                <Label
+                  htmlFor="rememberMe"
+                  className="ml-2 text-sm text-muted-foreground"
+                >
+                  Remember me
+                </Label>
               </div>
               <Link
                 to="/forgot-password"
-                className="text-sm text-blue-600 hover:text-blue-500"
+                className="text-sm text-primary hover:underline"
               >
                 Forgot password?
               </Link>
             </div>
-          </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
+
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Signing in..." : "Sign in"}
+              {isLoading ? "Logging in..." : "Log in"}
             </Button>
-            <div className="text-center text-sm">
-              Don't have an account?{" "}
-              <Link to="/signup" className="text-blue-600 hover:text-blue-500">
-                Sign up
-              </Link>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or continue with
+                </span>
+              </div>
             </div>
-          </CardFooter>
+
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={() => {
+                // Handle GitHub login
+                window.location.href = `${API_URL}/oauth2/authorization/github`;
+              }}
+            >
+              <Github className="mr-2 h-4 w-4" />
+              Continue with GitHub
+            </Button>
+          </div>
         </form>
-      </Card>
+      </div>
     </div>
   );
 };

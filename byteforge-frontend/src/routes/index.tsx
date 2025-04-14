@@ -5,6 +5,7 @@ import PublicOnlyRoute from "./PublicOnlyRoute";
 // Page imports
 import LoginPage from "@/pages/auth/LoginPage";
 import SignupPage from "@/pages/auth/SignupPage";
+import TestLoginPage from "@/pages/auth/TestLoginPage";
 // import ForgotPasswordPage from "@/pages/auth/ForgotPasswordPage";
 
 import HomePage from "@/pages/home/Home";
@@ -28,17 +29,18 @@ const AppRoutes = () => {
       {/* Public routes that don't require authentication */}
       <Route path="/" element={<HomePage />} />
       <Route path="/about" element={<AboutPage />} />
-      <Route path="/dashboard" element={<DashboardPage />} />
 
       {/* Public routes that should redirect authenticated users */}
       <Route element={<PublicOnlyRoute />}>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/testlogin" element={<TestLoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         {/* <Route path="/forgot-password" element={<ForgotPasswordPage />} /> */}
       </Route>
 
       {/* Protected routes - require authentication */}
       <Route element={<ProtectedRoute />}>
+        <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/topics" element={<TopicsPage />} />
         <Route path="/profile" element={<ProfilePage />} />
 

@@ -57,7 +57,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Settings, LogOut, History, HelpCircle } from "lucide-react";
-import authService from "@/services/authService";
 
 // Constants
 const QUICK_LINKS = [
@@ -178,6 +177,10 @@ interface Notification {
 interface UserProfileDropdownProps {
   isOpen: boolean;
   onClose: () => void;
+  user: {
+    name: string;
+    email: string;
+  };
 }
 
 interface SearchResultsProps {
@@ -434,6 +437,13 @@ const SearchResults = ({
     </motion.div>
   );
 };
+const getInitials = (name: string): string => {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
+};
 
 const UserProfileDropdown = ({ isOpen, onClose }: UserProfileDropdownProps) => {
   const { user, logout } = useAuth();
@@ -442,60 +452,105 @@ const UserProfileDropdown = ({ isOpen, onClose }: UserProfileDropdownProps) => {
   if (!user) return null;
 
   const handleLogout = () => {
-    authService.logout();
     logout();
     navigate("/login");
   };
 
   return (
     <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          className="absolute right-0 mt-2 w-64 bg-popover rounded-md shadow-lg border z-50"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-        >
-          <DropdownMenu>
-            <DropdownMenuContent className="w-64">
-              <DropdownMenuLabel className="flex items-center gap-3 p-4 border-b">
-                <Avatar>
-                  <AvatarImage src={user.avatar} />
-                  <AvatarFallback>
-                    {user.name
-                      ? user.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")
-                      : "U"}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <h3 className="font-medium">{user.name}</h3>
-                  <p className="text-sm text-muted-foreground">{user.email}</p>
+      {/* {isOpen && ( */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              className="relative h-8 w-8 rounded-full"
+              aria-label="User profile"
+            >
+              <Avatar className="h-8 w-8">
+                <AvatarImage
+                  src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                    user.name
+                  )}&background=random`}
+                  alt={user.name}
+                />
+                <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+              </Avatar>
+            </Button>
+          </DropdownMenuTrigger>
+          <AnimatePresence>
+            <DropdownMenuContent
+              className="w-56"
+              align="end"
+              forceMount
+              asChild
+            >
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+              >
+                <DropdownMenuLabel className="p-0">
+                  <div className="flex items-center gap-3 p-3 border-b">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage
+                        src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                          user.name
+                        )}&background=random`}
+                        alt={user.name}
+                      />
+                      <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium">{user.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {user.email}
+                      </p>
+                    </div>
+                  </div>
+                </DropdownMenuLabel>
+                <div className="p-2">
+                  <DropdownMenuItem asChild>
+                    <Link to="/dashboard" className="flex items-center w-full">
+                      <User className="mr-2 h-4 w-4" />
+                      Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="flex items-center w-full">
+                      <Settings className="mr-2 h-4 w-4" />
+                      Profile
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/saved" className="flex items-center w-full">
+                      <Bookmark className="mr-2 h-4 w-4" />
+                      Saved Items
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/history" className="flex items-center w-full">
+                      <History className="mr-2 h-4 w-4" />
+                      History
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/help" className="flex items-center w-full">
+                      <HelpCircle className="mr-2 h-4 w-4" />
+                      Help & Support
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Log out
+                  </DropdownMenuItem>
                 </div>
-              </DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => navigate("/dashboard")}>
-                <User className="mr-2 h-4 w-4" />
-                Dashboard
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate("/profile")}>
-                <Settings className="mr-2 h-4 w-4" />
-                Profile
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate("/notes")}>
-                <Bookmark className="mr-2 h-4 w-4" />
-                Notes
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout}>
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
-              </DropdownMenuItem>
+              </motion.div>
             </DropdownMenuContent>
-          </DropdownMenu>
-        </motion.div>
-      )}
+          </AnimatePresence>
+        </DropdownMenu>
+      {/* )} */}
     </AnimatePresence>
   );
 };
@@ -603,8 +658,7 @@ const SkipToContentLink = () => (
 );
 
 const Navbar: React.FC = () => {
-  const { user, isAuthenticated, logout } = useAuth();
-  const navigate = useNavigate();
+  const { user, logout, isAuthenticated, isLoading } = useAuth();
 
   // Search state variables - separate for different UI contexts
   const [searchQuery, setSearchQuery] = useState("");
@@ -640,6 +694,8 @@ const Navbar: React.FC = () => {
   const languageMenuRef = useRef<HTMLDivElement>(null);
   const userProfileRef = useRef<HTMLDivElement>(null);
 
+  // Router hooks
+  const navigate = useNavigate();
   const location = useLocation();
 
   // Close UI elements when route changes
@@ -941,8 +997,7 @@ const Navbar: React.FC = () => {
   const handleLogout = useCallback(() => {
     logout();
     closeSidebar();
-    navigate("/login");
-  }, [logout, closeSidebar]);
+  }, [closeSidebar]);
 
   const getInitials = (name: string) => {
     if (!name) return "U";
@@ -952,7 +1007,6 @@ const Navbar: React.FC = () => {
       .join("")
       .toUpperCase();
   };
-
   return (
     <>
       <SkipToContentLink />
@@ -1143,35 +1197,91 @@ const Navbar: React.FC = () => {
 
                   {/* Authentication links */}
                   <div className="p-4 border-t flex gap-2">
-                    {user ? (
-                      <>
-                        <Button variant="outline" className="flex-1" asChild>
-                          <Link to="/profile" onClick={closeSidebar}>
-                            <User className="h-4 w-4 mr-2" />
-                            Profile
-                          </Link>
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          className="flex-1"
-                          onClick={handleLogout}
-                        >
-                          Logout
-                        </Button>
-                      </>
+                    {isLoading ? (
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                      </div>
+                    ) : isAuthenticated && user ? (
+                      <div className="flex items-center gap-4">
+                        {/* Notifications */}
+                        <div className="relative" ref={notificationRef}>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() =>
+                              setIsNotificationOpen(!isNotificationOpen)
+                            }
+                            aria-label="Notifications"
+                            aria-expanded={isNotificationOpen}
+                          >
+                            <div className="relative">
+                              <Bell className="h-5 w-5" />
+                              {unreadCount > 0 && (
+                                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center">
+                                  {unreadCount}
+                                </span>
+                              )}
+                            </div>
+                          </Button>
+                          <AnimatePresence>
+                            {isNotificationOpen && (
+                              <NotificationDropdown
+                                notifications={notifications}
+                                handleNotificationClick={
+                                  handleNotificationClick
+                                }
+                                handleMarkAllAsRead={handleMarkAllAsRead}
+                              />
+                            )}
+                          </AnimatePresence>
+                        </div>
+
+                        {/* User Profile */}
+                        <div className="relative" ref={userProfileRef}>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setUserProfileOpen(!userProfileOpen)}
+                            aria-label="User profile"
+                            aria-expanded={userProfileOpen}
+                          >
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage
+                                src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                                  user.name
+                                )}&background=random`}
+                                alt={user.name}
+                              />
+                              <AvatarFallback>
+                                {user.name
+                                  .split(" ")
+                                  .map((n) => n[0])
+                                  .join("")}
+                              </AvatarFallback>
+                            </Avatar>
+                          </Button>
+                          <AnimatePresence>
+                            {userProfileOpen && (
+                              <UserProfileDropdown
+                                isOpen={userProfileOpen}
+                                onClose={() => setUserProfileOpen(false)}
+                              />
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      </div>
                     ) : (
-                      <>
-                        <Button variant="outline" className="flex-1" asChild>
-                          <Link to="/login" onClick={closeSidebar}>
-                            Log In
-                          </Link>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          onClick={() => navigate("/login")}
+                        >
+                          Log in
                         </Button>
-                        <Button className="flex-1" asChild>
-                          <Link to="/signup" onClick={closeSidebar}>
-                            Sign Up
-                          </Link>
+                        <Button onClick={() => navigate("/signup")}>
+                          Sign up
                         </Button>
-                      </>
+                      </div>
                     )}
                   </div>
                 </motion.nav>
@@ -1318,7 +1428,7 @@ const Navbar: React.FC = () => {
           </div>
 
           {/* Right side: Search, theme toggle, and auth buttons */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
             {/* Desktop Search Button and Dropdown */}
             <div className="hidden md:block relative" ref={desktopSearchRef}>
               <Button
@@ -1605,7 +1715,7 @@ const Navbar: React.FC = () => {
             </div>
 
             {/* Notification and language buttons */}
-            {user && (
+            {isAuthenticated && user && (
               <>
                 <div className="relative" ref={notificationRef}>
                   <Button
@@ -1654,74 +1764,41 @@ const Navbar: React.FC = () => {
                     )}
                   </AnimatePresence>
                 </div>
+
+                <div className="relative" ref={userProfileRef}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setUserProfileOpen(!userProfileOpen)}
+                    aria-label="User profile"
+                    aria-expanded={userProfileOpen}
+                  >
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage
+                        src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                          user.name
+                        )}&background=random`}
+                        alt={user.name}
+                      />
+                      <AvatarFallback>
+                        {user.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                  <AnimatePresence>
+                    <UserProfileDropdown
+                      isOpen={userProfileOpen}
+                      onClose={() => setUserProfileOpen(false)}
+                    />
+                  </AnimatePresence>
+                </div>
               </>
             )}
 
             <ModeToggle />
-
-            <div className="flex items-center gap-4">
-              {isAuthenticated() && user ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="relative h-8 w-8 rounded-full"
-                    >
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage
-                          src={`https://ui-avatars.com/api/?name=${
-                            user.name || "User"
-                          }&background=random`}
-                          alt={user.name || "User"}
-                        />
-                        <AvatarFallback>
-                          {getInitials(user.name)}
-                        </AvatarFallback>
-                      </Avatar>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end" forceMount>
-                    <DropdownMenuLabel className="font-normal">
-                      <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">
-                          {user.name || "User"}
-                        </p>
-                        <p className="text-xs leading-none text-muted-foreground">
-                          {user.email || ""}
-                        </p>
-                      </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link to="/dashboard">
-                        <User className="mr-2 h-4 w-4" />
-                        Dashboard
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/profile">
-                        <Settings className="mr-2 h-4 w-4" />
-                        Profile
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout}>
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Log out
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <div className="flex space-x-4">
-                  <Button variant="ghost" asChild>
-                    <Link to="/login">Log In</Link>
-                  </Button>
-                  <Button asChild>
-                    <Link to="/signup">Sign Up</Link>
-                  </Button>
-                </div>
-              )}
-            </div>
           </div>
         </div>
       </motion.header>

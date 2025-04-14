@@ -36,7 +36,7 @@ class AuthService {
 
       const response = await axios.post(`${API_URL}/auth/login`, {
         usernameOrEmail: email,
-        password: password,
+        password,
       });
 
       if (!response.data || !response.data.token) {
@@ -55,13 +55,11 @@ class AuthService {
 
       // Create and store user data
       const userData: User = {
-        id: "0", // Backend doesn't provide ID in response
-        name: response.data.username,
+        id: response.data.id || "0",
+        name: response.data.name || response.data.username,
         email: response.data.email,
         username: response.data.username,
-        roles: ["USER"], // Default role
-        token: token,
-        type: "user",
+        roles: response.data.roles || [],
       };
 
       localStorage.setItem("user", JSON.stringify(userData));
@@ -86,9 +84,9 @@ class AuthService {
       this.clearAuth();
 
       const response = await axios.post(`${API_URL}/auth/register`, {
-        username: name,
-        email: email,
-        password: password,
+        name,
+        email,
+        password,
       });
 
       if (!response.data || !response.data.token) {
@@ -107,13 +105,11 @@ class AuthService {
 
       // Create and store user data
       const userData: User = {
-        id: "0", // Backend doesn't provide ID in response
-        name: response.data.username,
+        id: response.data.id || "0",
+        name: response.data.name,
         email: response.data.email,
         username: response.data.username,
-        roles: ["USER"], // Default role
-        token: token,
-        type: "user",
+        roles: response.data.roles || [],
       };
 
       localStorage.setItem("user", JSON.stringify(userData));
@@ -163,9 +159,7 @@ class AuthService {
       typeof user.name === "string" &&
       typeof user.email === "string" &&
       typeof user.username === "string" &&
-      Array.isArray(user.roles) &&
-      typeof user.token === "string" &&
-      typeof user.type === "string"
+      Array.isArray(user.roles)
     );
   }
 

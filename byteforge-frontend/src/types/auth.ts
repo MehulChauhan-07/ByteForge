@@ -4,6 +4,4 @@ export interface User {
   email: string;
   username: string;
   roles: string[];
-  token: string;
-  type: string;
 }
