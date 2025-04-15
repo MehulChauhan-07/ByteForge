@@ -22,6 +22,8 @@ import authService from "@/services/authService";
 import axios from "axios";
 import { useAuth } from "@/context/AuthContext";
 import { AuthRequest } from "@/types/user";
+import { cn } from "@/lib/utils";
+import { AnimatePresence, motion } from "framer-motion";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
@@ -329,6 +331,65 @@ const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Add these state variables in your LoginPage component
+  const [validationErrors, setValidationErrors] = useState<{
+    usernameOrEmail?: string;
+    password?: string;
+  }>({});
+  const [formTouched, setFormTouched] = useState({
+    usernameOrEmail: false,
+    password: false,
+  });
+
+  // Add this useEffect for real-time validation
+  useEffect(() => {
+    const errors: { usernameOrEmail?: string; password?: string } = {};
+
+    // Username/Email validation
+    if (formTouched.usernameOrEmail && formData.usernameOrEmail) {
+      if (formData.usernameOrEmail.length < 3) {
+        errors.usernameOrEmail =
+          "Username or email must be at least 3 characters";
+      } else if (
+        formData.usernameOrEmail.includes("@") &&
+        !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(
+          formData.usernameOrEmail
+        )
+      ) {
+        errors.usernameOrEmail = "Please enter a valid email address";
+      }
+    }
+
+    // Password validation
+    if (formTouched.password && formData.password) {
+      if (formData.password.length < 6) {
+        errors.password = "Password must be at least 6 characters";
+      }
+    }
+
+    setValidationErrors(errors);
+  }, [formData, formTouched]);
+
+  // Update your handleChange function
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // Mark field as touched when user types
+    setFormTouched((prev) => ({
+      ...prev,
+      [name]: true,
+    }));
+  };
+
+  // Update the onBlur handlers to mark fields as touched when user tabs out
+  const handleBlur = (name: string) => {
+    setFormTouched((prev) => ({
+      ...prev,
+      [name]: true,
+    }));
+  };
+
   // Add this useEffect to capture console errors
   useEffect(() => {
     // Save the original console.error
@@ -382,6 +443,8 @@ const LoginPage: React.FC = () => {
       // After successful login, navigate to the intended page
       navigate(from, { replace: true });
     } catch (err: any) {
+      // Handle errors and DON'T navigate
+      setIsLoading(false);
       console.error("Login error:", err); // Add this line to log the error
       console.log("Error type:", typeof err); // Add this line to verify the error is caught
       // Store the full error object for debugging
@@ -416,15 +479,17 @@ const LoginPage: React.FC = () => {
       } else {
         setError("An unexpected error occurred. Please try again.");
       }
+      console.error("login error:", err); // Add this line to log the error
+      return;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const { name, value } = e.target;
+  //   setFormData((prev) => ({ ...prev, [name]: value }));
+  // };
 
   return (
     <div className="container max-w-md mx-auto py-10 px-4 min-h-[calc(100vh-8rem)]">
@@ -459,39 +524,128 @@ const LoginPage: React.FC = () => {
           )}
 
           <div className="space-y-4">
+            {/* email/username */}
             <div className="space-y-2">
-              <Label htmlFor="usernameOrEmail" className="font-medium">
+              <Label
+                htmlFor="usernameOrEmail"
+                className="font-medium flex items-center justify-between"
+              >
                 Username or Email
+                {formTouched.usernameOrEmail && formData.usernameOrEmail && (
+                  <span
+                    className={cn(
+                      "text-xs transition-colors duration-200",
+                      validationErrors.usernameOrEmail
+                        ? "text-destructive"
+                        : "text-green-500"
+                    )}
+                  >
+                    {validationErrors.usernameOrEmail ? "Invalid" : "Valid"}
+                  </span>
+                )}
               </Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Mail
+                  className={cn(
+                    "absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors duration-200",
+                    formTouched.usernameOrEmail &&
+                      formData.usernameOrEmail &&
+                      (validationErrors.usernameOrEmail
+                        ? "text-destructive"
+                        : "text-green-500"),
+                    (!formTouched.usernameOrEmail ||
+                      !formData.usernameOrEmail) &&
+                      "text-muted-foreground"
+                  )}
+                />
                 <Input
                   id="usernameOrEmail"
                   name="usernameOrEmail"
                   type="text"
-                  className="pl-10"
+                  className={cn(
+                    "pl-10 transition-all duration-200",
+                    formTouched.usernameOrEmail &&
+                      formData.usernameOrEmail &&
+                      !validationErrors.usernameOrEmail &&
+                      "border-green-500 focus-visible:ring-green-500",
+                    formTouched.usernameOrEmail &&
+                      formData.usernameOrEmail &&
+                      validationErrors.usernameOrEmail &&
+                      "border-destructive focus-visible:ring-destructive"
+                  )}
                   placeholder="username or email@example.com"
                   value={formData.usernameOrEmail}
                   onChange={handleChange}
+                  onBlur={() => handleBlur("usernameOrEmail")}
                   required
                 />
               </div>
+              <AnimatePresence>
+                {validationErrors.usernameOrEmail &&
+                  formTouched.usernameOrEmail && (
+                    <motion.p
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="text-sm text-destructive mt-1 overflow-hidden"
+                    >
+                      {validationErrors.usernameOrEmail}
+                    </motion.p>
+                  )}
+              </AnimatePresence>
             </div>
-
+            {/* password */}
             <div className="space-y-2">
-              <Label htmlFor="password" className="font-medium">
+              <Label
+                htmlFor="password"
+                className="font-medium flex items-center justify-between"
+              >
                 Password
+                {formTouched.password && formData.password && (
+                  <span
+                    className={cn(
+                      "text-xs transition-colors duration-200",
+                      validationErrors.password
+                        ? "text-destructive"
+                        : "text-green-500"
+                    )}
+                  >
+                    {validationErrors.password ? "Invalid" : "Valid"}
+                  </span>
+                )}
               </Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Lock
+                  className={cn(
+                    "absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors duration-200",
+                    formTouched.password &&
+                      formData.password &&
+                      (validationErrors.password
+                        ? "text-destructive"
+                        : "text-green-500"),
+                    (!formTouched.password || !formData.password) &&
+                      "text-muted-foreground"
+                  )}
+                />
                 <Input
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
-                  className="pl-10"
+                  className={cn(
+                    "pl-10 transition-all duration-200",
+                    formTouched.password &&
+                      formData.password &&
+                      !validationErrors.password &&
+                      "border-green-500 focus-visible:ring-green-500",
+                    formTouched.password &&
+                      formData.password &&
+                      validationErrors.password &&
+                      "border-destructive focus-visible:ring-destructive"
+                  )}
                   placeholder="Enter your password"
                   value={formData.password}
                   onChange={handleChange}
+                  onBlur={() => handleBlur("password")}
                   required
                 />
                 <button
@@ -506,8 +660,21 @@ const LoginPage: React.FC = () => {
                   )}
                 </button>
               </div>
+              <AnimatePresence>
+                {validationErrors.password && formTouched.password && (
+                  <motion.p
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="text-sm text-destructive mt-1 overflow-hidden"
+                  >
+                    {validationErrors.password}
+                  </motion.p>
+                )}
+              </AnimatePresence>
             </div>
 
+            {/* login button */}
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? (
                 <>
@@ -518,7 +685,6 @@ const LoginPage: React.FC = () => {
                 "Log in"
               )}
             </Button>
-
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t" />
@@ -529,7 +695,6 @@ const LoginPage: React.FC = () => {
                 </span>
               </div>
             </div>
-
             <Button
               type="button"
               variant="outline"

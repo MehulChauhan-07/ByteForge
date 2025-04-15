@@ -7,7 +7,7 @@ import LoginPage from "@/pages/auth/LoginPage";
 import SignupPage from "@/pages/auth/SignupPage";
 import TestLoginPage from "@/pages/auth/TestLoginPage";
 import HomePage from "@/pages/home/Home";
-import DashboardPage from "@/pages/dashboard/DashboardPage";
+import DashboardPage from "@/pages/DashboardPage";
 import ProfilePage from "@/pages/ProfilePage";
 import TopicsPage from "@/pages/topic/TopicsPage";
 import NotFoundPage from "@/pages/NotFoundPage";

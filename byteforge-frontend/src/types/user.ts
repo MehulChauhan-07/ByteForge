@@ -3,8 +3,6 @@ export interface User {
   username: string;
   email: string;
   roles: string[];
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface AuthRequest {
@@ -13,6 +11,8 @@ export interface AuthRequest {
 }
 
 export interface AuthResponse {
+  id: string;
+  roles: string[];
   token: string;
   username: string;
   email: string;

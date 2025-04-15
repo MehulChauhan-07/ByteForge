@@ -60,10 +60,10 @@ class AuthService {
     };
   }
 
-  public async login(email: string, password: string): Promise<User> {
+  public async login(usernameOrEmail: string, password: string): Promise<User> {
     try {
       const authRequest: AuthRequest = {
-        usernameOrEmail: email,
+        usernameOrEmail,
         password,
       };
 
@@ -74,12 +74,10 @@ class AuthService {
       const { token, username, email: userEmail } = response.data;
 
       const user: User = {
-        id: "0", // This will be updated when we get the user profile
-        username,
-        email: userEmail,
-        roles: [],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        id: response.data.id || "0",
+        username: response.data.username,
+        email: response.data.email,
+        roles: response.data.roles || ["USER"],
       };
 
       this.token = token;
@@ -91,35 +89,59 @@ class AuthService {
       return user;
     } catch (error) {
       this.clearAuth();
+      // Match the error handling style from signup
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 401) {
+          throw new Error("Invalid username/email or password");
+        } else if (error.response?.status === 403) {
+          throw new Error("Your account is locked or disabled");
+        } else if (!error.response) {
+          throw new Error("Network error. Please check your connection.");
+        } else {
+          throw new Error(error.response.data.message || "Login failed");
+        }
+      }
       throw error;
     }
   }
 
-  public async signup(data: RegisterRequest): Promise<AuthResponse> {
+  public async signup(userData: RegisterRequest): Promise<User> {
     try {
+      // Make a copy of userData to avoid modifying the original
+      const requestData = { ...userData };
+
+      // Ensure roles is an array if provided
+      if (requestData.roles && !Array.isArray(requestData.roles)) {
+        requestData.roles = [requestData.roles];
+      }
+
+      // Default to USER role if not provided
+      if (!requestData.roles || requestData.roles.length === 0) {
+        requestData.roles = ["USER"];
+      }
+
       const response = await axios.post<AuthResponse>(
         `${API_URL}/auth/register`,
-        data
+        requestData
       );
       const { token, username, email } = response.data;
 
       const user: User = {
-        id: "0", // This will be updated when we get the user profile
-        username,
-        email,
-        roles: data.roles || [],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        id: response.data.id || "0",
+        username: response.data.username,
+        email: response.data.email,
+        roles: response.data.roles || ["USER"],
       };
 
-      this.token = token;
+      // Store the token and user data
+      this.token = response.data.token;
       this.user = user;
-      localStorage.setItem("token", token);
+      localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify(user));
-      this.setAuthHeader(token);
+      this.setAuthHeader(response.data.token);
       this.notifyListeners(user);
 
-      return response.data;
+      return user;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 400) {
@@ -128,6 +150,13 @@ class AuthService {
           );
         } else if (error.response?.status === 409) {
           throw new Error("Email or username already exists");
+        } else if (
+          error.response?.status === 401 ||
+          error.response?.status === 403
+        ) {
+          throw new Error("Authentication failed. Please try again.");
+        } else if (!error.response) {
+          throw new Error("Network error. Please check your connection.");
         }
       }
       throw error;
@@ -148,3 +177,6 @@ class AuthService {
 }
 
 export default AuthService.getInstance();
+function setLoading(arg0: boolean) {
+  throw new Error("Function not implemented.");
+}

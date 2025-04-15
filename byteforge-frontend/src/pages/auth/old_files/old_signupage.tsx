@@ -162,186 +162,65 @@ const SignupPage = () => {
           )}
 
           <div className="space-y-4">
-            {/* // For username field */}
             <div className="space-y-2">
-              <Label
-                htmlFor="username"
-                className="font-medium flex items-center justify-between"
-              >
+              <Label htmlFor="username" className="font-medium">
                 Username
-                {formData.username && (
-                  <span
-                    className={cn(
-                      "text-xs transition-colors duration-200",
-                      validationErrors.username
-                        ? "text-destructive"
-                        : "text-green-500"
-                    )}
-                  >
-                    {validationErrors.username ? "Invalid" : "Valid"}
-                  </span>
-                )}
               </Label>
               <div className="relative">
-                <User
-                  className={cn(
-                    "absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors duration-200",
-                    formData.username &&
-                      (validationErrors.username
-                        ? "text-destructive"
-                        : "text-green-500"),
-                    !formData.username && "text-muted-foreground"
-                  )}
-                />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="username"
                   name="username"
                   type="text"
-                  className={cn(
-                    "pl-10 transition-all duration-200",
-                    formData.username &&
-                      !validationErrors.username &&
-                      "border-green-500 focus-visible:ring-green-500",
-                    formData.username &&
-                      validationErrors.username &&
-                      "border-destructive focus-visible:ring-destructive"
-                  )}
+                  className="pl-10"
                   placeholder="username"
                   value={formData.username}
                   onChange={handleChange}
                   required
                 />
               </div>
-              <AnimatePresence>
-                {validationErrors.username && (
-                  <motion.p
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="text-sm text-destructive mt-1 overflow-hidden"
-                  >
-                    {validationErrors.username}
-                  </motion.p>
-                )}
-              </AnimatePresence>
+              {validationErrors.username && (
+                <p className="text-sm text-destructive">
+                  {validationErrors.username}
+                </p>
+              )}
             </div>
 
-            {/* email field */}
             <div className="space-y-2">
-              <Label
-                htmlFor="email"
-                className="font-medium flex items-center justify-between"
-              >
+              <Label htmlFor="email" className="font-medium">
                 Email
-                {formData.email && (
-                  <span
-                    className={cn(
-                      "text-xs transition-colors duration-200",
-                      validationErrors.email
-                        ? "text-destructive"
-                        : "text-green-500"
-                    )}
-                  >
-                    {validationErrors.email ? "Invalid" : "Valid"}
-                  </span>
-                )}
               </Label>
               <div className="relative">
-                <Mail
-                  className={cn(
-                    "absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors duration-200",
-                    formData.email &&
-                      (validationErrors.email
-                        ? "text-destructive"
-                        : "text-green-500"),
-                    !formData.email && "text-muted-foreground"
-                  )}
-                />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="email"
                   name="email"
                   type="email"
-                  className={cn(
-                    "pl-10 transition-all duration-200",
-                    formData.email &&
-                      !validationErrors.email &&
-                      "border-green-500 focus-visible:ring-green-500",
-                    formData.email &&
-                      validationErrors.email &&
-                      "border-destructive focus-visible:ring-destructive"
-                  )}
+                  className="pl-10"
                   placeholder="email@example.com"
                   value={formData.email}
                   onChange={handleChange}
                   required
                 />
               </div>
-              <AnimatePresence>
-                {validationErrors.email && (
-                  <motion.p
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="text-sm text-destructive mt-1 overflow-hidden"
-                  >
-                    {validationErrors.email}
-                  </motion.p>
-                )}
-              </AnimatePresence>
+              {validationErrors.email && (
+                <p className="text-sm text-destructive">
+                  {validationErrors.email}
+                </p>
+              )}
             </div>
 
-            {/* password field enhansment */}
             <div className="space-y-2">
-              <Label
-                htmlFor="password"
-                className="font-medium flex items-center justify-between"
-              >
+              <Label htmlFor="password" className="font-medium">
                 Password
-                {password.length > 0 && (
-                  <span
-                    className={cn(
-                      "text-xs font-medium transition-colors duration-200",
-                      passwordStrength < 3
-                        ? "text-destructive"
-                        : passwordStrength < 5
-                        ? "text-yellow-500"
-                        : "text-green-500"
-                    )}
-                  >
-                    {passwordStrength < 3
-                      ? "Weak"
-                      : passwordStrength < 5
-                      ? "Good"
-                      : "Strong"}
-                  </span>
-                )}
               </Label>
               <div className="relative">
-                <Lock
-                  className={cn(
-                    "absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors duration-200",
-                    password.length > 0 &&
-                      (passwordStrength < 3
-                        ? "text-destructive"
-                        : passwordStrength < 5
-                        ? "text-yellow-500"
-                        : "text-green-500"),
-                    !password.length && "text-muted-foreground"
-                  )}
-                />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
-                  className={cn(
-                    "pl-10 transition-all duration-200",
-                    password.length > 0 &&
-                      (passwordStrength < 3
-                        ? "border-destructive focus-visible:ring-destructive"
-                        : passwordStrength < 5
-                        ? "border-yellow-500 focus-visible:ring-yellow-500"
-                        : "border-green-500 focus-visible:ring-green-500")
-                  )}
+                  className="pl-10"
                   placeholder="Enter your password"
                   value={formData.password}
                   onChange={handleChange}
@@ -359,9 +238,13 @@ const SignupPage = () => {
                   )}
                 </button>
               </div>
-
-              {/* Password strength meter with smooth animation */}
-               {password.length > 0 && (
+              {/* {validationErrors.password && (
+                <p className="text-sm text-destructive">
+                  {validationErrors.password}
+                </p>
+              )} */}
+              {/* Password strength meter */}
+              {/* {password.length > 0 && (
                 <div className="mt-2">
                   <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
                     <div
@@ -435,8 +318,115 @@ const SignupPage = () => {
                   </div>
                 </div>
               )}
+            </div> */}
+              {password.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="mt-2"
+                >
+                  <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden grid grid-cols-5 gap-0.5">
+                    {[...Array(5)].map((_, i) => (
+                      <motion.div
+                        key={i}
+                        className={cn(
+                          "h-full rounded-full transition-colors duration-300",
+                          i < passwordStrength
+                            ? i < 2
+                              ? "bg-destructive"
+                              : i < 4
+                              ? "bg-yellow-500"
+                              : "bg-green-500"
+                            : "bg-muted-foreground/20"
+                        )}
+                        initial={{ scaleX: 0 }}
+                        animate={{ scaleX: 1 }}
+                        transition={{ delay: i * 0.1, duration: 0.3 }}
+                      />
+                    ))}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-3">
+                    {/* Your existing validation checks with improved styling */}
+                    <motion.div
+                      className="flex items-center gap-1.5 text-xs"
+                      initial={{ opacity: 0, x: -5 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.1 }}
+                    >
+                      {hasMinLength ? (
+                        <Check className="h-3.5 w-3.5 text-green-500" />
+                      ) : (
+                        <X className="h-3.5 w-3.5 text-muted-foreground" />
+                      )}
+                      <span
+                        className={
+                          hasMinLength
+                            ? "text-green-500"
+                            : "text-muted-foreground"
+                        }
+                      >
+                        At least 8 characters
+                      </span>
+                    </motion.div>
+
+                    {/* Repeat for other validation checks with appropriate delay values */}
+                  </div>
+                </motion.div>
+              )}
             </div>
+
             {/* Confirm password animation */}
+            {/* <div className="space-y-2">
+              <Label htmlFor="confirmPassword" className="font-medium">
+                Confirm Password
+              </Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  className={`pl-10 
+                  ${
+                    confirmPassword
+                      ? confirmPassword === formData.password
+                        ? "border-green-500 focus-visible:ring-green-500"
+                        : "border-red-500 focus-visible:ring-red-500"
+                      : ""
+                  }
+                  `}
+                  placeholder="Confirm your password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+                {confirmPassword && (
+                  <div className="absolute right-10 top-1/2 -translate-y-1/2">
+                    {confirmPassword === formData.password ? (
+                      <Check className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <X className="h-4 w-4 text-red-500" />
+                    )}
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={toggleConfirmPasswordVisibility}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
+              {validationErrors.confirmPassword && (
+                <p className="text-sm text-destructive">
+                  {validationErrors.confirmPassword}
+                </p>
+              )}
+            </div> */}
             <div className="space-y-2">
               <Label htmlFor="confirmPassword" className="font-medium">
                 Confirm Password
@@ -506,6 +496,7 @@ const SignupPage = () => {
                 )}
               </AnimatePresence>
             </div>
+
             <Button
               type="submit"
               className={cn(
@@ -527,6 +518,7 @@ const SignupPage = () => {
                 <>Create account</>
               )}
             </Button>
+
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t" />
@@ -537,6 +529,7 @@ const SignupPage = () => {
                 </span>
               </div>
             </div>
+
             <Button
               type="button"
               variant="outline"
