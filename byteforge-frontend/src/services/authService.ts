@@ -1,34 +1,38 @@
 import axios from "axios";
-import { User } from "../types/auth";
+import { User, AuthRequest, AuthResponse, RegisterRequest } from "@/types/user";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
 class AuthService {
+  private static instance: AuthService;
   private token: string | null = null;
   private user: User | null = null;
   private listeners: ((user: User | null) => void)[] = [];
 
-  constructor() {
+  private constructor() {
     this.initializeAuth();
   }
 
+  public static getInstance(): AuthService {
+    if (!AuthService.instance) {
+      AuthService.instance = new AuthService();
+    }
+    return AuthService.instance;
+  }
+
   private initializeAuth() {
-    // Initialize token and user from localStorage
-    this.token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
     const userStr = localStorage.getItem("user");
-    if (userStr) {
+
+    if (token && userStr) {
       try {
+        this.token = token;
         this.user = JSON.parse(userStr);
+        this.setAuthHeader(token);
       } catch (error) {
-        console.error("Error parsing user data:", error);
+        console.error("Error initializing auth:", error);
         this.clearAuth();
       }
-    }
-
-    if (this.token && this.user) {
-      this.setAuthHeader(this.token);
-    } else {
-      this.clearAuth();
     }
   }
 
@@ -49,121 +53,98 @@ class AuthService {
     this.listeners.forEach((listener) => listener(user));
   }
 
-  addListener(listener: (user: User | null) => void) {
+  public addListener(listener: (user: User | null) => void) {
     this.listeners.push(listener);
     return () => {
       this.listeners = this.listeners.filter((l) => l !== listener);
     };
   }
 
-  async login(email: string, password: string): Promise<User> {
+  public async login(email: string, password: string): Promise<User> {
     try {
-      // Clear any existing auth data
-      this.clearAuth();
-
-      const response = await axios.post(`${API_URL}/auth/login`, {
+      const authRequest: AuthRequest = {
         usernameOrEmail: email,
         password,
-      });
-
-      if (!response.data || !response.data.token) {
-        throw new Error("Invalid response format: Missing token");
-      }
-
-      // Store token
-      const token = response.data.token;
-      if (!token) {
-        throw new Error("Invalid token received");
-      }
-
-      this.token = token;
-      localStorage.setItem("token", token);
-      this.setAuthHeader(token);
-
-      // Create and store user data
-      const userData: User = {
-        id: response.data.id || "0",
-        name: response.data.name || response.data.username,
-        email: response.data.email,
-        username: response.data.username,
-        roles: response.data.roles || [],
       };
 
-      this.user = userData;
-      localStorage.setItem("user", JSON.stringify(userData));
-      this.notifyListeners(userData);
-      return userData;
-    } catch (error: any) {
+      const response = await axios.post<AuthResponse>(
+        `${API_URL}/auth/login`,
+        authRequest
+      );
+      const { token, username, email: userEmail } = response.data;
+
+      const user: User = {
+        id: "0", // This will be updated when we get the user profile
+        username,
+        email: userEmail,
+        roles: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      this.token = token;
+      this.user = user;
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+      this.setAuthHeader(token);
+      this.notifyListeners(user);
+      return user;
+    } catch (error) {
       this.clearAuth();
       throw error;
     }
   }
 
-  async signup(name: string, email: string, password: string): Promise<User> {
+  public async signup(data: RegisterRequest): Promise<AuthResponse> {
     try {
-      // Clear any existing auth data
-      this.clearAuth();
+      const response = await axios.post<AuthResponse>(
+        `${API_URL}/auth/register`,
+        data
+      );
+      const { token, username, email } = response.data;
 
-      const response = await axios.post(`${API_URL}/auth/register`, {
-        name,
+      const user: User = {
+        id: "0", // This will be updated when we get the user profile
+        username,
         email,
-        password,
-      });
-
-      if (!response.data || !response.data.token) {
-        throw new Error("Invalid response format: Missing token");
-      }
-
-      // Store token
-      const token = response.data.token;
-      if (!token) {
-        throw new Error("Invalid token received");
-      }
-
-      this.token = token;
-      localStorage.setItem("token", token);
-      this.setAuthHeader(token);
-
-      // Create and store user data
-      const userData: User = {
-        id: response.data.id || "0",
-        name: response.data.name,
-        email: response.data.email,
-        username: response.data.username,
-        roles: response.data.roles || [],
+        roles: data.roles || [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
 
-      localStorage.setItem("user", JSON.stringify(userData));
-      return userData;
-    } catch (error: any) {
-      this.clearAuth();
+      this.token = token;
+      this.user = user;
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+      this.setAuthHeader(token);
+      this.notifyListeners(user);
 
-      if (error.response) {
-        const errorMessage = error.response.data?.message || "Signup failed";
-        throw new Error(errorMessage);
-      } else if (error.request) {
-        throw new Error("No response from server");
-      } else {
-        throw new Error("Signup request failed");
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 400) {
+          throw new Error(
+            error.response.data.message || "Invalid registration data"
+          );
+        } else if (error.response?.status === 409) {
+          throw new Error("Email or username already exists");
+        }
       }
+      throw error;
     }
   }
 
-  logout(): void {
+  public logout() {
     this.clearAuth();
   }
 
-  getCurrentUser(): User | null {
+  public getCurrentUser(): User | null {
     return this.user;
   }
 
-  getToken(): string | null {
-    return this.token;
-  }
-
-  isAuthenticated(): boolean {
+  public isAuthenticated(): boolean {
     return !!this.token && !!this.user;
   }
 }
 
-export default new AuthService();
+export default AuthService.getInstance();

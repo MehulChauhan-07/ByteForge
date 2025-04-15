@@ -16,10 +16,12 @@ import {
   ChevronDown,
   ChevronUp,
   X,
+  User,
 } from "lucide-react";
 import authService from "@/services/authService";
 import axios from "axios";
 import { useAuth } from "@/context/AuthContext";
+import { AuthRequest } from "@/types/user";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
@@ -313,9 +315,10 @@ const ErrorDebugger: React.FC<{ error: unknown; onClose: () => void }> = ({
 };
 
 const LoginPage: React.FC = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
+  const [formData, setFormData] = useState<AuthRequest>({
+    usernameOrEmail: "",
+    password: "",
+  });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [errorObject, setErrorObject] = useState<any>(null);
@@ -372,9 +375,9 @@ const LoginPage: React.FC = () => {
     setIsLoading(true);
 
     try {
-      console.log("Attempting to login with email:", email); // Add this line to verify the email being used
+      console.log("Attempting to login with email:", formData.usernameOrEmail); // Add this line to verify the email being used
       // Call the authService login method
-      await login(email, password);
+      await login(formData.usernameOrEmail, formData.password);
       console.log("Login successful"); // Add this line to verify successful login
       // After successful login, navigate to the intended page
       navigate(from, { replace: true });
@@ -418,8 +421,9 @@ const LoginPage: React.FC = () => {
     }
   };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -456,33 +460,44 @@ const LoginPage: React.FC = () => {
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email" className="font-medium">
-                Email
+              <Label htmlFor="usernameOrEmail" className="font-medium">
+                Username or Email
               </Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  id="email"
-                  type="email"
+                  id="usernameOrEmail"
+                  name="usernameOrEmail"
+                  type="text"
                   className="pl-10"
-                  placeholder="email@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="username or email@example.com"
+                  value={formData.usernameOrEmail}
+                  onChange={handleChange}
                   required
-                  autoComplete="email"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="font-medium">
-                  Password
-                </Label>
+              <Label htmlFor="password" className="font-medium">
+                Password
+              </Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  className="pl-10"
+                  placeholder="Enter your password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                />
                 <button
                   type="button"
-                  onClick={togglePasswordVisibility}
-                  className="text-sm text-muted-foreground hover:text-foreground"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
                   {showPassword ? (
                     <EyeOff className="h-4 w-4" />
@@ -491,43 +506,6 @@ const LoginPage: React.FC = () => {
                   )}
                 </button>
               </div>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  className="pl-10"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  autoComplete="current-password"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="rememberMe"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-                />
-                <Label
-                  htmlFor="rememberMe"
-                  className="ml-2 text-sm text-muted-foreground"
-                >
-                  Remember me
-                </Label>
-              </div>
-              <Link
-                to="/forgot-password"
-                className="text-sm text-primary hover:underline"
-              >
-                Forgot password?
-              </Link>
             </div>
 
             <Button type="submit" className="w-full" disabled={isLoading}>

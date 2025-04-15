@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,73 +18,90 @@ import {
 } from "lucide-react";
 import authService from "@/services/authService";
 import axios from "axios";
+import { RegisterRequest } from "@/types/user";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
 const SignupPage = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState<RegisterRequest>({
+    username: "",
+    email: "",
+    password: "",
+    roles: ["USER"], // Default role for new users
+  });
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<{
+    username?: string;
+    email?: string;
+    password?: string;
+    confirmPassword?: string;
+  }>({});
   const navigate = useNavigate();
 
-  // Password strength check
-  const hasMinLength = password.length >= 8;
-  const hasUppercase = /[A-Z]/.test(password);
-  const hasLowercase = /[a-z]/.test(password);
-  const hasNumber = /[0-9]/.test(password);
-  const hasSpecialChar = /[^A-Za-z0-9]/.test(password);
+  // Real-time validation
+  useEffect(() => {
+    const errors: typeof validationErrors = {};
 
-  const passwordStrength = [
-    hasMinLength,
-    hasUppercase,
-    hasLowercase,
-    hasNumber,
-    hasSpecialChar,
-  ].filter(Boolean).length;
+    // Username validation
+    if (formData.username.length < 3) {
+      errors.username = "Username must be at least 3 characters long";
+    } else if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
+      errors.username =
+        "Username can only contain letters, numbers, and underscores";
+    }
 
-  const getPasswordStrengthColor = () => {
-    if (password.length === 0) return "bg-muted";
-    if (passwordStrength <= 2) return "bg-red-500";
-    if (passwordStrength <= 4) return "bg-yellow-500";
-    return "bg-green-500";
-  };
+    // Email validation
+    if (!formData.email) {
+      errors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errors.email = "Please enter a valid email address";
+    }
+
+    // Password validation
+    if (formData.password.length < 8) {
+      errors.password = "Password must be at least 8 characters long";
+    } else if (!/(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(formData.password)) {
+      errors.password =
+        "Password must contain at least one letter and one number";
+    }
+
+    // Confirm password validation
+    if (formData.password !== confirmPassword) {
+      errors.confirmPassword = "Passwords do not match";
+    }
+
+    setValidationErrors(errors);
+  }, [formData, confirmPassword]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
-    if (passwordStrength < 3) {
-      setError("Password is too weak. Please make it stronger.");
+    // Check if there are any validation errors
+    if (Object.keys(validationErrors).length > 0) {
+      setError("Please fix the validation errors before submitting");
       return;
     }
 
     setIsLoading(true);
 
     try {
-      // Call the authService signup method with the correct parameters
-      await authService.signup(name, email, password);
+      await authService.signup(formData);
       navigate("/dashboard");
-    } catch (err) {
-      if (axios.isAxiosError(err) && err.response) {
-        setError(
-          err.response.data.message ||
-            "Signup failed. Please check your information."
-        );
-      } else {
-        setError("Signup failed. Please try again later.");
-      }
+    } catch (err: any) {
+      setError(err.message || "Registration failed. Please try again.");
+    } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const togglePasswordVisibility = () => {
@@ -115,22 +132,27 @@ const SignupPage = () => {
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name" className="font-medium">
-                Full Name
+              <Label htmlFor="username" className="font-medium">
+                Username
               </Label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  id="name"
+                  id="username"
+                  name="username"
                   type="text"
                   className="pl-10"
-                  placeholder="John Doe"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  placeholder="username"
+                  value={formData.username}
+                  onChange={handleChange}
                   required
-                  autoComplete="name"
                 />
               </div>
+              {validationErrors.username && (
+                <p className="text-sm text-destructive">
+                  {validationErrors.username}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -141,15 +163,20 @@ const SignupPage = () => {
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="email"
+                  name="email"
                   type="email"
                   className="pl-10"
                   placeholder="email@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={formData.email}
+                  onChange={handleChange}
                   required
-                  autoComplete="email"
                 />
               </div>
+              {validationErrors.email && (
+                <p className="text-sm text-destructive">
+                  {validationErrors.email}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -160,13 +187,13 @@ const SignupPage = () => {
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="password"
+                  name="password"
                   type={showPassword ? "text" : "password"}
                   className="pl-10"
                   placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={formData.password}
+                  onChange={handleChange}
                   required
-                  autoComplete="new-password"
                 />
                 <button
                   type="button"
@@ -180,6 +207,11 @@ const SignupPage = () => {
                   )}
                 </button>
               </div>
+              {validationErrors.password && (
+                <p className="text-sm text-destructive">
+                  {validationErrors.password}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -196,7 +228,6 @@ const SignupPage = () => {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
-                  autoComplete="new-password"
                 />
                 <button
                   type="button"
@@ -210,70 +241,18 @@ const SignupPage = () => {
                   )}
                 </button>
               </div>
+              {validationErrors.confirmPassword && (
+                <p className="text-sm text-destructive">
+                  {validationErrors.confirmPassword}
+                </p>
+              )}
             </div>
 
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label className="text-sm text-muted-foreground">
-                  Password Strength
-                </Label>
-                <div className="text-sm text-muted-foreground">
-                  {password.length > 0 && `${passwordStrength}/5`}
-                </div>
-              </div>
-              <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
-                <div
-                  className={`h-full ${getPasswordStrengthColor()}`}
-                  style={{
-                    width: `${(passwordStrength / 5) * 100}%`,
-                  }}
-                />
-              </div>
-              <div className="space-y-1 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  {hasMinLength ? (
-                    <Check className="h-4 w-4 text-green-500" />
-                  ) : (
-                    <X className="h-4 w-4 text-red-500" />
-                  )}
-                  <span>At least 8 characters</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  {hasUppercase ? (
-                    <Check className="h-4 w-4 text-green-500" />
-                  ) : (
-                    <X className="h-4 w-4 text-red-500" />
-                  )}
-                  <span>At least one uppercase letter</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  {hasLowercase ? (
-                    <Check className="h-4 w-4 text-green-500" />
-                  ) : (
-                    <X className="h-4 w-4 text-red-500" />
-                  )}
-                  <span>At least one lowercase letter</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  {hasNumber ? (
-                    <Check className="h-4 w-4 text-green-500" />
-                  ) : (
-                    <X className="h-4 w-4 text-red-500" />
-                  )}
-                  <span>At least one number</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  {hasSpecialChar ? (
-                    <Check className="h-4 w-4 text-green-500" />
-                  ) : (
-                    <X className="h-4 w-4 text-red-500" />
-                  )}
-                  <span>At least one special character</span>
-                </div>
-              </div>
-            </div>
-
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isLoading || Object.keys(validationErrors).length > 0}
+            >
               {isLoading ? "Creating account..." : "Create account"}
             </Button>
 

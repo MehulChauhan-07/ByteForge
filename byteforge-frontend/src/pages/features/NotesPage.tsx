@@ -1,182 +1,267 @@
-// src/pages/features/NotesPage.jsx
-import { useState, useEffect, ChangeEvent } from "react";
+"use client";
+
+import { useState, useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  createNote,
-  updateNote,
-  deleteNote,
-  getNotes,
-  getNoteById,
-} from "@/services/noteService";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Plus, Trash2, Edit2, Save, X, Loader2 } from "lucide-react";
+import noteService from "@/services/noteService";
 import { toast } from "sonner";
 
-export default function NotesPage() {
-  const [notes, setNotes] = useState<
-    Array<{
-      id: string;
-      title: string;
-      content: string;
-      createdAt: string;
-      updatedAt: string;
-    }>
-  >([]);
-  const [selectedNote, setSelectedNote] = useState<{
-    id: string;
-    title: string;
-    content: string;
-  } | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+interface Note {
+  id: number;
+  title: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const NotesPage = () => {
+  const { user } = useAuth();
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
+  const [editingNote, setEditingNote] = useState<Note | null>(null);
+  const [newNote, setNewNote] = useState({ title: "", content: "" });
 
   useEffect(() => {
-    loadNotes();
-  }, []);
+    if (user) {
+      fetchNotes();
+    }
+  }, [user]);
 
-  const loadNotes = async () => {
+  const fetchNotes = async () => {
     try {
-      const loadedNotes = await getNotes();
-      setNotes(loadedNotes);
-    } catch (error) {
-      toast.error("Failed to load notes");
+      setIsLoading(true);
+      setError("");
+      const loadedNotes = await noteService.getAllNotes();
+      setNotes(loadedNotes || []);
+    } catch (err) {
+      setError("Failed to load notes");
+      toast.error("Failed to load notes. Please try again later.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleCreateNote = async () => {
-    if (!title.trim() || !content.trim()) {
+    if (!newNote.title.trim() || !newNote.content.trim()) {
       toast.error("Title and content are required");
       return;
     }
 
     try {
-      await createNote(title, content);
-      toast.success("Note created successfully");
-      setTitle("");
-      setContent("");
-      loadNotes();
-    } catch (error) {
+      const createdNote = await noteService.createNote(
+        newNote.title,
+        newNote.content
+      );
+      if (createdNote) {
+        setNotes((prevNotes) => [...prevNotes, createdNote]);
+        toast.success("Note created successfully");
+        setIsCreating(false);
+        setNewNote({ title: "", content: "" });
+      }
+    } catch (err) {
       toast.error("Failed to create note");
     }
   };
 
   const handleUpdateNote = async () => {
-    if (!selectedNote) return;
+    if (!editingNote) return;
 
     try {
-      await updateNote(selectedNote.id, title, content);
-      toast.success("Note updated successfully");
-      setIsEditing(false);
-      setSelectedNote(null);
-      setTitle("");
-      setContent("");
-      loadNotes();
-    } catch (error) {
+      const updatedNote = await noteService.updateNote(
+        editingNote.id,
+        editingNote.title,
+        editingNote.content
+      );
+      if (updatedNote) {
+        setNotes((prevNotes) =>
+          prevNotes.map((note) =>
+            note.id === updatedNote.id ? updatedNote : note
+          )
+        );
+        toast.success("Note updated successfully");
+        setEditingNote(null);
+      }
+    } catch (err) {
       toast.error("Failed to update note");
     }
   };
 
-  const handleDeleteNote = async (id: string) => {
+  const handleDeleteNote = async (id: number) => {
     try {
-      await deleteNote(id);
+      await noteService.deleteNote(id);
+      setNotes((prevNotes) => prevNotes.filter((note) => note.id !== id));
       toast.success("Note deleted successfully");
-      loadNotes();
-    } catch (error) {
+    } catch (err) {
       toast.error("Failed to delete note");
     }
   };
 
-  const handleEditNote = async (id: string) => {
-    try {
-      const note = await getNoteById(id);
-      setSelectedNote(note);
-      setTitle(note.title);
-      setContent(note.content);
-      setIsEditing(true);
-    } catch (error) {
-      toast.error("Failed to load note");
-    }
-  };
-
-  const handleCancelEdit = () => {
-    setIsEditing(false);
-    setSelectedNote(null);
-    setTitle("");
-    setContent("");
-  };
-
-  const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setTitle(e.target.value);
-  };
-
-  const handleContentChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    setContent(e.target.value);
-  };
+  if (!user) {
+    return (
+      <div className="container max-w-4xl mx-auto py-10 px-4">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
+          <p className="text-muted-foreground">
+            Please log in to access your notes.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="container mx-auto p-4 space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>{isEditing ? "Edit Note" : "Create New Note"}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Input
-            placeholder="Note title"
-            value={title}
-            onChange={handleTitleChange}
-          />
-          <Textarea
-            placeholder="Note content"
-            value={content}
-            onChange={handleContentChange}
-            className="min-h-[200px]"
-          />
-          <div className="flex gap-2">
-            {isEditing ? (
-              <>
-                <Button onClick={handleUpdateNote}>Update Note</Button>
-                <Button variant="outline" onClick={handleCancelEdit}>
-                  Cancel
-                </Button>
-              </>
-            ) : (
-              <Button onClick={handleCreateNote}>Create Note</Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+    <div className="container max-w-4xl mx-auto py-10 px-4">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">My Notes</h1>
+        <Button onClick={() => setIsCreating(true)}>
+          <Plus className="mr-2 h-4 w-4" />
+          New Note
+        </Button>
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {notes.map((note) => (
-          <Card key={note.id}>
-            <CardHeader>
-              <CardTitle className="text-lg">{note.title}</CardTitle>
-              <p className="text-sm text-gray-500">
-                {new Date(note.updatedAt).toLocaleDateString()}
-              </p>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <p className="text-gray-700 line-clamp-3">{note.content}</p>
-              <div className="flex gap-2">
+      {error && (
+        <div className="mb-4 p-3 rounded-md bg-destructive/10 text-destructive">
+          {error}
+        </div>
+      )}
+
+      {isCreating && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Create New Note</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <Input
+                placeholder="Note title"
+                value={newNote.title}
+                onChange={(e) =>
+                  setNewNote({ ...newNote, title: e.target.value })
+                }
+              />
+              <Textarea
+                placeholder="Note content"
+                value={newNote.content}
+                onChange={(e) =>
+                  setNewNote({ ...newNote, content: e.target.value })
+                }
+                className="min-h-[200px]"
+              />
+              <div className="flex justify-end gap-2">
                 <Button
                   variant="outline"
-                  onClick={() => handleEditNote(note.id)}
+                  onClick={() => {
+                    setIsCreating(false);
+                    setNewNote({ title: "", content: "" });
+                  }}
                 >
-                  Edit
+                  <X className="mr-2 h-4 w-4" />
+                  Cancel
                 </Button>
-                <Button
-                  variant="destructive"
-                  onClick={() => handleDeleteNote(note.id)}
-                >
-                  Delete
+                <Button onClick={handleCreateNote}>
+                  <Save className="mr-2 h-4 w-4" />
+                  Save
                 </Button>
               </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {isLoading ? (
+        <div className="flex justify-center items-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      ) : notes.length === 0 ? (
+        <div className="text-center text-muted-foreground">
+          No notes yet. Create your first note!
+        </div>
+      ) : (
+        <div className="grid gap-6">
+          {notes.map((note) => (
+            <Card key={note.id}>
+              <CardHeader>
+                <div className="flex justify-between items-start">
+                  {editingNote?.id === note.id ? (
+                    <Input
+                      value={editingNote.title}
+                      onChange={(e) =>
+                        setEditingNote({
+                          ...editingNote,
+                          title: e.target.value,
+                        })
+                      }
+                      className="text-xl font-bold"
+                    />
+                  ) : (
+                    <CardTitle>{note.title}</CardTitle>
+                  )}
+                  <div className="flex gap-2">
+                    {editingNote?.id === note.id ? (
+                      <>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => setEditingNote(null)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                        <Button size="icon" onClick={handleUpdateNote}>
+                          <Save className="h-4 w-4" />
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => setEditingNote(note)}
+                        >
+                          <Edit2 className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          onClick={() => handleDeleteNote(note.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  Last updated: {new Date(note.updatedAt).toLocaleString()}
+                </div>
+              </CardHeader>
+              <CardContent>
+                {editingNote?.id === note.id ? (
+                  <Textarea
+                    value={editingNote.content}
+                    onChange={(e) =>
+                      setEditingNote({
+                        ...editingNote,
+                        content: e.target.value,
+                      })
+                    }
+                    className="min-h-[200px]"
+                  />
+                ) : (
+                  <div className="whitespace-pre-wrap">{note.content}</div>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
-}
+};
+
+export default NotesPage;

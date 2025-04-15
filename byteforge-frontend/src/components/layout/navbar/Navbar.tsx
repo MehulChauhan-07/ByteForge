@@ -89,19 +89,19 @@ const LEARNING_ITEMS = [
 
 const TOOL_ITEMS = [
   {
-    to: "/compiler",
+    to: "/tools/compiler",
     title: "Java Compiler",
     description: "Write, compile, and run Java code in your browser",
     icon: <Code className="h-5 w-5" />,
   },
   {
-    to: "/assistant",
+    to: "/tools/assistant",
     title: "AI Assistant",
     description: "Get help with coding problems and concepts",
     icon: <MessageSquare className="h-5 w-5" />,
   },
   {
-    to: "/notes",
+    to: "/tools/notes",
     title: "Note Taking",
     description: "Save and organize important concepts and code snippets",
     icon: <Save className="h-5 w-5" />,
@@ -447,83 +447,44 @@ const getInitials = (name: string): string => {
 
 // Update the Avatar component in the UserProfileDropdown
 
-const UserProfileDropdown = ({ isOpen, onClose }: UserProfileDropdownProps) => {
+const UserProfileDropdown = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   if (!user) return null;
 
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
-
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          className="absolute right-0 mt-2 w-64 bg-popover rounded-md shadow-lg border z-50"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-        >
-          <div className="p-4 border-b">
-            <div className="flex items-center gap-3">
-              <Avatar className="h-10 w-10">
-                <AvatarImage
-                  src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                    user.name
-                  )}&background=random`}
-                  alt={user.name}
-                />
-                <AvatarFallback>
-                  {user.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h3 className="font-medium">{user.name}</h3>
-                <p className="text-sm text-muted-foreground">{user.email}</p>
-              </div>
-            </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+          <Avatar className="h-8 w-8">
+            <AvatarImage src="/avatars/01.png" alt={user.username} />
+            <AvatarFallback>
+              {user.username.charAt(0).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56" align="end" forceMount>
+        <DropdownMenuLabel className="font-normal">
+          <div className="flex flex-col space-y-1">
+            <p className="text-sm font-medium leading-none">{user.username}</p>
+            <p className="text-xs leading-none text-muted-foreground">
+              {user.email}
+            </p>
           </div>
-          <div className="p-2">
-            <DropdownMenu>
-              <DropdownMenuContent className="w-56">
-                <DropdownMenuItem onClick={() => navigate("/dashboard")}>
-                  <User className="mr-2 h-4 w-4" />
-                  Dashboard
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/profile")}>
-                  <Settings className="mr-2 h-4 w-4" />
-                  Profile
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/saved")}>
-                  <Bookmark className="mr-2 h-4 w-4" />
-                  Saved Items
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/history")}>
-                  <History className="mr-2 h-4 w-4" />
-                  History
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate("/help")}>
-                  <HelpCircle className="mr-2 h-4 w-4" />
-                  Help & Support
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => navigate("/profile")}>
+          Profile
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate("/settings")}>
+          Settings
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={logout}>Log out</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 
@@ -1210,66 +1171,7 @@ const Navbar: React.FC = () => {
 
                         {/* User Profile */}
                         <div className="flex items-center">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                className="relative h-8 w-8 rounded-full"
-                              >
-                                <Avatar className="h-8 w-8">
-                                  <AvatarImage
-                                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                                      user?.name || "User"
-                                    )}&background=random`}
-                                    alt={user?.name || "User"}
-                                  />
-                                  <AvatarFallback>
-                                    {getInitials(user?.name || "User")}
-                                  </AvatarFallback>
-                                </Avatar>
-                              </Button>
-                            </DropdownMenuTrigger>
-
-                            <DropdownMenuContent
-                              className="w-56"
-                              align="end"
-                              forceMount
-                            >
-                              <DropdownMenuLabel className="font-normal">
-                                <div className="flex flex-col space-y-1">
-                                  <p className="text-sm font-medium leading-none">
-                                    {user?.name || "User"}
-                                  </p>
-                                  <p className="text-xs leading-none text-muted-foreground">
-                                    {user?.email || ""}
-                                  </p>
-                                </div>
-                              </DropdownMenuLabel>
-
-                              <DropdownMenuSeparator />
-
-                              <DropdownMenuItem asChild>
-                                <Link to="/dashboard">
-                                  <User className="mr-2 h-4 w-4" />
-                                  Dashboard
-                                </Link>
-                              </DropdownMenuItem>
-
-                              <DropdownMenuItem asChild>
-                                <Link to="/profile">
-                                  <Settings className="mr-2 h-4 w-4" />
-                                  Profile
-                                </Link>
-                              </DropdownMenuItem>
-
-                              <DropdownMenuSeparator />
-
-                              <DropdownMenuItem onClick={handleLogout}>
-                                <LogOut className="mr-2 h-4 w-4" />
-                                Log out
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <UserProfileDropdown />
                         </div>
                       </div>
                     ) : (
@@ -1769,69 +1671,11 @@ const Navbar: React.FC = () => {
                 </div> */}
 
                 <div className="flex items-center">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        className="relative h-8 w-8 rounded-full"
-                      >
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage
-                            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                              user?.name || "User"
-                            )}&background=random`}
-                            alt={user?.name || "User"}
-                          />
-                          <AvatarFallback>
-                            {getInitials(user?.name || "User")}
-                          </AvatarFallback>
-                        </Avatar>
-                      </Button>
-                    </DropdownMenuTrigger>
-
-                    <DropdownMenuContent
-                      className="w-56"
-                      align="end"
-                      forceMount
-                    >
-                      <DropdownMenuLabel className="font-normal">
-                        <div className="flex flex-col space-y-1">
-                          <p className="text-sm font-medium leading-none">
-                            {user?.name || "User"}
-                          </p>
-                          <p className="text-xs leading-none text-muted-foreground">
-                            {user?.email || ""}
-                          </p>
-                        </div>
-                      </DropdownMenuLabel>
-
-                      <DropdownMenuSeparator />
-
-                      <DropdownMenuItem asChild>
-                        <Link to="/dashboard">
-                          <User className="mr-2 h-4 w-4" />
-                          Dashboard
-                        </Link>
-                      </DropdownMenuItem>
-
-                      <DropdownMenuItem asChild>
-                        <Link to="/profile">
-                          <Settings className="mr-2 h-4 w-4" />
-                          Profile
-                        </Link>
-                      </DropdownMenuItem>
-
-                      <DropdownMenuSeparator />
-
-                      <DropdownMenuItem onClick={handleLogout}>
-                        <LogOut className="mr-2 h-4 w-4" />
-                        Log out
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <UserProfileDropdown />
                 </div>
               </>
             )}
+
             {/* Add this right before the ModeToggle */}
             {!isAuthenticated && !isLoading && (
               <div className="hidden md:flex items-center gap-2">
