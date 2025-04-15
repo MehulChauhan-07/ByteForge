@@ -17,6 +17,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/context/AuthContext";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import {
   User,
   Mail,
@@ -29,6 +31,13 @@ import {
   AlertCircle,
   Calendar,
   Clock,
+  Code,
+  BookOpen,
+  Trophy,
+  Brain,
+  PencilLine,
+  Save,
+  X,
 } from "lucide-react";
 
 const ProfilePage = () => {
@@ -39,9 +48,21 @@ const ProfilePage = () => {
     username: "",
     email: "",
     displayName: "",
+    bio: "", // Added bio for user self-description
+    preferredLanguage: "Java", // Default to Java for ByteForge
   });
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Learning statistics
+  const [learningStats, setLearningStats] = useState({
+    completedCourses: 2,
+    completedExercises: 15,
+    streak: 7,
+    totalCodingHours: 24,
+    javaLevel: "Intermediate", // Beginner, Intermediate, Advanced
+    skillLevel: 65, // Percentage
+  });
 
   // Notification preferences state
   const [notificationPrefs, setNotificationPrefs] = useState({
@@ -49,7 +70,34 @@ const ProfilePage = () => {
     courseReminders: true,
     newFeatures: false,
     securityAlerts: true,
+    codingTips: true, // New Java-focused notification preference
+    weeklyProgress: true, // New preference for progress reports
   });
+
+  // Recent activity data
+  const [recentActivities, setRecentActivities] = useState([
+    {
+      id: 1,
+      type: "course_progress",
+      title: "Java Basics",
+      description: "Completed Module 3: Control Flow",
+      date: "2 days ago",
+    },
+    {
+      id: 2,
+      type: "code_challenge",
+      title: "String Manipulation",
+      description: "Completed challenge with 95% score",
+      date: "4 days ago",
+    },
+    {
+      id: 3,
+      type: "note",
+      title: "OOP Concepts",
+      description: "Added new note on inheritance",
+      date: "5 days ago",
+    },
+  ]);
 
   useEffect(() => {
     if (!isAuthenticated || !user) {
@@ -60,8 +108,13 @@ const ProfilePage = () => {
     setFormData({
       username: user.username,
       email: user.email,
-      displayName: user.username, // You could add displayName to your user model
+      displayName: user.username,
+      bio: user.bio || "Java enthusiast learning to code!",
+      preferredLanguage: user.preferredLanguage || "Java",
     });
+
+    // Here you would fetch user learning statistics
+    // fetchLearningStats(user.id)
   }, [user, isAuthenticated, navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -118,6 +171,20 @@ const ProfilePage = () => {
 
   const accountCreatedDate = "April 15, 2023"; // Replace with actual data when available
 
+  // Function to get activity icon by type
+  const getActivityIcon = (type: string) => {
+    switch (type) {
+      case "course_progress":
+        return <BookOpen className="h-4 w-4 text-primary" />;
+      case "code_challenge":
+        return <Code className="h-4 w-4 text-green-500" />;
+      case "note":
+        return <PencilLine className="h-4 w-4 text-blue-500" />;
+      default:
+        return <Clock className="h-4 w-4" />;
+    }
+  };
+
   if (!user) {
     return null;
   }
@@ -147,6 +214,18 @@ const ProfilePage = () => {
                 <h2 className="text-xl font-bold">{formData.displayName}</h2>
                 <p className="text-muted-foreground">{user.email}</p>
 
+                {/* Java skill level badge */}
+                <Badge
+                  variant="outline"
+                  className="mt-2 bg-yellow-50 text-yellow-700 border-yellow-200"
+                >
+                  {learningStats.javaLevel} Java Developer
+                </Badge>
+
+                <p className="mt-2 text-sm text-center text-muted-foreground">
+                  {formData.bio}
+                </p>
+
                 <div className="mt-2 flex items-center text-xs text-muted-foreground">
                   <Calendar className="h-3 w-3 mr-1" />
                   <span>Member since {accountCreatedDate}</span>
@@ -175,52 +254,107 @@ const ProfilePage = () => {
             </CardContent>
           </Card>
 
-          {/* Account info card */}
+          {/* Learning Progress card - NEW */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Account Information</CardTitle>
+              <CardTitle className="text-base">Learning Progress</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-primary/10 rounded-full">
-                  <User className="h-4 w-4 text-primary" />
+                  <BookOpen className="h-4 w-4 text-primary" />
                 </div>
-                <div>
-                  <p className="text-sm font-medium">Username</p>
-                  <p className="text-sm text-muted-foreground">
-                    {user.username}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-500/10 rounded-full">
-                  <Mail className="h-4 w-4 text-blue-500" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium">Email</p>
-                  <p className="text-sm text-muted-foreground">{user.email}</p>
+                <div className="flex-1">
+                  <div className="flex justify-between">
+                    <p className="text-sm font-medium">Java Skill Level</p>
+                    <p className="text-sm font-medium">
+                      {learningStats.skillLevel}%
+                    </p>
+                  </div>
+                  <Progress
+                    value={learningStats.skillLevel}
+                    className="h-2 mt-1"
+                  />
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-yellow-500/10 rounded-full">
-                  <Shield className="h-4 w-4 text-yellow-500" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium">Role</p>
-                  <p className="text-sm text-muted-foreground capitalize">
-                    {user.roles ? user.roles.join(", ").toLowerCase() : "user"}
-                  </p>
-                </div>
-              </div>
+
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-green-500/10 rounded-full">
-                  <Clock className="h-4 w-4 text-green-500" />
+                  <Trophy className="h-4 w-4 text-green-500" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium">Last Active</p>
-                  <p className="text-sm text-muted-foreground">Just now</p>
+                  <p className="text-sm font-medium">Current Streak</p>
+                  <p className="text-sm text-muted-foreground">
+                    {learningStats.streak} days of continuous learning
+                  </p>
                 </div>
               </div>
+
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-500/10 rounded-full">
+                  <Code className="h-4 w-4 text-blue-500" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Completed Exercises</p>
+                  <p className="text-sm text-muted-foreground">
+                    {learningStats.completedExercises} exercises
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-yellow-500/10 rounded-full">
+                  <Clock className="h-4 w-4 text-yellow-500" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Total Coding Hours</p>
+                  <p className="text-sm text-muted-foreground">
+                    {learningStats.totalCodingHours} hours
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter className="border-t pt-4">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full"
+                onClick={() => navigate("/learning-path")}
+              >
+                View Full Learning Journey
+              </Button>
+            </CardFooter>
+          </Card>
+
+          {/* Recent Activity - NEW */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Recent Activity</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <ul className="divide-y">
+                {recentActivities.map((activity) => (
+                  <li
+                    key={activity.id}
+                    className="p-3 hover:bg-accent/50 transition-colors"
+                  >
+                    <div className="flex gap-3">
+                      <div className="mt-0.5 p-1.5 bg-accent rounded-full">
+                        {getActivityIcon(activity.type)}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">{activity.title}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {activity.description}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {activity.date}
+                        </p>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
             </CardContent>
           </Card>
         </div>
@@ -230,6 +364,7 @@ const ProfilePage = () => {
           <Tabs defaultValue="edit-profile">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="edit-profile">Profile</TabsTrigger>
+              {/* <TabsTrigger value="learning-preferences">Learning</TabsTrigger> */}
               <TabsTrigger value="notifications">Notifications</TabsTrigger>
               <TabsTrigger value="security">Security</TabsTrigger>
             </TabsList>
@@ -298,6 +433,22 @@ const ProfilePage = () => {
                           recovery
                         </p>
                       </div>
+
+                      {/* Bio field - NEW */}
+                      <div className="space-y-2">
+                        <Label htmlFor="bio">Bio</Label>
+                        <Input
+                          id="bio"
+                          name="bio"
+                          value={formData.bio}
+                          onChange={handleInputChange}
+                          disabled={!isEditing || isLoading}
+                          className="w-full"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Short description about yourself (max 160 characters)
+                        </p>
+                      </div>
                     </div>
                   </form>
                 </CardContent>
@@ -313,10 +464,14 @@ const ProfilePage = () => {
                             username: user.username,
                             email: user.email,
                             displayName: user.username,
+                            bio:
+                              user.bio || "Java enthusiast learning to code!",
+                            preferredLanguage: user.preferredLanguage || "Java",
                           });
                         }}
                         disabled={isLoading}
                       >
+                        <X className="mr-2 h-4 w-4" />
                         Cancel
                       </Button>
                       <Button
@@ -324,7 +479,17 @@ const ProfilePage = () => {
                         form="profile-form"
                         disabled={isLoading}
                       >
-                        {isLoading ? "Saving..." : "Save Changes"}
+                        {isLoading ? (
+                          <>
+                            <span className="h-4 w-4 border-2 border-t-transparent border-white/80 rounded-full animate-spin mr-2"></span>
+                            Saving...
+                          </>
+                        ) : (
+                          <>
+                            <Save className="mr-2 h-4 w-4" />
+                            Save Changes
+                          </>
+                        )}
                       </Button>
                     </>
                   ) : (
@@ -333,6 +498,7 @@ const ProfilePage = () => {
                       onClick={() => setIsEditing(true)}
                       className="ml-auto"
                     >
+                      <PencilLine className="mr-2 h-4 w-4" />
                       Edit Profile
                     </Button>
                   )}
@@ -372,6 +538,123 @@ const ProfilePage = () => {
                     </div>
                   </div>
                 </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Learning Preferences Tab - NEW */}
+            <TabsContent value="learning-preferences" className="mt-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Learning Preferences</CardTitle>
+                  <CardDescription>
+                    Customize your learning experience
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-4">
+                    <div>
+                      <Label className="text-base">
+                        Preferred Programming Language
+                      </Label>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        ByteForge focuses on Java, but you can set your
+                        preferences for future courses
+                      </p>
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        {["Java", "Python", "JavaScript", "C++", "C#"].map(
+                          (lang) => (
+                            <Badge
+                              key={lang}
+                              variant={
+                                formData.preferredLanguage === lang
+                                  ? "default"
+                                  : "outline"
+                              }
+                              className="cursor-pointer px-3 py-1.5"
+                              onClick={() =>
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  preferredLanguage: lang,
+                                }))
+                              }
+                            >
+                              {lang}
+                            </Badge>
+                          )
+                        )}
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    <div>
+                      <Label className="text-base">Learning Goals</Label>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        What do you want to achieve with Java?
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                        {[
+                          {
+                            id: "web-dev",
+                            label: "Web Development",
+                            icon: <Code className="h-4 w-4" />,
+                          },
+                          {
+                            id: "android",
+                            label: "Android Development",
+                            icon: <Code className="h-4 w-4" />,
+                          },
+                          {
+                            id: "data-science",
+                            label: "Data Science",
+                            icon: <Brain className="h-4 w-4" />,
+                          },
+                          {
+                            id: "academic",
+                            label: "Academic Learning",
+                            icon: <BookOpen className="h-4 w-4" />,
+                          },
+                        ].map((goal) => (
+                          <div
+                            key={goal.id}
+                            className="flex items-center gap-2 p-3 border rounded-md cursor-pointer hover:bg-accent/50 transition-colors"
+                          >
+                            <div className="p-1.5 bg-primary/10 rounded-full">
+                              {goal.icon}
+                            </div>
+                            <span className="text-sm">{goal.label}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    <div>
+                      <Label className="text-base">Daily Learning Target</Label>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        How much time do you want to spend learning each day?
+                      </p>
+                      <div className="flex items-center justify-between mt-2">
+                        <span className="text-sm">15 minutes</span>
+                        <span className="text-sm font-medium">30 minutes</span>
+                        <span className="text-sm">1 hour or more</span>
+                      </div>
+                      <Separator className="my-2" />
+                      <input
+                        type="range"
+                        min="15"
+                        max="60"
+                        step="15"
+                        defaultValue="30"
+                        className="w-full h-2 bg-accent rounded-lg appearance-none cursor-pointer"
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter className="border-t p-6">
+                  <Button className="ml-auto">Save Preferences</Button>
+                </CardFooter>
               </Card>
             </TabsContent>
 
@@ -426,9 +709,45 @@ const ProfilePage = () => {
 
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
+                        <Label htmlFor="coding-tips">Java Coding Tips</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Receive daily Java coding tips and best practices
+                        </p>
+                      </div>
+                      <Switch
+                        id="coding-tips"
+                        checked={notificationPrefs.codingTips}
+                        onCheckedChange={() =>
+                          handleNotificationChange("codingTips")
+                        }
+                      />
+                    </div>
+
+                    <Separator />
+
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label htmlFor="weekly-progress">Weekly Progress</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Get a weekly summary of your learning progress
+                        </p>
+                      </div>
+                      <Switch
+                        id="weekly-progress"
+                        checked={notificationPrefs.weeklyProgress}
+                        onCheckedChange={() =>
+                          handleNotificationChange("weeklyProgress")
+                        }
+                      />
+                    </div>
+
+                    <Separator />
+
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
                         <Label htmlFor="new-features">New Features</Label>
                         <p className="text-sm text-muted-foreground">
-                          Learn about new features and improvements
+                          Learn about new features and improvements to ByteForge
                         </p>
                       </div>
                       <Switch

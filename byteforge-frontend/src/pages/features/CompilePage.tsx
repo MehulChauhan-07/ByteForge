@@ -1,22 +1,14 @@
-// src/pages/features/CompilerPage.jsx
-import { useState, useEffect, ChangeEvent } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { toast } from "sonner";
+import MonacoEditor from "@monaco-editor/react";
 import {
   executeCode,
   saveCode,
   getSavedCodes,
   deleteCode,
 } from "@/services/codeEditorService";
-import { toast } from "sonner";
 
 const languages = [
   { value: "java", label: "Java" },
@@ -26,7 +18,7 @@ const languages = [
 ];
 
 export default function CompilerPage() {
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState("// Write your code here");
   const [language, setLanguage] = useState("java");
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
@@ -94,14 +86,6 @@ export default function CompilerPage() {
     }
   };
 
-  const handleCodeChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    setCode(e.target.value);
-  };
-
-  const handleInputChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    setInput(e.target.value);
-  };
-
   return (
     <div className="container mx-auto p-4 space-y-4">
       <Card>
@@ -110,18 +94,17 @@ export default function CompilerPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-4">
-            <Select value={language} onValueChange={setLanguage}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select language" />
-              </SelectTrigger>
-              <SelectContent>
-                {languages.map((lang) => (
-                  <SelectItem key={lang.value} value={lang.value}>
-                    {lang.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              className="border rounded-md p-2"
+            >
+              {languages.map((lang) => (
+                <option key={lang.value} value={lang.value}>
+                  {lang.label}
+                </option>
+              ))}
+            </select>
             <Button onClick={handleExecute} disabled={isLoading}>
               {isLoading ? "Executing..." : "Execute"}
             </Button>
@@ -133,19 +116,25 @@ export default function CompilerPage() {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <h3 className="text-lg font-semibold">Code</h3>
-              <Textarea
+              <MonacoEditor
+                height="400px"
+                language={language}
+                theme="vs-dark"
                 value={code}
-                onChange={handleCodeChange}
-                className="h-[400px] font-mono"
-                placeholder="Enter your code here..."
+                onChange={(value) => setCode(value || "")}
+                options={{
+                  selectOnLineNumbers: true,
+                  autoClosingBrackets: "always",
+                  suggestOnTriggerCharacters: true,
+                }}
               />
             </div>
             <div className="space-y-2">
               <h3 className="text-lg font-semibold">Input</h3>
-              <Textarea
+              <textarea
                 value={input}
-                onChange={handleInputChange}
-                className="h-[200px]"
+                onChange={(e) => setInput(e.target.value)}
+                className="w-full p-2 h-[200px] border rounded-md"
                 placeholder="Enter input here..."
               />
               <h3 className="text-lg font-semibold">Output</h3>

@@ -25,7 +25,7 @@ import { AuthRequest } from "@/types/user";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
+const API_URL = "http://localhost:8080/api";
 
 // Enhanced Error Debugger Component
 const ErrorDebugger: React.FC<{ error: unknown; onClose: () => void }> = ({

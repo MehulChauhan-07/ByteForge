@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Trash2, Edit2, Save, X, Loader2 } from "lucide-react";
+import { Plus, Trash2, Edit2, Save, X, Loader2, Search } from "lucide-react";
 import noteService from "@/services/noteService";
 import { toast } from "sonner";
 
@@ -21,6 +21,8 @@ interface Note {
 const NotesPage = () => {
   const { user } = useAuth();
   const [notes, setNotes] = useState<Note[]>([]);
+  const [filteredNotes, setFilteredNotes] = useState<Note[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [isCreating, setIsCreating] = useState(false);
@@ -33,12 +35,27 @@ const NotesPage = () => {
     }
   }, [user]);
 
+  useEffect(() => {
+    if (searchQuery.trim() === "") {
+      setFilteredNotes(notes);
+    } else {
+      const query = searchQuery.toLowerCase();
+      const filtered = notes.filter(
+        note => 
+          note.title.toLowerCase().includes(query) || 
+          note.content.toLowerCase().includes(query)
+      );
+      setFilteredNotes(filtered);
+    }
+  }, [searchQuery, notes]);
+
   const fetchNotes = async () => {
     try {
       setIsLoading(true);
       setError("");
       const loadedNotes = await noteService.getAllNotes();
       setNotes(loadedNotes || []);
+      setFilteredNotes(loadedNotes || []);
     } catch (err) {
       setError("Failed to load notes");
       toast.error("Failed to load notes. Please try again later.");
@@ -125,6 +142,16 @@ const NotesPage = () => {
         </Button>
       </div>
 
+      <div className="relative mb-6">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Search notes..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-10"
+        />
+      </div>
+
       {error && (
         <div className="mb-4 p-3 rounded-md bg-destructive/10 text-destructive">
           {error}
@@ -178,13 +205,13 @@ const NotesPage = () => {
         <div className="flex justify-center items-center h-64">
           <Loader2 className="h-8 w-8 animate-spin" />
         </div>
-      ) : notes.length === 0 ? (
+      ) : filteredNotes.length === 0 ? (
         <div className="text-center text-muted-foreground">
-          No notes yet. Create your first note!
+          {searchQuery ? "No notes found matching your search." : "No notes yet. Create your first note!"}
         </div>
       ) : (
         <div className="grid gap-6">
-          {notes.map((note) => (
+          {filteredNotes.map((note) => (
             <Card key={note.id}>
               <CardHeader>
                 <div className="flex justify-between items-start">
