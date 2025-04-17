@@ -86,9 +86,9 @@ System.out.println("Welcome, " + name);`,
                     New! Interactive Java lessons available
                   </motion.div>
 
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     <motion.h1
-                      className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-blue-600 dark:from-white dark:to-blue-400"
+                      className="text-4xl font-bold tracking-normal sm:text-5xl xl:text-6xl leading-snug bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-blue-600 dark:from-white dark:to-blue-400"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.5 }}

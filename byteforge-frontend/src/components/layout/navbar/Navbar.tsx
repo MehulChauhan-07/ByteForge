@@ -969,7 +969,7 @@ const Navbar: React.FC = () => {
               </SheetTrigger>
               <SheetContent
                 side="left"
-                className="w-[300px] sm:w-[350px] p-0 overflow-hidden"
+                className="w-[300px] sm:w-[350px] p-0 overflow-hidden [&>button]:hidden"
               >
                 <motion.nav
                   className="flex h-full flex-col gap-4 overflow-hidden"
@@ -1220,7 +1220,7 @@ const Navbar: React.FC = () => {
                       transition={{ duration: 0.2 }}
                       className="ml-1"
                     >
-                      <ChevronDown className="h-4 w-4" />
+                      {/* <ChevronDown className="h-4 w-4" /> */}
                     </motion.div>
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
@@ -1287,7 +1287,7 @@ const Navbar: React.FC = () => {
                       transition={{ duration: 0.2 }}
                       className="ml-1"
                     >
-                      <ChevronDown className="h-4 w-4" />
+                      {/* <ChevronDown className="h-4 w-4" /> */}
                     </motion.div>
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>

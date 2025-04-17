@@ -362,3 +362,350 @@ ByteForge offers an intuitive and clean UI that is optimized for all devices.
           Drawer Menu for Mobile
 
           Adaptive Code Editor for Small Screens
+
+ByteForge/
+├── .gitignore
+├── byteforge-backend/
+│   ├── byteforge/
+│   │   ├── .gitattributes
+│   │   ├── .gitignore
+│   │   ├── .idea/
+│   │   │   ├── .gitignore
+│   │   │   ├── compiler.xml
+│   │   │   ├── encodings.xml
+│   │   │   ├── jarRepositories.xml
+│   │   │   ├── misc.xml
+│   │   │   ├── vcs.xml
+│   │   │   ├── workspace.xml
+│   │   ├── .mvn/
+│   │   │   ├── wrapper/
+│   │   │   │   ├── maven-wrapper.properties
+│   │   ├── mvnw
+│   │   ├── mvnw.cmd
+│   │   ├── pom.xml
+│   │   ├── src/
+│   │   │   ├── main/
+│   │   │   │   ├── java/
+│   │   │   │   │   ├── com/
+│   │   │   │   │   │   ├── byteforge/
+│   │   │   │   │   │   │   ├── auth/
+│   │   │   │   │   │   │   │   ├── config/
+│   │   │   │   │   │   │   │   │   ├── CorsConfig.java
+│   │   │   │   │   │   │   │   │   ├── JwtRequestFilter.java
+│   │   │   │   │   │   │   │   │   ├── SecurityConfig.java
+│   │   │   │   │   │   │   │   ├── controller/
+│   │   │   │   │   │   │   │   │   ├── AuthController.java
+│   │   │   │   │   │   │   │   ├── dto/
+│   │   │   │   │   │   │   │   │   ├── AuthRequest.java
+│   │   │   │   │   │   │   │   │   ├── AuthResponse.java
+│   │   │   │   │   │   │   │   │   ├── RegisterRequest.java
+│   │   │   │   │   │   │   │   ├── model/
+│   │   │   │   │   │   │   │   │   ├── BlacklistedToken.java
+│   │   │   │   │   │   │   │   │   ├── User.java
+│   │   │   │   │   │   │   │   ├── repository/
+│   │   │   │   │   │   │   │   │   ├── BlacklistedTokenRepository.java
+│   │   │   │   │   │   │   │   │   ├── UserRepository.java
+│   │   │   │   │   │   │   │   ├── service/
+│   │   │   │   │   │   │   │   │   ├── AuthService.java
+│   │   │   │   │   │   │   │   │   ├── UserDetailsServiceImpl.java
+│   │   │   │   │   │   │   │   ├── util/
+│   │   │   │   │   │   │   │   │   ├── JwtTokenUtil.java
+│   │   │   │   │   │   │   ├── ByteforgeApplication.java
+│   │   │   │   │   │   │   ├── codeEditorAndCompiler/
+│   │   │   │   │   │   │   │   ├── controller/
+│   │   │   │   │   │   │   │   │   ├── CodeEditorController.java
+│   │   │   │   │   │   │   │   ├── dto/
+│   │   │   │   │   │   │   │   │   ├── CompileRequest.java
+│   │   │   │   │   │   │   │   │   ├── CompileResponse.java
+│   │   │   │   │   │   │   │   ├── service/
+│   │   │   │   │   │   │   │   │   ├── CodeEditorService.java
+│   │   │   │   │   │   │   ├── exception/
+│   │   │   │   │   │   │   │   ├── BadRequestException.java
+│   │   │   │   │   │   │   │   ├── CustomException.java
+│   │   │   │   │   │   │   │   ├── ErrorResponse.java
+│   │   │   │   │   │   │   │   ├── GlobalExceptionHandler.java
+│   │   │   │   │   │   │   │   ├── MethodArgumentNotValidException.java
+│   │   │   │   │   │   │   │   ├── ResourceAlreadyExistsException.java
+│   │   │   │   │   │   │   │   ├── ResourceNotFoundException.java
+│   │   │   │   │   │   │   │   ├── UnauthorizedException.java
+│   │   │   │   │   │   │   ├── notes/
+│   │   │   │   │   │   │   │   ├── controller/
+│   │   │   │   │   │   │   │   │   ├── NoteController.java
+│   │   │   │   │   │   │   │   ├── dto/
+│   │   │   │   │   │   │   │   │   ├── NoteDTO.java
+│   │   │   │   │   │   │   │   ├── mapper/
+│   │   │   │   │   │   │   │   │   ├── NoteMapper.java
+│   │   │   │   │   │   │   │   ├── model/
+│   │   │   │   │   │   │   │   │   ├── Note.java
+│   │   │   │   │   │   │   │   ├── repository/
+│   │   │   │   │   │   │   │   │   ├── NoteRepository.java
+│   │   │   │   │   │   │   │   ├── service/
+│   │   │   │   │   │   │   │   │   ├── NoteService.java
+│   │   │   │   ├── resources/
+│   │   │   │   │   ├── application.properties
+│   │   │   ├── test/
+│   │   │   │   ├── java/
+│   │   │   │   │   ├── com/
+│   │   │   │   │   │   ├── byteforge/
+│   │   │   │   │   │   │   ├── ByteforgeApplicationTests.java
+│   │   ├── target/
+│   │   │   ├── classes/
+│   │   │   │   ├── application.properties
+│   │   │   │   ├── com/
+│   │   │   │   │   ├── byteforge/
+│   │   │   │   │   │   ├── auth/
+│   │   │   │   │   │   │   ├── config/
+│   │   │   │   │   │   │   │   ├── CorsConfig$1.class
+│   │   │   │   │   │   │   │   ├── CorsConfig.class
+│   │   │   │   │   │   │   │   ├── JwtRequestFilter.class
+│   │   │   │   │   │   │   │   ├── SecurityConfig.class
+│   │   │   │   │   │   │   ├── controller/
+│   │   │   │   │   │   │   │   ├── AuthController.class
+│   │   │   │   │   │   │   ├── dto/
+│   │   │   │   │   │   │   │   ├── AuthRequest.class
+│   │   │   │   │   │   │   │   ├── AuthResponse.class
+│   │   │   │   │   │   │   │   ├── RegisterRequest.class
+│   │   │   │   │   │   │   ├── model/
+│   │   │   │   │   │   │   │   ├── BlacklistedToken.class
+│   │   │   │   │   │   │   │   ├── User.class
+│   │   │   │   │   │   │   ├── repository/
+│   │   │   │   │   │   │   │   ├── BlacklistedTokenRepository.class
+│   │   │   │   │   │   │   │   ├── UserRepository.class
+│   │   │   │   │   │   │   ├── service/
+│   │   │   │   │   │   │   │   ├── AuthService.class
+│   │   │   │   │   │   │   │   ├── UserDetailsServiceImpl.class
+│   │   │   │   │   │   │   ├── util/
+│   │   │   │   │   │   │   │   ├── JwtTokenUtil.class
+│   │   │   │   │   │   ├── ByteforgeApplication.class
+│   │   │   │   │   │   ├── codeEditorAndCompiler/
+│   │   │   │   │   │   │   ├── controller/
+│   │   │   │   │   │   │   │   ├── CodeEditorController.class
+│   │   │   │   │   │   │   ├── dto/
+│   │   │   │   │   │   │   │   ├── CompileRequest.class
+│   │   │   │   │   │   │   │   ├── CompileResponse.class
+│   │   │   │   │   │   │   ├── service/
+│   │   │   │   │   │   │   │   ├── CodeEditorService.class
+│   │   │   │   │   │   ├── exception/
+│   │   │   │   │   │   │   ├── BadRequestException.class
+│   │   │   │   │   │   │   ├── CustomException.class
+│   │   │   │   │   │   │   ├── ErrorResponse.class
+│   │   │   │   │   │   │   ├── GlobalExceptionHandler.class
+│   │   │   │   │   │   │   ├── MethodArgumentNotValidException.class
+│   │   │   │   │   │   │   ├── ResourceAlreadyExistsException.class
+│   │   │   │   │   │   │   ├── ResourceNotFoundException.class
+│   │   │   │   │   │   │   ├── UnauthorizedException.class
+│   │   │   │   │   │   ├── notes/
+│   │   │   │   │   │   │   ├── controller/
+│   │   │   │   │   │   │   │   ├── NoteController.class
+│   │   │   │   │   │   │   ├── dto/
+│   │   │   │   │   │   │   │   ├── NoteDTO.class
+│   │   │   │   │   │   │   ├── mapper/
+│   │   │   │   │   │   │   │   ├── NoteMapper.class
+│   │   │   │   │   │   │   ├── model/
+│   │   │   │   │   │   │   │   ├── Note.class
+│   │   │   │   │   │   │   ├── repository/
+│   │   │   │   │   │   │   │   ├── NoteRepository.class
+│   │   │   │   │   │   │   ├── service/
+│   │   │   │   │   │   │   │   ├── NoteService.class
+│   │   │   ├── generated-sources/
+│   │   │   │   ├── annotations/
+├── byteforge-frontend/
+│   ├── .dependency-cruiser.cjs
+│   ├── .env
+│   ├── .env.local
+│   ├── .env.production
+│   ├── .gitignore
+│   ├── components.json
+│   ├── dependency-graph.dot
+│   ├── dependency-graph.svg
+│   ├── index.html
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── postcss.config.mjs
+│   ├── public/
+│   │   ├── favicon.svg
+│   │   ├── placeholder-logo.png
+│   │   ├── placeholder-logo.svg
+│   │   ├── placeholder-user.jpg
+│   │   ├── placeholder.jpg
+│   │   ├── placeholder.svg
+│   ├── src/
+│   │   ├── api/
+│   │   │   ├── api.ts
+│   │   │   ├── code.ts
+│   │   │   ├── httpClient.ts
+│   │   │   ├── notes.ts
+│   │   ├── App.tsx
+│   │   ├── assets/
+│   │   │   ├── gif/
+│   │   │   ├── logo/
+│   │   │   │   ├── logo-dark.svg
+│   │   │   │   ├── logo-light.svg
+│   │   ├── components/
+│   │   │   ├── CorsTest.tsx
+│   │   │   ├── diagrams/
+│   │   │   │   ├── MemoryAllocationDiagram.tsx
+│   │   │   ├── features/
+│   │   │   │   ├── chatbot/
+│   │   │   │   │   ├── ChatInput.tsx
+│   │   │   │   │   ├── ChatInterface.tsx
+│   │   │   │   │   ├── ChatMessage.tsx
+│   │   │   │   ├── code/
+│   │   │   │   │   ├── CodePlayground.tsx
+│   │   │   │   ├── community/
+│   │   │   │   │   ├── DiscussionThread.tsx
+│   │   │   │   │   ├── ForumList.tsx
+│   │   │   │   ├── diagram/
+│   │   │   │   │   ├── MemoryAllocationdiagram.tsx
+│   │   │   │   ├── home/
+│   │   │   │   │   ├── FeatureSection.tsx
+│   │   │   │   │   ├── HeroSection.tsx
+│   │   │   │   │   ├── JavaTopics.tsx
+│   │   │   │   │   ├── TestimonialSection.tsx
+│   │   │   │   ├── Java_Topics/
+│   │   │   │   │   ├── CodePlayground.tsx
+│   │   │   │   │   ├── MultiFormatContent.tsx
+│   │   │   │   │   ├── Sidebar.tsx
+│   │   │   │   ├── learning-path/
+│   │   │   │   │   ├── NextLesson.tsx
+│   │   │   │   │   ├── PathOverview.tsx
+│   │   │   │   │   ├── PathProgress.tsx
+│   │   │   │   ├── notes/
+│   │   │   │   │   ├── NotesEditor.tsx
+│   │   │   │   │   ├── NoteSidebar.tsx
+│   │   │   │   │   ├── NotesList.tsx
+│   │   │   │   ├── progress/
+│   │   │   │   │   ├── AchievementBadges.tsx
+│   │   │   │   │   ├── ProgressDashboard.tsx
+│   │   │   │   │   ├── TopicProgress.tsx
+│   │   │   │   ├── quiz/
+│   │   │   │   │   ├── TopicQuiz.tsx
+│   │   │   ├── layout/
+│   │   │   │   ├── Footer.tsx
+│   │   │   │   ├── Layout.tsx
+│   │   │   │   ├── motion-layout.tsx
+│   │   │   │   ├── navbar/
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   ├── CollapsibleSection.tsx
+│   │   │   │   │   │   ├── DropdownItem.tsx
+│   │   │   │   │   │   ├── mobile-navbar.tsx
+│   │   │   │   │   │   ├── MobileMenu.tsx
+│   │   │   │   │   │   ├── MobileNavLink.tsx
+│   │   │   │   │   │   ├── navbar-Items.ts
+│   │   │   │   │   │   ├── navbar-Items.tsx
+│   │   │   │   │   │   ├── Navbar.tsx
+│   │   │   │   │   │   ├── Navlogo.tsx
+│   │   │   │   │   │   ├── old_navbar.tsx
+│   │   │   │   │   │   ├── OptimizedSearchDropdown.tsx
+│   │   │   │   │   │   ├── Tools.tsx
+│   │   │   │   │   ├── Navbar.tsx
+│   │   │   │   │   ├── UserProfileDropdown.tsx
+│   │   │   │   ├── old_files/
+│   │   │   │   │   ├── old_navbar-v2.tsx
+│   │   │   │   │   ├── old_navbar.tsx
+│   │   │   │   ├── ThemeProvider.tsx
+│   │   │   ├── ProtectedRoutes.tsx
+│   │   │   ├── shared/
+│   │   │   │   ├── CommentsSection.tsx
+│   │   │   │   ├── ModeToggle.tsx
+│   │   │   │   ├── MultiFormatContent.tsx
+│   │   │   ├── ui/
+│   │   │   │   ├── accordion.tsx
+│   │   │   │   ├── alert.tsx
+│   │   │   │   ├── avatar.tsx
+│   │   │   │   ├── badge.tsx
+│   │   │   │   ├── button.tsx
+│   │   │   │   ├── card.tsx
+│   │   │   │   ├── checkbox.tsx
+│   │   │   │   ├── dialog.tsx
+│   │   │   │   ├── dropdown-menu.tsx
+│   │   │   │   ├── editor.tsx
+│   │   │   │   ├── hover-card.tsx
+│   │   │   │   ├── icons.tsx
+│   │   │   │   ├── input.tsx
+│   │   │   │   ├── label.tsx
+│   │   │   │   ├── modal.tsx
+│   │   │   │   ├── navigation-menu.tsx
+│   │   │   │   ├── progress.tsx
+│   │   │   │   ├── select.tsx
+│   │   │   │   ├── separator.tsx
+│   │   │   │   ├── sheet.tsx
+│   │   │   │   ├── skeleton.tsx
+│   │   │   │   ├── switch.tsx
+│   │   │   │   ├── tabs.tsx
+│   │   │   │   ├── textarea.tsx
+│   │   │   │   ├── toast.tsx
+│   │   │   │   ├── toaster.tsx
+│   │   │   │   ├── tooltip.tsx
+│   │   ├── context/
+│   │   │   ├── AuthContext.tsx
+│   │   │   ├── ProgressContex.tsx
+│   │   ├── data/
+│   │   │   ├── codeExamples.ts
+│   │   │   ├── javaBasicsContent.ts
+│   │   │   ├── topics.ts
+│   │   ├── hooks/
+│   │   │   ├── use-toast.ts
+│   │   │   ├── useDebounce.tsx
+│   │   │   ├── useOnClickOutside.tsx
+│   │   ├── index.css
+│   │   ├── lib/
+│   │   │   ├── api.ts
+│   │   │   ├── utils.ts
+│   │   ├── main.tsx
+│   │   ├── pages/
+│   │   │   ├── about/
+│   │   │   │   ├── About.tsx
+│   │   │   │   ├── components/
+│   │   │   │   │   ├── features.tsx
+│   │   │   │   │   ├── team-details.tsx
+│   │   │   ├── auth/
+│   │   │   │   ├── ForgotPasswordPage.tsx
+│   │   │   │   ├── LoginPage.tsx
+│   │   │   │   ├── old_files/
+│   │   │   │   │   ├── old_signupage.tsx
+│   │   │   │   ├── SignupPage.tsx
+│   │   │   │   ├── TestLoginPage.tsx
+│   │   │   ├── dashboard/
+│   │   │   │   ├── DashboardPage.tsx
+│   │   │   │   ├── ProfilePage.tsx
+│   │   │   ├── DashboardPage.tsx
+│   │   │   ├── features/
+│   │   │   │   ├── ChatbotPage.tsx
+│   │   │   │   ├── CommunityPage.tsx
+│   │   │   │   ├── CompilePage.tsx
+│   │   │   │   ├── ExercisesPage.tsx
+│   │   │   │   ├── NotesPage.tsx
+│   │   │   │   ├── old_folder/
+│   │   │   │   │   ├── old_compilepage.tsx
+│   │   │   │   ├── TutorialsPage.tsx
+│   │   │   ├── home/
+│   │   │   │   ├── Home.tsx
+│   │   │   ├── NotesPage.tsx
+│   │   │   ├── NotFoundPage.tsx
+│   │   │   ├── ProfilePage.tsx
+│   │   │   ├── topic/
+│   │   │   │   ├── TopicsPage.tsx
+│   │   ├── routes/
+│   │   │   ├── index.tsx
+│   │   │   ├── ProtectedRoute.tsx
+│   │   │   ├── PublicOnlyRoute.tsx
+│   │   ├── services/
+│   │   │   ├── api.ts
+│   │   │   ├── authService.ts
+│   │   │   ├── codeEditorService.ts
+│   │   │   ├── dashboardService.js
+│   │   │   ├── noteService.ts
+│   │   ├── types/
+│   │   │   ├── auth.ts
+│   │   │   ├── index.ts
+│   │   │   ├── user.ts
+│   │   ├── vite-env.d.ts
+│   ├── Structure.txt
+│   ├── styles/
+│   │   ├── byteforge-logo.css
+│   │   ├── globals.css
+│   ├── tailwind.config.js
+│   ├── tsconfig.json
+│   ├── vite.config.ts
+├── README.md

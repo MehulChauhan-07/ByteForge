@@ -1,8 +1,13 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Loader2 } from "lucide-react";
+import { ReactNode } from "react";
 
-const ProtectedRoute = () => {
+interface ProtectedRouteProps {
+  children: ReactNode;
+}
+
+const ProtectedRoute = ({children}: ProtectedRouteProps) => {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
 
@@ -23,7 +28,7 @@ const ProtectedRoute = () => {
   }
 
   // User is authenticated, render the protected route
-  return <Outlet />;
+  return children;
 };
 
 export default ProtectedRoute;

@@ -15,7 +15,7 @@ import {
   Save,
   Users,
 } from "lucide-react";
-import { ModeToggle } from "@/components/common/ModeToggle";
+import { ModeToggle } from "@/components/shared/ModeToggle";
 import {
   NavigationMenu,
   NavigationMenuContent,

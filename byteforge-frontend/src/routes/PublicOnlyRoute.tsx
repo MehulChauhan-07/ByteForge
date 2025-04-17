@@ -1,9 +1,14 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { Loader2 } from "lucide-react";
+import { Children, ReactNode } from "react";
+
+interface PublicOnlyRouteProps {
+  children: ReactNode;
+}
 
 // This route is for login/signup pages - authenticated users should be redirected away
-const PublicOnlyRoute = () => {
+const PublicOnlyRoute = ({ children }: PublicOnlyRouteProps) => {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
 
@@ -27,7 +32,7 @@ const PublicOnlyRoute = () => {
   }
 
   // User is not authenticated, render the public route
-  return <Outlet />;
+  return children;
 };
 
 export default PublicOnlyRoute;

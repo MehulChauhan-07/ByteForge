@@ -361,7 +361,7 @@ const SignupPage = () => {
               </div>
 
               {/* Password strength meter with smooth animation */}
-               {password.length > 0 && (
+              {password.length > 0 && (
                 <div className="mt-2">
                   <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
                     <div
@@ -468,18 +468,31 @@ const SignupPage = () => {
                   required
                 />
                 {confirmPassword && (
-                  <motion.div
-                    className="absolute right-10 top-1/2 -translate-y-1/2"
-                    initial={{ scale: 0.5, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                  >
-                    {confirmPassword === formData.password ? (
-                      <Check className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <X className="h-4 w-4 text-destructive" />
-                    )}
-                  </motion.div>
+                  <div className="absolute right-10 top-1/2 -translate-y-1/2 flex items-center pointer-events-none">
+                    <motion.div
+                      // className="absolute right-10 top-1/2 -translate-y-1/2 "
+                      className="flex items-center justify-center"
+                      initial={{ scale: 0.5, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 20,
+                      }}
+                    >
+                      {confirmPassword === formData.password ? (
+                        <Check
+                          className="h-4 w-4 text-green-500"
+                          style={{ margin: 0, padding: 0 }}
+                        />
+                      ) : (
+                        <X
+                          className="h-4 w-4 text-destructive"
+                          style={{ margin: 0, padding: 0 }}
+                        />
+                      )}
+                    </motion.div>
+                  </div>
                 )}
                 <button
                   type="button"
