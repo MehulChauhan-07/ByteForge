@@ -20,6 +20,7 @@ import ExercisesPage from "@/pages/features/ExercisesPage";
 // testing imports
 import Old_CompilerPage from "@/pages/features/old_folder/old_compilepage";
 import ComplexNavbar from "@/components/layout/old_files/old_navbar";
+import EnhancedTopicsPage from "@/pages/topic/EnhancedTopicPage";
 // import Layout from "@/components/layout/Layout";
 
 // Route configurations
@@ -34,6 +35,9 @@ export const routes = {
     { path: "/testing", element: <TestLoginPage /> },
     { path: "/testing/compiler", element: <Old_CompilerPage /> },
     { path: "/testing/navbar", element: <ComplexNavbar /> },
+    { path: "/topics", element: <EnhancedTopicsPage /> },
+    { path: "/topics/:topicId", element: <EnhancedTopicsPage /> },
+    // { path: "/topics", element: <TopicsPage /> },
   ],
   protected: [
     { path: "/dashboard", element: <DashboardPage /> },
@@ -44,7 +48,6 @@ export const routes = {
     { path: "/community", element: <CommunityPage /> },
     { path: "/exercises", element: <ExercisesPage /> },
     { path: "/tutorials", element: <TutorialsPage /> },
-    { path: "/topics", element: <TopicsPage /> },
   ],
   redirects: [
     // Define redirects here
