@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useProgress } from "@/context/ProgressContex";
+import { useProgress } from "@/context/ProgressContext";
 
 interface QuizQuestion {
   question: string;

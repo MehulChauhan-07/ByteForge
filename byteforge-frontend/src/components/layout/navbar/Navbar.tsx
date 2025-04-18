@@ -57,6 +57,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Settings, LogOut, History, HelpCircle } from "lucide-react";
+import { useTheme } from "../ThemeProvider";
 
 // Constants
 const QUICK_LINKS = [
@@ -551,35 +552,6 @@ const NotificationDropdown = ({
   </motion.div>
 );
 
-const LanguageMenu = ({
-  activeLanguage,
-  handleLanguageChange,
-}: {
-  activeLanguage: string;
-  handleLanguageChange: (lang: string) => void;
-}) => (
-  <motion.div
-    className="absolute right-0 mt-2 w-48 bg-popover rounded-md shadow-lg border z-50"
-    initial={{ opacity: 0, y: -10 }}
-    animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, y: -10 }}
-  >
-    <div className="p-2">
-      {["en", "es", "fr", "de", "ja"].map((lang) => (
-        <button
-          key={lang}
-          className={`w-full text-left px-3 py-2 rounded-md hover:bg-accent transition-colors ${
-            activeLanguage === lang ? "bg-accent" : ""
-          }`}
-          onClick={() => handleLanguageChange(lang)}
-        >
-          {lang.toUpperCase()}
-        </button>
-      ))}
-    </div>
-  </motion.div>
-);
-
 // Skip to content link for accessibility
 const SkipToContentLink = () => (
   <a
@@ -614,6 +586,8 @@ const Navbar: React.FC = () => {
   const [activeLanguage, setActiveLanguage] = useState("en");
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
   const [userProfileOpen, setUserProfileOpen] = useState(false);
+  const [showSearchOverlay, setShowSearchOverlay] = useState(false);
+  const { theme } = useTheme();
 
   // Debounced search query for API calls
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
@@ -652,6 +626,19 @@ const Navbar: React.FC = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // search section
+  //  modern search section
+  // Handle search submit
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      setShowSearchOverlay(false);
+      navigate(`/topics?q=${encodeURIComponent(searchQuery)}`);
+      setSearchQuery("");
+    }
+  };
+
+  // old search section
   // Load recent searches from localStorage
   useEffect(() => {
     const storedSearches = localStorage.getItem("recentSearches");
@@ -1335,7 +1322,7 @@ const Navbar: React.FC = () => {
           <div className="flex items-center gap-2 md:gap-3">
             {/* Desktop Search Button and Dropdown */}
             <div className="hidden md:block relative" ref={desktopSearchRef}>
-              <Button
+              {/* <Button
                 variant="ghost"
                 size="icon"
                 className="flex items-center justify-center"
@@ -1343,7 +1330,20 @@ const Navbar: React.FC = () => {
                 aria-label="Toggle search"
               >
                 <Search className="h-5 w-5" />
-              </Button>
+              </Button> */}
+              <button
+                onClick={() => setShowSearchOverlay(true)}
+                className={`p-2 rounded-md ${
+                  theme === "dark"
+                    ? "hover:bg-slate-800 text-slate-300"
+                    : "hover:bg-slate-100 text-slate-700"
+                }`}
+                aria-label="Search"
+              >
+                <Search className="h-5 w-5" />
+              </button>
+
+              {/* search results */}
               <AnimatePresence>
                 {desktopSearchOpen && (
                   <motion.div
@@ -1695,6 +1695,157 @@ const Navbar: React.FC = () => {
           </div>
         </div>
       </motion.header>
+      {/* Search overlay */}
+      <AnimatePresence>
+        {showSearchOverlay && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className={`fixed inset-0 z-50 p-4 sm:p-6 md:p-20 flex items-start justify-center ${
+              theme === "dark"
+                ? "bg-slate-900/95 backdrop-blur-sm"
+                : "bg-slate-100/95 backdrop-blur-sm"
+            }`}
+          >
+            <div
+              className="fixed inset-0 bg-transparent"
+              onClick={() => setShowSearchOverlay(false)}
+            ></div>
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className={`relative w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden ${
+                theme === "dark"
+                  ? "bg-slate-800 border border-slate-700"
+                  : "bg-white border border-slate-200"
+              }`}
+            >
+              <form onSubmit={handleSearchSubmit}>
+                <div className="flex items-center px-4 py-3 border-b">
+                  <Search
+                    className={`h-5 w-5 ${
+                      theme === "dark" ? "text-slate-400" : "text-slate-500"
+                    }`}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Search topics, lessons, or keywords..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className={`w-full ml-3 bg-transparent border-none outline-none ${
+                      theme === "dark"
+                        ? "text-white placeholder:text-slate-400"
+                        : "text-slate-900 placeholder:text-slate-500"
+                    }`}
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowSearchOverlay(false)}
+                    className={`p-1 rounded-full ${
+                      theme === "dark"
+                        ? "hover:bg-slate-700 text-slate-400"
+                        : "hover:bg-slate-200 text-slate-500"
+                    }`}
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+              </form>
+
+              <div
+                className={`p-4 max-h-[60vh] overflow-y-auto ${
+                  theme === "dark" ? "bg-slate-800" : "bg-white"
+                }`}
+              >
+                <div className="space-y-2">
+                  <div
+                    className={`px-3 py-1 text-xs font-medium ${
+                      theme === "dark" ? "text-slate-400" : "text-slate-500"
+                    }`}
+                  >
+                    Popular searches
+                  </div>
+                  {[
+                    "Java Basics",
+                    "Object-Oriented Programming",
+                    "Data Structures",
+                    "Exception Handling",
+                  ].map((term) => (
+                    <div
+                      key={term}
+                      className={`px-3 py-2 rounded-md cursor-pointer flex items-center gap-3 ${
+                        theme === "dark"
+                          ? "hover:bg-slate-700 text-slate-200"
+                          : "hover:bg-slate-100 text-slate-800"
+                      }`}
+                      onClick={() => {
+                        setShowSearchOverlay(false);
+                        navigate(`/topics?q=${encodeURIComponent(term)}`);
+                      }}
+                    >
+                      <Search className="h-4 w-4 flex-shrink-0" />
+                      <span>{term}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-4">
+                  <div
+                    className={`px-3 py-1 text-xs font-medium ${
+                      theme === "dark" ? "text-slate-400" : "text-slate-500"
+                    }`}
+                  >
+                    Quick links
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+                    {[
+                      {
+                        name: "All Topics",
+                        path: "/topics",
+                        icon: <BookOpen className="h-4 w-4" />,
+                      },
+                      {
+                        name: "Practice",
+                        path: "/practice",
+                        icon: <Code className="h-4 w-4" />,
+                      },
+                      {
+                        name: "Community",
+                        path: "/community",
+                        icon: <Users className="h-4 w-4" />,
+                      },
+                      {
+                        name: "Account Settings",
+                        path: "/settings",
+                        icon: <Settings className="h-4 w-4" />,
+                      },
+                    ].map((link) => (
+                      <div
+                        key={link.name}
+                        className={`px-3 py-2 rounded-md cursor-pointer flex items-center gap-3 ${
+                          theme === "dark"
+                            ? "hover:bg-slate-700 text-slate-200"
+                            : "hover:bg-slate-100 text-slate-800"
+                        }`}
+                        onClick={() => {
+                          setShowSearchOverlay(false);
+                          navigate(link.path);
+                        }}
+                      >
+                        {link.icon}
+                        <span>{link.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 };

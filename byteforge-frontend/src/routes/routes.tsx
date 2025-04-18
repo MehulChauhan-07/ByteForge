@@ -4,6 +4,7 @@ import SignupPage from "@/pages/auth/SignupPage";
 import TestLoginPage from "@/pages/auth/TestLoginPage";
 import HomePage from "@/pages/home/Home";
 import DashboardPage from "@/pages/DashboardPage";
+// import DashboardPage from "@/pages/dashboard/DashboardPage";
 import ProfilePage from "@/pages/ProfilePage";
 import TopicsPage from "@/pages/topic/TopicsPage";
 import NotFoundPage from "@/pages/NotFoundPage";
@@ -20,7 +21,11 @@ import ExercisesPage from "@/pages/features/ExercisesPage";
 // testing imports
 import Old_CompilerPage from "@/pages/features/old_folder/old_compilepage";
 import ComplexNavbar from "@/components/layout/old_files/old_navbar";
-import EnhancedTopicsPage from "@/pages/topic/EnhancedTopicPage";
+// import EnhancedTopicsPage from "@/pages/topic/EnhancedTopicPage";
+import EnhancedTopicsPage from "@/pages/features/EnhancedTopicsPage";
+import EnhancedHome from "@/pages/home/EnhancedHome";
+import ModernEnhancedHome from "@/pages/home/ModernEnhancedHome";
+
 // import Layout from "@/components/layout/Layout";
 
 // Route configurations
@@ -31,12 +36,16 @@ export const routes = {
     { path: "/login", element: <LoginPage /> },
     { path: "/signup", element: <SignupPage /> },
     // { path: '/forgot-password', element: <ForgotPasswordPage /> },
-    // tools
-    { path: "/testing", element: <TestLoginPage /> },
-    { path: "/testing/compiler", element: <Old_CompilerPage /> },
-    { path: "/testing/navbar", element: <ComplexNavbar /> },
     { path: "/topics", element: <EnhancedTopicsPage /> },
     { path: "/topics/:topicId", element: <EnhancedTopicsPage /> },
+    { path: "/topics/:topicId/:subtopicId", element: <EnhancedTopicsPage /> },
+
+    // testing routes
+    { path: "/testing", element: <TestLoginPage /> },
+    // { path: "/testing/home1", element: <EnhancedHome /> },
+    { path: "/testing/home2", element: <ModernEnhancedHome /> },
+    { path: "/testing/compiler", element: <Old_CompilerPage /> },
+    { path: "/testing/navbar", element: <ComplexNavbar /> },
     // { path: "/topics", element: <TopicsPage /> },
   ],
   protected: [
@@ -54,5 +63,10 @@ export const routes = {
     { from: "/compiler", to: "/tools/compiler" },
     { from: "/assistant", to: "/tools/assistant" },
     { from: "/notes", to: "/tools/notes" },
+    { from: "/search/:topicId", to: "/topics/:topicId" },
+    {
+      from: "/search/:topicId/:subtopicId",
+      to: "/topics/:topicId/:subtopicId",
+    },
   ],
 };

@@ -14,23 +14,31 @@ import { useEffect, useState } from "react";
 import { topics } from "@/data/topics";
 import { AnimatedRoute } from "@/components/layout/motion-layout";
 import { motion } from "framer-motion";
+import { useAuth } from "@/context/AuthContext";
+import { useTheme } from "@/components/layout/ThemeProvider"; // Your ThemeProvider path
 
 const Hero = () => {
   const [topicCount, setTopicCount] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [isTyping, setIsTyping] = useState(true);
+  const { user } = useAuth();
+  const { theme } = useTheme();
+  // Get initials for avatar fallback
 
+  // get user name from user context
+  const userName = user?.username || "Developer";
+  // Set up code examples with dynamic username
   const codeSteps = [
     {
-      code: 'System.out.println("Hello, ByteForge!");',
-      output: "Hello, ByteForge!",
+      code: `System.out.println("Hello, ${userName} from ByteForge!");`,
+      output: `Hello, ${userName} from ByteForge!`,
       explanation: "Basic output in Java",
     },
     {
-      code: `String name = "Developer";
+      code: `String name = "${userName}";
 System.out.println("Welcome, " + name);`,
-      output: "Welcome, Developer",
+      output: `Welcome, ${userName}`,
       explanation: "Working with variables",
     },
     {
@@ -69,6 +77,14 @@ System.out.println("Welcome, " + name);`,
 
   return (
     <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-blue-50 to-white dark:from-slate-900 dark:to-slate-950 relative">
+      {/* <section
+      className={`w-full py-12 md:py-24 lg:py-32 relative overflow-hidden transition-colors duration-300 
+      ${
+        theme === "dark"
+          ? "bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white"
+          : "bg-gradient-to-b from-blue-50 via-white to-blue-50 text-slate-900"
+      }`}
+    > */}
       <div className="container px-4 md:px-6 relative z-10">
         <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
           {/* Left Column - Text Content */}
@@ -87,14 +103,32 @@ System.out.println("Welcome, " + name);`,
                   </motion.div>
 
                   <div className="space-y-6">
-                    <motion.h1
+                    {/* old title */}
+                    {/* <motion.h1
                       className="text-4xl font-bold tracking-normal sm:text-5xl xl:text-6xl leading-snug bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-blue-600 dark:from-white dark:to-blue-400"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.5 }}
                     >
                       Master Java Programming with ByteForge
-                    </motion.h1>
+                    </motion.h1> */}
+                    {/* new title */}
+                    <h1
+                      className={`text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight
+                ${theme === "dark" ? "text-white" : "text-slate-900"}`}
+                    >
+                      Master Java Programming with
+                      <span
+                        className={`${
+                          theme === "dark"
+                            ? "text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300"
+                            : "text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500"
+                        }`}
+                      >
+                        {" "}
+                        ByteForge
+                      </span>
+                    </h1>
                     <motion.p
                       className="max-w-[600px] text-slate-600 text-lg md:text-xl dark:text-slate-300 leading-relaxed sm:leading-loose"
                       initial={{ opacity: 0, y: 20 }}

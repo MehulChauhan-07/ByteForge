@@ -31,7 +31,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { useProgress } from "@/context/ProgressContex";
+import { useProgress } from "@/context/ProgressContext";
 
 import { topics } from "@/data/topics";
 import { javaBasicsContent } from "@/data/javaBasicsContent";

@@ -6,7 +6,7 @@ import { ArrowLeft, CheckCircle, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { javaBasicsContent } from "@/data/javaBasicsContent";
 import { codeExamples } from "@/data/codeExamples";
-import { useProgress } from "@/context/ProgressContex";
+import { useProgress } from "@/context/ProgressContext";
 import type { Topic } from "@/types";
 
 import MultiFormatContent from "@/components/features/Java_Topics/MultiFormatContent";

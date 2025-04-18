@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { topics } from "@/data/topics";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useProgress } from "@/context/ProgressContex";
+import { useProgress } from "@/context/ProgressContext";
 import {
   Book,
   Code,
