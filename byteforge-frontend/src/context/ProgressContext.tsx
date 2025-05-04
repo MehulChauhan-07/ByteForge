@@ -1,36 +1,31 @@
-import {
-  createContext,
-  useState,
-  useContext,
-  useEffect,
-  ReactNode,
-} from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { topics } from "@/data/topics";
+import { Topic, SubTopic } from "../types";
 
 interface TopicProgress {
   completed: boolean;
   subtopics: Record<string, boolean>;
-  quizScore?: number;
 }
 
 interface ProgressContextType {
   progress: Record<string, TopicProgress>;
-  markSubtopicComplete: (topicId: string, subtopicId: string) => void;
-  updateQuizScore: (topicId: string, score: number) => void;
-  getCompletionPercentage: (topicId: string) => number;
-  resetProgress: () => void;
+  markSubTopicComplete: (topicId: string, subtopicId: string) => void;
+  isSubTopicComplete: (topicId: string, subtopicId: string) => boolean;
+  isTopicComplete: (topicId: string) => boolean;
 }
 
 const ProgressContext = createContext<ProgressContextType | undefined>(
   undefined
 );
 
-export const ProgressProvider = ({ children }: { children: ReactNode }) => {
+export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [progress, setProgress] = useState<Record<string, TopicProgress>>({});
 
-  // Initialize progress from localStorage on mount
   useEffect(() => {
-    const savedProgress = localStorage.getItem("byteforge_progress");
+    // Load progress from localStorage
+    const savedProgress = localStorage.getItem("topicProgress");
     if (savedProgress) {
       setProgress(JSON.parse(savedProgress));
     } else {
@@ -39,12 +34,8 @@ export const ProgressProvider = ({ children }: { children: ReactNode }) => {
       topics.forEach((topic) => {
         initialProgress[topic.id] = {
           completed: false,
-          subtopics: topic.topics.reduce((acc, subtopic) => {
-            const subtopicId = subtopic
-              .toLowerCase()
-              .replace(" & ", "-")
-              .replace(/\s+/g, "-");
-            acc[subtopicId] = false;
+          subtopics: topic.subtopics.reduce((acc, subtopic: SubTopic) => {
+            acc[subtopic.id] = false;
             return acc;
           }, {} as Record<string, boolean>),
         };
@@ -53,81 +44,50 @@ export const ProgressProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  // Save progress to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem("byteforge_progress", JSON.stringify(progress));
+    // Save progress to localStorage whenever it changes
+    localStorage.setItem("topicProgress", JSON.stringify(progress));
   }, [progress]);
 
-  const markSubtopicComplete = (topicId: string, subtopicId: string) => {
+  const markSubTopicComplete = (topicId: string, subtopicId: string) => {
     setProgress((prev) => {
-      const topicProgress = prev[topicId] || {
-        completed: false,
-        subtopics: {},
-      };
-      const updatedSubtopics = {
-        ...topicProgress.subtopics,
-        [subtopicId]: true,
-      };
+      const newProgress = { ...prev };
+      if (!newProgress[topicId]) {
+        newProgress[topicId] = {
+          completed: false,
+          subtopics: {},
+        };
+      }
+      newProgress[topicId].subtopics[subtopicId] = true;
 
       // Check if all subtopics are complete
       const topic = topics.find((t) => t.id === topicId);
-      const allSubtopicsComplete = topic
-        ? topic.topics.every((st) => {
-            const stId = st
-              .toLowerCase()
-              .replace(" & ", "-")
-              .replace(/\s+/g, "-");
-            return updatedSubtopics[stId];
-          })
-        : false;
+      if (topic) {
+        const allSubtopicsComplete = topic.subtopics.every(
+          (st) => newProgress[topicId].subtopics[st.id]
+        );
+        newProgress[topicId].completed = allSubtopicsComplete;
+      }
 
-      return {
-        ...prev,
-        [topicId]: {
-          ...topicProgress,
-          subtopics: updatedSubtopics,
-          completed: allSubtopicsComplete,
-        },
-      };
+      return newProgress;
     });
   };
 
-  const updateQuizScore = (topicId: string, score: number) => {
-    setProgress((prev) => ({
-      ...prev,
-      [topicId]: {
-        ...prev[topicId],
-        quizScore: score,
-      },
-    }));
+  const isSubTopicComplete = (topicId: string, subtopicId: string) => {
+    return progress[topicId]?.subtopics[subtopicId] || false;
   };
 
-  const getCompletionPercentage = (topicId: string) => {
-    const topicProgress = progress[topicId];
-    if (!topicProgress) return 0;
-
-    const subtopicCount = Object.keys(topicProgress.subtopics).length;
-    if (subtopicCount === 0) return 0;
-
-    const completedCount = Object.values(topicProgress.subtopics).filter(
-      Boolean
-    ).length;
-    return Math.round((completedCount / subtopicCount) * 100);
-  };
-
-  const resetProgress = () => {
-    localStorage.removeItem("byteforge_progress");
-    setProgress({});
+  const isTopicComplete = (topicId: string) => {
+    return progress[topicId]?.completed || false;
   };
 
   return (
     <ProgressContext.Provider
       value={{
         progress,
-        markSubtopicComplete,
-        updateQuizScore,
-        getCompletionPercentage,
-        resetProgress,
+        markSubTopicComplete,
+        isSubTopicComplete,
+        isTopicComplete,
       }}
     >
       {children}

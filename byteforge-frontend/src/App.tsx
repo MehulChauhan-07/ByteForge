@@ -13,7 +13,7 @@ function App() {
           v7_relativeSplatPath: true,
         }}
       >
-        <Layout>
+        <Layout>  
           <AppRoutes />
         </Layout>
       </BrowserRouter>
