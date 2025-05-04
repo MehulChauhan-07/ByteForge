@@ -17,7 +17,7 @@ import CommunityPage from "@/pages/features/CommunityPage";
 import TutorialsPage from "@/pages/features/TutorialsPage";
 import ExercisesPage from "@/pages/features/ExercisesPage";
 
-// testing imports
+// testing new pages imports
 import Old_CompilerPage from "@/pages/features/old_folder/old_compilepage";
 import ComplexNavbar from "@/components/layout/old_files/old_navbar";
 import EnhancedTopicsPage from "@/pages/topic/EnhancedTopicPage";
