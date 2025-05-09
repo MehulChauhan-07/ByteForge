@@ -5,7 +5,7 @@ export interface Topic {
   level: "Beginner" | "Intermediate" | "Advanced";
   duration: string;
   category: string;
-  prerequisites: string[];
+  prerequisites?: string[];
   tags: string[];
   image: string;
   updatedAt: string;
@@ -40,29 +40,27 @@ export interface ContentBlock {
 export interface SubTopic {
   id: string;
   title: string;
-  description: string;
+  description?: string;
   estimatedTime: string;
   content: ContentBlock[];
-  codeExamples: CodeExample[];
-  resources: Resource[];
-  quizQuestions: QuizQuestion[];
+  codeExamples?: CodeExample[];
+  resources?: Resource[];
   exercises?: Exercise[];
+  quizQuestions?: QuizQuestion[];
 }
 
 export interface CodeExample {
   title: string;
+  description?: string;
   code: string;
-  language: string;
-  description: string;
-  output?: string;
-  explanation?: string;
+  language?: string;
 }
 
 export interface Resource {
   title: string;
+  description?: string;
   url: string;
   type: "tutorial" | "documentation" | "video" | "article" | "book";
-  description: string;
   level?: "beginner" | "intermediate" | "advanced";
 }
 
@@ -71,15 +69,15 @@ export interface QuizQuestion {
   options: string[];
   correctAnswer: number;
   explanation: string;
-  difficulty: "easy" | "medium" | "hard";
-  timeLimit?: number;
 }
 
 export interface Exercise {
   title: string;
-  description: string;
-  starterCode: string;
-  solution: string;
+  description?: string;
+  initialCode: string;
+  language?: string;
+  solution?: string;
+  hints?: string[];
   testCases: TestCase[];
   difficulty: "easy" | "medium" | "hard";
   estimatedTime: string;

@@ -327,7 +327,7 @@ const ProfilePage = () => {
           </Card>
 
           {/* Recent Activity - NEW */}
-          <Card>
+          {/* <Card>
             <CardHeader>
               <CardTitle className="text-base">Recent Activity</CardTitle>
             </CardHeader>
@@ -356,7 +356,7 @@ const ProfilePage = () => {
                 ))}
               </ul>
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
 
         {/* Right column - tabs for different sections */}

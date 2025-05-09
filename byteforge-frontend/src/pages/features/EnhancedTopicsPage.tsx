@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react"; // Added useRef
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -17,6 +17,8 @@ import {
   Link,
   FileText,
   Lightbulb,
+  Filter,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,6 +54,12 @@ import {
 } from "@/components/ui/tooltip";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
+// Import our enhanced components
+import EnhancedSidebar from "@/components/features/Java_Topics/Enhancedpage/EnhancedSidebar";
+import TopicDetails from "@/components/features/Java_Topics/Enhancedpage/TopicDetails";
+import TopicPage from "./TopicPage";
+import SubtopicPage from "./SubtopicPage";
+
 // --- Constants ---
 const LEVEL_OPTIONS = ["All", "Beginner", "Intermediate", "Advanced"];
 const SORT_OPTIONS = [
@@ -64,13 +72,26 @@ type SortOrderType = (typeof SORT_OPTIONS)[number]["value"];
 // --- Animation Variants ---
 const containerVariants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.3 } },
-  exit: { opacity: 0, transition: { duration: 0.2 } },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+  exit: { opacity: 0 },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      type: "spring",
+      stiffness: 300,
+      damping: 24,
+    },
+  },
 };
 
 // Helper function to determine badge variant based on level
@@ -154,7 +175,14 @@ const SubtopicNavigation: React.FC<SubtopicNavigationProps> = ({
                   )}
                 />
               )}
-              <span className="truncate">{subtopic.title}</span>
+              <div>
+                <h3 className="text-lg font-semibold">{subtopic.title}</h3>
+                {subtopic?.description && (
+                  <p className="text-sm text-muted-foreground">
+                    {subtopic.description}
+                  </p>
+                )}
+              </div>
               {subtopic.estimatedTime && (
                 <span className="ml-auto text-xs text-muted-foreground whitespace-nowrap flex items-center">
                   <Clock className="h-3 w-3 mr-1" />
@@ -466,6 +494,7 @@ const EnhancedTopicsPage = () => {
   const [bookmarkedTopics, setBookmarkedTopics] = useState<Set<string>>(
     new Set()
   );
+  const [showSidebar, setShowSidebar] = useState(true);
 
   // New state variables for enhanced features
   const [activeSubtopicId, setActiveSubtopicId] = useState<string | null>(null);
@@ -483,7 +512,7 @@ const EnhancedTopicsPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { topicId, subtopicId } = useParams();
-  // const { getCompletionPercentage } = useProgress();
+  const { getCompletionPercentage } = useProgress();
 
   // --- Utility functions ---
   const scrollToSubtopic = (
@@ -557,7 +586,6 @@ const EnhancedTopicsPage = () => {
   };
 
   // --- Effects ---
-  // Sync state from URL params and fetch topic details
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     setSearchQuery(params.get("q") || "");
@@ -604,6 +632,8 @@ const EnhancedTopicsPage = () => {
     } else {
       setSelectedTopic(null);
     }
+
+    setIsLoading(false);
   }, [topicId, subtopicId, location.search, navigate]);
 
   // Scroll to active subtopic when it changes
@@ -622,12 +652,11 @@ const EnhancedTopicsPage = () => {
   useEffect(() => {
     const handler = setTimeout(() => {
       updateUrlParams();
-    }, 300); // Debounce time for search/filter URL updates
+    }, 300);
 
     return () => {
       clearTimeout(handler);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery, levelFilter, categoryFilter, sortOrder]);
 
   const updateUrlParams = () => {
@@ -646,8 +675,6 @@ const EnhancedTopicsPage = () => {
 
   // --- Filtering and Sorting ---
   const filteredTopics = useMemo(() => {
-    setIsLoading(true);
-
     const filtered = topics
       .filter((topic) => {
         const lowerSearch = searchQuery.toLowerCase();
@@ -658,7 +685,8 @@ const EnhancedTopicsPage = () => {
             topic.subtopics.some(
               (subtopic) =>
                 subtopic.title.toLowerCase().includes(lowerSearch) ||
-                subtopic.description.toLowerCase().includes(lowerSearch)
+                (subtopic.description?.toLowerCase().includes(lowerSearch) ??
+                  false)
             )
           : true;
         const matchesLevel = levelFilter ? topic.level === levelFilter : true;
@@ -679,8 +707,6 @@ const EnhancedTopicsPage = () => {
             return 0;
         }
       });
-
-    setIsLoading(false);
 
     return filtered;
   }, [searchQuery, levelFilter, categoryFilter, sortOrder]);
@@ -761,6 +787,30 @@ const EnhancedTopicsPage = () => {
   }, [selectedTopic, activeSubtopicId]);
 
   // --- Render Logic ---
+  if (topicId && subtopicId) {
+    return <SubtopicPage />;
+  }
+
+  if (topicId) {
+    return <TopicPage />;
+  }
+
+  if (isLoading) {
+    return (
+      <div className="container py-8">
+        <div className="animate-pulse space-y-6">
+          <div className="h-8 w-48 bg-muted rounded" />
+          <div className="h-4 w-96 bg-muted rounded" />
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-48 bg-muted rounded" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex-1 overflow-auto bg-background text-foreground">
       <AnimatePresence mode="wait">
@@ -769,7 +819,7 @@ const EnhancedTopicsPage = () => {
           // Topics List View
           // ========================
           <motion.div
-            key={`topic-${selectedTopic?.id}`}
+            key="topics-list"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -779,9 +829,19 @@ const EnhancedTopicsPage = () => {
             {/* Header Section */}
             <motion.div variants={itemVariants} className="mb-8 space-y-2">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
-                  Java Learning Topics
-                </h1>
+                <div className="flex items-center gap-4">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setShowSidebar(!showSidebar)}
+                    className="lg:hidden"
+                  >
+                    <Filter className="h-4 w-4" />
+                  </Button>
+                  <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
+                    Java Learning Topics
+                  </h1>
+                </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-muted-foreground">
                     Sort by:
@@ -825,7 +885,12 @@ const EnhancedTopicsPage = () => {
               className="grid grid-cols-1 gap-8 lg:grid-cols-4"
             >
               {/* Filters Panel */}
-              <aside className="lg:col-span-1">
+              <aside
+                className={cn(
+                  "lg:col-span-1",
+                  !showSidebar && "hidden lg:block"
+                )}
+              >
                 <Card className="sticky top-6 border-border shadow-sm">
                   <CardHeader className="pb-4">
                     <CardTitle className="text-lg">Filter & Search</CardTitle>
@@ -938,7 +1003,9 @@ const EnhancedTopicsPage = () => {
               </aside>
 
               {/* Topics Grid Area */}
-              <main className="lg:col-span-3">
+              <main
+                className={cn("lg:col-span-3", !showSidebar && "lg:col-span-4")}
+              >
                 {/* Loading State */}
                 {isLoading ? (
                   <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
@@ -1025,875 +1092,24 @@ const EnhancedTopicsPage = () => {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="container mx-auto max-w-5xl px-4 py-8"
+            className="flex h-full"
           >
-            {/* Back Button & Header */}
-            <div className="mb-6">
-              <Button
-                variant="ghost"
-                className="mb-4 text-muted-foreground hover:text-primary px-0"
-                onClick={handleBackClick}
-              >
-                <ChevronLeft className="mr-1 h-4 w-4" />
-                Back to Topics
-              </Button>
-
-              <div className="flex flex-col md:flex-row justify-between gap-4 mb-2">
-                <h1 className="text-3xl md:text-4xl font-bold">
-                  {selectedTopic.title}
-                </h1>
-
-                {/* Overall progress for topic */}
-                <div className="flex items-center">
-                  <div className="text-sm text-muted-foreground mr-3">
-                    Progress: {topicProgress[selectedTopic.id] || 0}%
-                  </div>
-                  <div className="w-32 h-2 rounded-full bg-muted overflow-hidden">
-                    <div
-                      className="h-full bg-primary rounded-full transition-all duration-500"
-                      style={{
-                        width: `${topicProgress[selectedTopic.id] || 0}%`,
-                      }}
-                    ></div>
-                  </div>
-                </div>
-              </div>
-
-              <p className="text-lg text-muted-foreground">
-                {selectedTopic.description}
-              </p>
-
-              <div className="flex flex-wrap gap-2 mt-3">
-                <Badge variant={levelVariant(selectedTopic.level)}>
-                  {selectedTopic.level}
-                </Badge>
-                <Badge variant="outline">{selectedTopic.duration}</Badge>
-                {selectedTopic.tags.map((tag) => (
-                  <Badge key={tag} variant="outline">
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-
-              {/* Prerequisites */}
-              {selectedTopic.prerequisites &&
-                selectedTopic.prerequisites.length > 0 && (
-                  <Prerequisites
-                    prerequisites={selectedTopic.prerequisites}
-                    onPrerequisiteClick={handlePrerequisiteClick}
-                  />
-                )}
+            {/* Sidebar */}
+            <div
+              className={cn(
+                "w-64 border-r border-border bg-card hidden lg:block",
+                !showSidebar && "lg:hidden"
+              )}
+            >
+              <EnhancedSidebar />
             </div>
 
-            {/* Subtopic Navigation */}
-            {selectedTopic.subtopics.length > 0 && (
-              <SubtopicNavigation
-                subtopics={selectedTopic.subtopics}
-                activeSubtopicId={activeSubtopicId}
-                completedSubtopics={completedSubtopics}
-                onSubtopicClick={handleSubtopicClick}
-                currentTab={activeTab}
-              />
-            )}
-
-            {/* Tabs for Content Sections */}
-            <Tabs
-              value={activeTab}
-              onValueChange={setActiveTab}
-              className="w-full"
-            >
-              <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 mb-6">
-                <TabsTrigger value="content">Content</TabsTrigger>
-                <TabsTrigger value="code">Examples</TabsTrigger>
-                <TabsTrigger
-                  value="resources"
-                  disabled={
-                    !selectedTopic.subtopics.some((s) => s.resources?.length)
-                  }
-                >
-                  Resources
-                </TabsTrigger>
-                <TabsTrigger
-                  value="quiz"
-                  disabled={
-                    !selectedTopic.subtopics.some(
-                      (s) => s.quizQuestions?.length
-                    )
-                  }
-                >
-                  Quiz
-                </TabsTrigger>
-                <TabsTrigger
-                  value="exercises"
-                  disabled={
-                    !selectedTopic.subtopics.some((s) => s.exercises?.length)
-                  }
-                >
-                  Exercises
-                </TabsTrigger>
-              </TabsList>
-
-              {/* Content Tab */}
-              <TabsContent
-                value="content"
-                className="space-y-6 focus-visible:ring-0 focus-visible:ring-offset-0"
-              >
-                {selectedTopic.subtopics.map((subtopic, index) => (
-                  <div
-                    key={`content-${subtopic.id}`}
-                    ref={(el) => (subtopicRefs.current[subtopic.id] = el)}
-                    id={`subtopic-${subtopic.id}`}
-                    className="scroll-mt-20"
-                  >
-                    <Card className="overflow-hidden border-border mb-8 last:mb-0">
-                      <CardHeader
-                        className={cn(
-                          "cursor-pointer hover:bg-muted/50 transition-colors",
-                          expandedSubtopics.has(subtopic.id) && "border-b"
-                        )}
-                        onClick={() => toggleAccordion(subtopic.id)}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            {completedSubtopics.has(subtopic.id) ? (
-                              <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0" />
-                            ) : (
-                              <div className="h-5 w-5 rounded-full border border-muted-foreground/30 flex-shrink-0" />
-                            )}
-
-                            <div>
-                              {subtopic.estimatedTime && (
-                                <div className="text-xs text-muted-foreground mb-1 flex items-center">
-                                  <Clock className="h-3 w-3 mr-1" />
-                                  {subtopic.estimatedTime}
-                                </div>
-                              )}
-                              <CardTitle className="text-xl pr-6">
-                                {subtopic.title}
-                              </CardTitle>
-                            </div>
-                          </div>
-                          <div className="flex-shrink-0">
-                            {expandedSubtopics.has(subtopic.id) ? (
-                              <ChevronLeft className="h-5 w-5 transform rotate-90" />
-                            ) : (
-                              <ChevronLeft className="h-5 w-5 transform -rotate-90" />
-                            )}
-                          </div>
-                        </div>
-
-                        {subtopic.description &&
-                          !expandedSubtopics.has(subtopic.id) && (
-                            <CardDescription className="mt-1">
-                              {subtopic.description}
-                            </CardDescription>
-                          )}
-                      </CardHeader>
-
-                      {expandedSubtopics.has(subtopic.id) && (
-                        <CardContent className="pt-6">
-                          {subtopic.description && (
-                            <p className="text-muted-foreground mb-4">
-                              {subtopic.description}
-                            </p>
-                          )}
-
-                          {/* Content Blocks */}
-                          <div className="prose prose-sm sm:prose lg:prose-lg dark:prose-invert max-w-none space-y-6">
-                            {subtopic.content.map((block, blockIndex) => (
-                              <div key={blockIndex} className="mb-6 last:mb-0">
-                                {block.type === "text" && (
-                                  // Enhanced text display with formatting and tooltips for special terms
-                                  <div className="text-foreground whitespace-pre-line">
-                                    {block.content
-                                      .split("\n\n")
-                                      .map((paragraph, pIdx) => (
-                                        <p
-                                          key={pIdx}
-                                          className="mb-4 last:mb-0"
-                                        >
-                                          {paragraph.includes("•") ? (
-                                            // Handle bullet points
-                                            <ul className="list-disc pl-6 space-y-1 mt-2">
-                                              {paragraph
-                                                .split("•")
-                                                .slice(1)
-                                                .map((item, i) => (
-                                                  <li key={i}>{item.trim()}</li>
-                                                ))}
-                                            </ul>
-                                          ) : paragraph.startsWith("✅") ? (
-                                            // Handle checkmarks for tips/success
-                                            <div className="flex items-start gap-2">
-                                              <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                                              <span>
-                                                {paragraph.slice(1).trim()}
-                                              </span>
-                                            </div>
-                                          ) : paragraph.startsWith("⚠️") ? (
-                                            // Handle warnings
-                                            <div className="flex items-start gap-2">
-                                              <AlertTriangle className="h-5 w-5 text-amber-500 mt-0.5 flex-shrink-0" />
-                                              <span>
-                                                {paragraph.slice(1).trim()}
-                                              </span>
-                                            </div>
-                                          ) : (
-                                            paragraph
-                                          )}
-                                        </p>
-                                      ))}
-                                  </div>
-                                )}
-                                {block.type === "code" && (
-                                  <div className="rounded-md overflow-hidden my-4">
-                                    <div className="bg-muted/80 text-xs px-4 py-1.5 border-b border-border flex justify-between items-center">
-                                      <span className="font-medium">
-                                        {block.language || "java"}
-                                      </span>
-                                      <Button
-                                        size="sm"
-                                        variant="ghost"
-                                        onClick={() =>
-                                          navigator.clipboard.writeText(
-                                            block.content
-                                          )
-                                        }
-                                        className="h-6 px-2 text-xs font-normal"
-                                      >
-                                        Copy Code
-                                      </Button>
-                                    </div>
-                                    <CodeEditor
-                                      code={block.content}
-                                      language={block.language || "java"}
-                                      readOnly
-                                      className="!bg-transparent !p-0"
-                                    />
-                                  </div>
-                                )}
-                                {block.type === "image" && (
-                                  <div className="my-6">
-                                    <img
-                                      src={block.url}
-                                      alt={block.alt || ""}
-                                      className="max-w-full rounded-md border border-border"
-                                    />
-                                    {block.caption && (
-                                      <p className="text-sm text-muted-foreground text-center mt-2">
-                                        {block.caption}
-                                      </p>
-                                    )}
-                                  </div>
-                                )}
-                                {block.type === "video" && (
-                                  <div className="aspect-video my-6">
-                                    <iframe
-                                      src={block.url}
-                                      title={block.title || "Video"}
-                                      className="w-full h-full rounded-md border border-border"
-                                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                      allowFullScreen
-                                    />
-                                  </div>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-
-                          {/* Interactive Elements */}
-                          {subtopic.quizQuestions &&
-                            subtopic.quizQuestions.length > 0 && (
-                              <QuickKnowledgeCheck
-                                question={subtopic.quizQuestions[0].question}
-                                options={subtopic.quizQuestions[0].options}
-                                correctAnswer={
-                                  subtopic.quizQuestions[0].correctAnswer
-                                }
-                                explanation={
-                                  subtopic.quizQuestions[0].explanation
-                                }
-                              />
-                            )}
-
-                          {/* Key Takeaways */}
-                          <KeyTakeaways
-                            points={[
-                              subtopic.title.includes("Variables")
-                                ? "Variables store data and must be declared with a specific type in Java"
-                                : "Java is a powerful, platform-independent language following 'Write Once, Run Anywhere'",
-                              subtopic.title.includes("Variables")
-                                ? "Java supports primitive types (int, double, boolean) and reference types (String, arrays)"
-                                : "The JVM (Java Virtual Machine) allows Java code to run on any device with a JVM installed",
-                              subtopic.title.includes("Variables")
-                                ? "Proper variable naming and initialization is crucial for clean, maintainable code"
-                                : "Java's robust ecosystem makes it ideal for enterprise applications, Android development, and more",
-                            ]}
-                          />
-
-                          {/* Actions Footer */}
-                          <div className="mt-8 pt-4 border-t flex justify-between items-center">
-                            <MarkCompleteButton
-                              subtopicId={subtopic.id}
-                              isCompleted={completedSubtopics.has(subtopic.id)}
-                              onToggleComplete={toggleSubtopicCompletion}
-                            />
-
-                            {/* Code examples button if available */}
-                            {subtopic.codeExamples &&
-                              subtopic.codeExamples.length > 0 && (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="gap-1.5"
-                                  onClick={() => {
-                                    setActiveTab("code");
-                                    setTimeout(
-                                      () => scrollToSubtopic(subtopic.id),
-                                      100
-                                    );
-                                  }}
-                                >
-                                  <FileText className="h-4 w-4" />
-                                  View Code Examples
-                                </Button>
-                              )}
-                          </div>
-
-                          {/* Next Subtopic Navigation */}
-                          {index < selectedTopic.subtopics.length - 1 && (
-                            <NextSubtopic
-                              currentIndex={index}
-                              subtopics={selectedTopic.subtopics}
-                              onClick={handleNextSubtopic}
-                            />
-                          )}
-                        </CardContent>
-                      )}
-                    </Card>
-                  </div>
-                ))}
-              </TabsContent>
-
-              {/* Code Examples Tab */}
-              <TabsContent
-                value="code"
-                className="space-y-6 focus-visible:ring-0 focus-visible:ring-offset-0"
-              >
-                {selectedTopic.subtopics.filter((s) => s.codeExamples?.length)
-                  .length > 0 ? (
-                  selectedTopic.subtopics.map(
-                    (subtopic, index) =>
-                      subtopic.codeExamples &&
-                      subtopic.codeExamples.length > 0 && (
-                        <div
-                          key={`code-${subtopic.id}`}
-                          ref={(el) => (subtopicRefs.current[subtopic.id] = el)}
-                          id={`subtopic-code-${subtopic.id}`}
-                          className="scroll-mt-20"
-                        >
-                          <Card className="border-border mb-8 last:mb-0">
-                            <CardHeader className="border-b">
-                              <div className="flex items-center gap-3">
-                                {completedSubtopics.has(subtopic.id) ? (
-                                  <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0" />
-                                ) : (
-                                  <div className="h-5 w-5 rounded-full border border-muted-foreground/30 flex-shrink-0" />
-                                )}
-                                <CardTitle className="text-xl">
-                                  {subtopic.title} - Code Examples
-                                </CardTitle>
-                              </div>
-                            </CardHeader>
-                            <CardContent className="space-y-6 pt-6">
-                              <Accordion
-                                allowMultiple
-                                defaultOpenId={subtopic.codeExamples[0]?.title}
-                              >
-                                {subtopic.codeExamples.map(
-                                  (example, exampleIndex) => (
-                                    <AccordionItem
-                                      key={exampleIndex}
-                                      title={example.title}
-                                      defaultOpen={exampleIndex === 0}
-                                      className="mb-4 last:mb-0"
-                                    >
-                                      {example.description && (
-                                        <p className="text-muted-foreground mb-4 text-sm">
-                                          {example.description}
-                                        </p>
-                                      )}
-                                      <div className="rounded-md overflow-hidden mb-4">
-                                        <div className="bg-muted/80 text-xs px-4 py-1.5 border-b border-border flex justify-between items-center">
-                                          <span className="font-medium">
-                                            {example.language || "java"}
-                                          </span>
-                                          <Button
-                                            size="sm"
-                                            variant="ghost"
-                                            onClick={() =>
-                                              navigator.clipboard.writeText(
-                                                example.code
-                                              )
-                                            }
-                                            className="h-6 px-2 text-xs font-normal"
-                                          >
-                                            Copy Code
-                                          </Button>
-                                        </div>
-                                        <CodeEditor
-                                          code={example.code}
-                                          language={example.language || "java"}
-                                          readOnly
-                                        />
-                                      </div>
-
-                                      {/* Try in Compiler Button */}
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="gap-1.5"
-                                        onClick={() =>
-                                          navigate(
-                                            `/tools/compiler?code=${encodeURIComponent(
-                                              example.code
-                                            )}`
-                                          )
-                                        }
-                                      >
-                                        <ExternalLink className="h-4 w-4" />
-                                        Try in Compiler
-                                      </Button>
-                                    </AccordionItem>
-                                  )
-                                )}
-                              </Accordion>
-
-                              {/* Actions Footer */}
-                              <div className="mt-8 pt-4 border-t flex justify-between items-center">
-                                <MarkCompleteButton
-                                  subtopicId={subtopic.id}
-                                  isCompleted={completedSubtopics.has(
-                                    subtopic.id
-                                  )}
-                                  onToggleComplete={toggleSubtopicCompletion}
-                                />
-
-                                {/* Back to content */}
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="gap-1.5"
-                                  onClick={() => {
-                                    setActiveTab("content");
-                                    setTimeout(
-                                      () => scrollToSubtopic(subtopic.id),
-                                      100
-                                    );
-                                  }}
-                                >
-                                  <FileText className="h-4 w-4" />
-                                  View Content
-                                </Button>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        </div>
-                      )
-                  )
-                ) : (
-                  <p className="text-muted-foreground text-center py-8">
-                    No code examples available for this topic yet.
-                  </p>
-                )}
-              </TabsContent>
-
-              {/* Resources Tab */}
-              <TabsContent
-                value="resources"
-                className="space-y-6 focus-visible:ring-0 focus-visible:ring-offset-0"
-              >
-                {selectedTopic.subtopics.filter((s) => s.resources?.length)
-                  .length > 0 ? (
-                  selectedTopic.subtopics.map(
-                    (subtopic, index) =>
-                      subtopic.resources &&
-                      subtopic.resources.length > 0 && (
-                        <div
-                          key={`resource-${subtopic.id}`}
-                          ref={(el) => (subtopicRefs.current[subtopic.id] = el)}
-                          id={`subtopic-resources-${subtopic.id}`}
-                          className="scroll-mt-20"
-                        >
-                          <Card className="border-border mb-8 last:mb-0">
-                            <CardHeader className="border-b">
-                              <div className="flex items-center gap-3">
-                                {completedSubtopics.has(subtopic.id) ? (
-                                  <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0" />
-                                ) : (
-                                  <div className="h-5 w-5 rounded-full border border-muted-foreground/30 flex-shrink-0" />
-                                )}
-                                <CardTitle className="text-xl">
-                                  {subtopic.title} - Resources
-                                </CardTitle>
-                              </div>
-                            </CardHeader>
-                            <CardContent className="space-y-4 pt-6">
-                              {subtopic.resources.map((resource, rIndex) => (
-                                <Card
-                                  key={rIndex}
-                                  className="border overflow-hidden transition-all hover:shadow-md"
-                                >
-                                  <CardHeader className="p-4">
-                                    <div className="flex items-center justify-between">
-                                      <div>
-                                        <div className="flex items-center gap-2">
-                                          <Badge
-                                            variant="outline"
-                                            className="text-xs capitalize"
-                                          >
-                                            {resource.type || "link"}
-                                          </Badge>
-                                          {resource.level && (
-                                            <Badge
-                                              variant={
-                                                resource.level === "beginner"
-                                                  ? "default"
-                                                  : resource.level ===
-                                                    "intermediate"
-                                                  ? "secondary"
-                                                  : "destructive"
-                                              }
-                                              className="text-xs capitalize"
-                                            >
-                                              {resource.level}
-                                            </Badge>
-                                          )}
-                                        </div>
-                                        <CardTitle className="text-base mt-2">
-                                          {resource.title}
-                                        </CardTitle>
-                                      </div>
-                                      <Button
-                                        size="sm"
-                                        className="gap-1.5"
-                                        onClick={() =>
-                                          window.open(
-                                            resource.url,
-                                            "_blank",
-                                            "noopener noreferrer"
-                                          )
-                                        }
-                                      >
-                                        <ExternalLink className="h-4 w-4" />
-                                        Open
-                                      </Button>
-                                    </div>
-                                  </CardHeader>
-                                  {resource.description && (
-                                    <CardContent className="pt-0 px-4 pb-4">
-                                      <p className="text-sm text-muted-foreground">
-                                        {resource.description}
-                                      </p>
-                                    </CardContent>
-                                  )}
-                                </Card>
-                              ))}
-
-                              {/* Actions Footer */}
-                              <div className="mt-8 pt-4 border-t flex justify-between items-center">
-                                <MarkCompleteButton
-                                  subtopicId={subtopic.id}
-                                  isCompleted={completedSubtopics.has(
-                                    subtopic.id
-                                  )}
-                                  onToggleComplete={toggleSubtopicCompletion}
-                                />
-
-                                {/* Back to content */}
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="gap-1.5"
-                                  onClick={() => {
-                                    setActiveTab("content");
-                                    setTimeout(
-                                      () => scrollToSubtopic(subtopic.id),
-                                      100
-                                    );
-                                  }}
-                                >
-                                  <FileText className="h-4 w-4" />
-                                  View Content
-                                </Button>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        </div>
-                      )
-                  )
-                ) : (
-                  <p className="text-muted-foreground text-center py-8">
-                    No additional resources available for this topic yet.
-                  </p>
-                )}
-              </TabsContent>
-
-              {/* Quiz Tab */}
-              <TabsContent value="quiz">
-                {selectedTopic.subtopics.filter((s) => s.quizQuestions?.length)
-                  .length > 0 ? (
-                  <div className="space-y-8">
-                    {selectedTopic.subtopics.map(
-                      (subtopic, index) =>
-                        subtopic.quizQuestions &&
-                        subtopic.quizQuestions.length > 0 && (
-                          <div
-                            key={`quiz-${subtopic.id}`}
-                            ref={(el) =>
-                              (subtopicRefs.current[subtopic.id] = el)
-                            }
-                            id={`subtopic-quiz-${subtopic.id}`}
-                            className="scroll-mt-20"
-                          >
-                            <Card>
-                              <CardHeader className="border-b">
-                                <div className="flex justify-between items-center">
-                                  <div className="flex items-center gap-3">
-                                    {completedSubtopics.has(subtopic.id) ? (
-                                      <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0" />
-                                    ) : (
-                                      <div className="h-5 w-5 rounded-full border border-muted-foreground/30 flex-shrink-0" />
-                                    )}
-                                    <CardTitle className="text-xl">
-                                      {subtopic.title} - Quiz
-                                    </CardTitle>
-                                  </div>
-                                  <Badge
-                                    variant="outline"
-                                    className="capitalize"
-                                  >
-                                    {subtopic.quizQuestions.length} questions
-                                  </Badge>
-                                </div>
-                              </CardHeader>
-                              <CardContent className="pt-6">
-                                <div className="space-y-6">
-                                  {subtopic.quizQuestions.map(
-                                    (question, qIndex) => (
-                                      <div
-                                        key={qIndex}
-                                        className="border rounded-lg p-4"
-                                      >
-                                        <h3 className="text-lg font-medium mb-4 flex items-start gap-2">
-                                          <span className="bg-primary/10 text-primary h-6 w-6 rounded-full flex items-center justify-center text-sm flex-shrink-0">
-                                            {qIndex + 1}
-                                          </span>
-                                          <span>{question.question}</span>
-                                        </h3>
-                                        <QuickKnowledgeCheck
-                                          question=""
-                                          options={question.options}
-                                          correctAnswer={question.correctAnswer}
-                                          explanation={question.explanation}
-                                        />
-                                      </div>
-                                    )
-                                  )}
-                                </div>
-
-                                {/* Actions Footer */}
-                                <div className="mt-8 pt-4 border-t flex justify-between items-center">
-                                  <MarkCompleteButton
-                                    subtopicId={subtopic.id}
-                                    isCompleted={completedSubtopics.has(
-                                      subtopic.id
-                                    )}
-                                    onToggleComplete={toggleSubtopicCompletion}
-                                  />
-
-                                  {/* Back to content */}
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="gap-1.5"
-                                    onClick={() => {
-                                      setActiveTab("content");
-                                      setTimeout(
-                                        () => scrollToSubtopic(subtopic.id),
-                                        100
-                                      );
-                                    }}
-                                  >
-                                    <FileText className="h-4 w-4" />
-                                    View Content
-                                  </Button>
-                                </div>
-                              </CardContent>
-                            </Card>
-                          </div>
-                        )
-                    )}
-                  </div>
-                ) : (
-                  <p className="text-muted-foreground text-center py-8">
-                    Quiz section coming soon!
-                  </p>
-                )}
-              </TabsContent>
-
-              {/* Exercises Tab */}
-              <TabsContent value="exercises">
-                {selectedTopic.subtopics.filter((s) => s.exercises?.length)
-                  .length > 0 ? (
-                  <div className="space-y-8">
-                    {selectedTopic.subtopics.map(
-                      (subtopic, index) =>
-                        subtopic.exercises &&
-                        subtopic.exercises.length > 0 && (
-                          <div
-                            key={`exercise-${subtopic.id}`}
-                            ref={(el) =>
-                              (subtopicRefs.current[subtopic.id] = el)
-                            }
-                            id={`subtopic-exercises-${subtopic.id}`}
-                            className="scroll-mt-20"
-                          >
-                            <Card>
-                              <CardHeader className="border-b">
-                                <div className="flex items-center gap-3">
-                                  {completedSubtopics.has(subtopic.id) ? (
-                                    <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0" />
-                                  ) : (
-                                    <div className="h-5 w-5 rounded-full border border-muted-foreground/30 flex-shrink-0" />
-                                  )}
-                                  <CardTitle className="text-xl">
-                                    {subtopic.title} - Exercises
-                                  </CardTitle>
-                                </div>
-                              </CardHeader>
-                              <CardContent className="pt-6 space-y-8">
-                                {subtopic.exercises.map((exercise, eIndex) => (
-                                  <div
-                                    key={eIndex}
-                                    className="border rounded-lg overflow-hidden"
-                                  >
-                                    <div className="bg-muted/40 p-4 border-b">
-                                      <div className="flex justify-between items-start mb-2">
-                                        <h3 className="text-lg font-medium">
-                                          {exercise.title}
-                                        </h3>
-                                        <div className="flex items-center gap-2">
-                                          <Badge variant="outline">
-                                            {exercise.difficulty}
-                                          </Badge>
-                                          {exercise.points && (
-                                            <Badge variant="secondary">
-                                              {exercise.points} points
-                                            </Badge>
-                                          )}
-                                        </div>
-                                      </div>
-                                      <p className="text-muted-foreground">
-                                        {exercise.description}
-                                      </p>
-                                      {exercise.estimatedTime && (
-                                        <div className="mt-2 flex items-center text-xs text-muted-foreground">
-                                          <Clock className="h-3 w-3 mr-1" />
-                                          Estimated time:{" "}
-                                          {exercise.estimatedTime}
-                                        </div>
-                                      )}
-                                    </div>
-
-                                    <div className="p-4">
-                                      <h4 className="font-medium mb-2">
-                                        Starter Code:
-                                      </h4>
-                                      <div className="rounded-md overflow-hidden mb-4">
-                                        <div className="bg-muted/80 text-xs px-4 py-1.5 border-b border-border flex justify-between items-center">
-                                          <span className="font-medium">
-                                            java
-                                          </span>
-                                          <Button
-                                            size="sm"
-                                            variant="ghost"
-                                            onClick={() =>
-                                              navigator.clipboard.writeText(
-                                                exercise.starterCode
-                                              )
-                                            }
-                                            className="h-6 px-2 text-xs font-normal"
-                                          >
-                                            Copy Code
-                                          </Button>
-                                        </div>
-                                        <CodeEditor
-                                          code={exercise.starterCode}
-                                          language="java"
-                                          readOnly
-                                        />
-                                      </div>
-
-                                      <div className="flex justify-end mt-4">
-                                        <Button
-                                          className="gap-1.5"
-                                          onClick={() =>
-                                            navigate(
-                                              `/tools/compiler?code=${encodeURIComponent(
-                                                exercise.starterCode
-                                              )}`
-                                            )
-                                          }
-                                        >
-                                          <ExternalLink className="h-4 w-4" />
-                                          Start Exercise
-                                        </Button>
-                                      </div>
-                                    </div>
-                                  </div>
-                                ))}
-
-                                {/* Actions Footer */}
-                                <div className="mt-8 pt-4 border-t flex justify-between items-center">
-                                  <MarkCompleteButton
-                                    subtopicId={subtopic.id}
-                                    isCompleted={completedSubtopics.has(
-                                      subtopic.id
-                                    )}
-                                    onToggleComplete={toggleSubtopicCompletion}
-                                  />
-
-                                  {/* Back to content */}
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="gap-1.5"
-                                    onClick={() => {
-                                      setActiveTab("content");
-                                      setTimeout(
-                                        () => scrollToSubtopic(subtopic.id),
-                                        100
-                                      );
-                                    }}
-                                  >
-                                    <FileText className="h-4 w-4" />
-                                    View Content
-                                  </Button>
-                                </div>
-                              </CardContent>
-                            </Card>
-                          </div>
-                        )
-                    )}
-                  </div>
-                ) : (
-                  <p className="text-muted-foreground text-center py-8">
-                    Exercises section coming soon!
-                  </p>
-                )}
-              </TabsContent>
-            </Tabs>
+            {/* Main Content */}
+            <div className="flex-1 overflow-auto">
+              <div className="container mx-auto max-w-5xl px-4 py-8">
+                <TopicDetails topic={selectedTopic} onBack={handleBackClick} />
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

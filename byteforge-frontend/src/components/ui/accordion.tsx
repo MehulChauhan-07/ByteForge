@@ -11,7 +11,7 @@ interface AccordionItemProps {
 }
 
 interface AccordionProps {
-  items: Array<{
+  items?: Array<{
     id: string;
     title: string;
     content: React.ReactNode;
@@ -20,6 +20,7 @@ interface AccordionProps {
   allowMultiple?: boolean;
   defaultOpenId?: string;
   className?: string;
+  children?: React.ReactNode;
 }
 
 export const AccordionItem: React.FC<AccordionItemProps> = ({
@@ -72,6 +73,7 @@ export const Accordion: React.FC<AccordionProps> = ({
   allowMultiple = false,
   defaultOpenId,
   className = "",
+  children,
 }) => {
   const [openItems, setOpenItems] = useState<string[]>(
     defaultOpenId ? [defaultOpenId] : []
@@ -89,9 +91,15 @@ export const Accordion: React.FC<AccordionProps> = ({
     }
   };
 
+  // If children are provided, render them directly
+  if (children) {
+    return <div className={`space-y-2 ${className}`}>{children}</div>;
+  }
+
+  // Otherwise render items from the items prop
   return (
     <div className={`space-y-2 ${className}`}>
-      {items.map((item) => (
+      {items?.map((item) => (
         <div
           key={item.id}
           className="border border-slate-200 dark:border-slate-700 rounded-md overflow-hidden"

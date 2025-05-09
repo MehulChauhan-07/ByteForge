@@ -60,7 +60,7 @@ const EnhancedTopicsPage = () => {
   const navigate = useNavigate();
   const { topicId } = useParams();
 
-  const { getUserProgress, getCompletionPercentage } = useProgress();
+  // const { getUserProgress, getCompletionPercentage } = useProgress();
 
   // Handle search from URL and topic selection
   useEffect(() => {
@@ -141,7 +141,7 @@ const EnhancedTopicsPage = () => {
           );
         case "popular":
           // This would be replaced with actual popularity metrics
-          return getCompletionPercentage(b.id) - getCompletionPercentage(a.id);
+          // return getCompletionPercentage(b.id) - getCompletionPercentage(a.id);
         case "alphabetical":
           return a.title.localeCompare(b.title);
         default:
@@ -154,6 +154,10 @@ const EnhancedTopicsPage = () => {
     acc[category.id] = topics.filter((t) => t.category === category.id).length;
     return acc;
   }, {} as Record<string, number>);
+
+  function getCompletionPercentage(id: string): number {
+    throw new Error("Function not implemented.");
+  }
 
   return (
     <div className="flex h-screen overflow-hidden">

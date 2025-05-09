@@ -640,7 +640,7 @@ const DashboardPage: React.FC = () => {
                 ))}
               </div>
 
-              <h2 className="text-xl font-semibold mt-8 mb-4">
+              {/* <h2 className="text-xl font-semibold mt-8 mb-4">
                 Explore More Courses
               </h2>
               <div className="space-y-4">
@@ -690,7 +690,7 @@ const DashboardPage: React.FC = () => {
                     </div>
                   </Card>
                 ))}
-              </div>
+              </div> */}
             </TabsContent>
 
             {/* Challenges Tab */}
@@ -954,7 +954,7 @@ const DashboardPage: React.FC = () => {
           </Card>
 
           {/* Recent Activity */}
-          <Card>
+          {/* <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle>Recent Activity</CardTitle>
               <Button variant="ghost" size="sm" asChild>
@@ -995,7 +995,7 @@ const DashboardPage: React.FC = () => {
                 )}
               </ul>
             </CardContent>
-          </Card>
+          </Card> */}
 
           {/* Learning Progress Card - NEW */}
           <Card>

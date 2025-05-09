@@ -1,190 +1,162 @@
-import { useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { topics } from "@/data/topics";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { useProgress } from "@/context/ProgressContext";
-import {
-  Book,
-  Code,
-  CheckCircle,
-  ChevronDown,
-  ChevronRight,
-} from "lucide-react";
+import React from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { BookOpen, ChevronRight, CheckCircle2, Bookmark } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { topics } from "@/data/topics";
+import { useProgress } from "@/context/ProgressContext";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import SearchBar from "./SearchBar";
 
-// Topic category definitions - using the actual topic IDs from your data
-const topicCategories = [
-  {
-    id: "java-fundamentals",
-    label: "Java Fundamentals",
-    icon: <Book className="h-4 w-4" />,
-    topics: ["java-basics"],
-  },
-  {
-    id: "object-oriented",
-    label: "Object-Oriented Programming",
-    icon: <Code className="h-4 w-4" />,
-    topics: ["oop-java"],
-  },
-  {
-    id: "data-structures",
-    label: "Data Structures",
-    icon: <Code className="h-4 w-4" />,
-    topics: ["java-collections"],
-  },
-  {
-    id: "error-handling",
-    label: "Exception Handling",
-    icon: <Code className="h-4 w-4" />,
-    topics: ["exception-handling"],
-  },
-  {
-    id: "io-files",
-    label: "I/O & Files",
-    icon: <Code className="h-4 w-4" />,
-    topics: ["java-io"],
-  },
-  {
-    id: "concurrency",
-    label: "Multithreading",
-    icon: <Code className="h-4 w-4" />,
-    topics: ["multithreading"],
-  },
-];
+interface EnhancedSidebarProps {
+  className?: string;
+  isMobile?: boolean;
+}
 
-const EnhancedSidebar = () => {
-  const navigate = useNavigate();
+const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
+  className,
+  isMobile = false,
+}) => {
   const location = useLocation();
-  const { progress, getCompletionPercentage } = useProgress();
-  const [expandedCategories, setExpandedCategories] = useState<string[]>(
-    topicCategories.map((cat) => cat.id) // All categories expanded by default
-  );
-
-  // Get current topic from URL path
-  const currentPath = location.pathname;
-  const currentTopicId = currentPath.split("/topics/")[1]?.split("/")[0];
-  const handleTopicClick = (topicId: string) => {
-    // Use navigate function to go to the topic detail page
-    navigate(`/topics/${topicId}`);
-  };
-  // Toggle category expansion
-  const toggleCategory = (categoryId: string) => {
-    setExpandedCategories((prev) =>
-      prev.includes(categoryId)
-        ? prev.filter((id) => id !== categoryId)
-        : [...prev, categoryId]
-    );
-  };
-
-  const isTopicActive = (topicId: string) => {
-    return currentTopicId === topicId;
-  };
+  const navigate = useNavigate();
+  const { isTopicComplete, isSubTopicComplete } = useProgress();
+  const currentTopicId = location.pathname.split("/")[2];
 
   return (
-    <div className="flex flex-col w-full h-full border-r p-4 space-y-4 bg-white dark:bg-slate-950">
-      <div className="space-y-2">
-        <h2 className="text-xl font-bold">Java Topics</h2>
+    <div
+      className={cn(
+        "h-full bg-gradient-to-b from-background to-muted/20 backdrop-blur-sm border-r border-border/40 overflow-y-auto",
+        className
+      )}
+    >
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold flex items-center gap-2">
+            <BookOpen className="h-5 w-5 text-primary" />
+            Learning Path
+          </h2>
+          <Badge variant="outline" className="text-xs">
+            {topics.length} Topics
+          </Badge>
+        </div>
 
-        <div className="space-y-1 mt-4">
-          {topicCategories.map((category) => {
-            const isExpanded = expandedCategories.includes(category.id);
+        <div className="mb-6">
+          <SearchBar variant={isMobile ? "mobile" : "desktop"} />
+        </div>
+
+        <nav className="space-y-2">
+          {topics.map((topic) => {
+            const isActive = topic.id === currentTopicId;
+            const isCompleted = isTopicComplete(topic.id);
 
             return (
-              <div key={category.id} className="space-y-1">
-                {/* Category header */}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full justify-between font-medium text-left"
-                  onClick={() => toggleCategory(category.id)}
+              <div key={topic.id} className="space-y-1">
+                <motion.button
+                  onClick={() => navigate(`/topics/${topic.id}`)}
+                  className={cn(
+                    "w-full flex items-center justify-between px-4 py-3 text-sm rounded-lg transition-all duration-200",
+                    isActive
+                      ? "bg-primary/10 text-primary font-medium"
+                      : "hover:bg-muted/50"
+                  )}
+                  whileHover={{ x: 4 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
                 >
-                  <div className="flex items-center gap-2">
-                    {category.icon}
-                    <span>{category.label}</span>
-                  </div>
-                  <div>
-                    {isExpanded ? (
-                      <ChevronDown className="h-4 w-4" />
+                  <div className="flex items-center gap-3">
+                    {isCompleted ? (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="text-green-500"
+                      >
+                        <CheckCircle2 className="h-4 w-4" />
+                      </motion.div>
                     ) : (
-                      <ChevronRight className="h-4 w-4" />
+                      <div className="h-4 w-4 rounded-full border-2 border-muted-foreground/30" />
                     )}
+                    <span className="truncate">{topic.title}</span>
                   </div>
-                </Button>
-
-                {/* Category topics */}
-                <AnimatePresence>
-                  {isExpanded && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="overflow-hidden"
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      variant="outline"
+                      className={cn(
+                        "text-xs",
+                        topic.level === "Beginner"
+                          ? "bg-green-500/10 text-green-500 border-green-500/20"
+                          : topic.level === "Intermediate"
+                          ? "bg-blue-500/10 text-blue-500 border-blue-500/20"
+                          : "bg-purple-500/10 text-purple-500 border-purple-500/20"
+                      )}
                     >
-                      <div className="pl-6 space-y-1 py-1">
-                        {category.topics.map((topicId) => {
-                          // Find the topic by ID from the topics array
-                          const topic = topics.find((t) => t.id === topicId);
+                      {topic.level}
+                    </Badge>
+                    <ChevronRight
+                      className={cn(
+                        "h-4 w-4 transition-transform duration-200",
+                        isActive && "rotate-90"
+                      )}
+                    />
+                  </div>
+                </motion.button>
 
-                          // Skip if topic not found
-                          if (!topic) return null;
+                <AnimatePresence>
+                  {isActive && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="pl-8 space-y-1"
+                    >
+                      {topic.subtopics.map((subtopic) => {
+                        const isSubTopicCompleted = isSubTopicComplete(
+                          topic.id,
+                          subtopic.id
+                        );
 
-                          const completionPercentage = getCompletionPercentage(
-                            topic.id
-                          );
-                          const isActive = isTopicActive(topic.id);
-
-                          return (
-                            <Button
-                              key={topic.id}
-                              variant="ghost"
-                              size="sm"
-                              className={cn(
-                                "w-full justify-between pl-4 pr-2 py-1 h-auto text-left",
-                                isActive
-                                  ? "bg-slate-100 dark:bg-slate-800 font-medium"
-                                  : "text-slate-700 dark:text-slate-300"
-                              )}
-                              onClick={() => navigate(`/topics/${topic.id}`)}
-                            >
-                              <span className="truncate">{topic.title}</span>
-
-                              {completionPercentage > 0 && (
-                                <div className="flex items-center gap-1 text-xs">
-                                  {completionPercentage === 100 ? (
-                                    <CheckCircle className="h-3 w-3 text-green-500" />
-                                  ) : (
-                                    <span className="text-xs text-slate-400">
-                                      {completionPercentage}%
-                                    </span>
-                                  )}
-                                </div>
-                              )}
-                            </Button>
-                          );
-                        })}
-                      </div>
+                        return (
+                          <motion.button
+                            key={subtopic.id}
+                            onClick={() =>
+                              navigate(`/topics/${topic.id}/${subtopic.id}`)
+                            }
+                            className={cn(
+                              "w-full flex items-center gap-3 px-4 py-2.5 text-sm rounded-lg transition-all duration-200",
+                              isSubTopicCompleted
+                                ? "text-green-500 hover:bg-green-500/5"
+                                : "text-muted-foreground hover:bg-muted/30 hover:text-foreground"
+                            )}
+                            whileHover={{ x: 4 }}
+                            transition={{
+                              type: "spring",
+                              stiffness: 400,
+                              damping: 25,
+                            }}
+                          >
+                            {isSubTopicCompleted ? (
+                              <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                className="text-green-500"
+                              >
+                                <CheckCircle2 className="h-4 w-4" />
+                              </motion.div>
+                            ) : (
+                              <div className="h-4 w-4 rounded-full border-2 border-muted-foreground/30" />
+                            )}
+                            <span className="truncate">{subtopic.title}</span>
+                          </motion.button>
+                        );
+                      })}
                     </motion.div>
                   )}
                 </AnimatePresence>
               </div>
             );
           })}
-        </div>
+        </nav>
       </div>
-
-      <div className="flex-1 overflow-auto">
-        {/* This area could contain topic details or other dynamic content */}
-      </div>
-
-      <Button
-        variant="outline"
-        className="w-full"
-        onClick={() => navigate("/topics")}
-      >
-        View All Topics
-      </Button>
     </div>
   );
 };

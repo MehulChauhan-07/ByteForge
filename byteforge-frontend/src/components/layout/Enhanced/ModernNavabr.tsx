@@ -16,6 +16,7 @@ import {
   Github,
   LogIn,
 } from "lucide-react";
+import UnifiedSearch from "@/components/features/Java_Topics/Enhancedpage/UnifiedSearch";
 
 // Define navigation items
 const navItems = [
@@ -104,12 +105,10 @@ const ModernNavbar = () => {
   };
 
   // Handle search submit
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
+  const handleSearchSubmit = (query: string) => {
+    if (query.trim()) {
       setShowSearchOverlay(false);
-      navigate(`/topics?q=${encodeURIComponent(searchQuery)}`);
-      setSearchQuery("");
+      navigate(`/topics?q=${encodeURIComponent(query)}`);
     }
   };
 
@@ -236,20 +235,17 @@ const ModernNavbar = () => {
               ))}
             </nav>
 
+            {/* Desktop Search */}
+            <div className="hidden md:block">
+              <UnifiedSearch
+                variant="navbar"
+                onSearch={handleSearchSubmit}
+                placeholder="Search topics, courses, and more..."
+              />
+            </div>
+
             {/* Right side buttons */}
             <div className="flex items-center gap-2">
-              <button
-                onClick={() => setShowSearchOverlay(true)}
-                className={`p-2 rounded-md ${
-                  theme === "dark"
-                    ? "hover:bg-slate-800 text-slate-300"
-                    : "hover:bg-slate-100 text-slate-700"
-                }`}
-                aria-label="Search"
-              >
-                <Search className="h-5 w-5" />
-              </button>
-
               <div className="hidden md:block">
                 <ModeToggle />
               </div>
@@ -291,319 +287,151 @@ const ModernNavbar = () => {
                 </Button>
               </div>
 
-              {/* Mobile menu button */}
-              <button
-                className={`p-2 rounded-md md:hidden ${
-                  theme === "dark"
-                    ? "text-slate-300 hover:bg-slate-800"
-                    : "text-slate-700 hover:bg-slate-100"
-                }`}
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                aria-label="Toggle menu"
-              >
-                {mobileMenuOpen ? (
-                  <X className="h-6 w-6" />
-                ) : (
-                  <Menu className="h-6 w-6" />
-                )}
-              </button>
+              {/* Mobile Menu Button */}
+              <div className="flex items-center gap-2 md:hidden">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9"
+                  onClick={() => setShowSearchOverlay(true)}
+                >
+                  <Search className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9"
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                >
+                  {mobileMenuOpen ? (
+                    <X className="h-5 w-5" />
+                  ) : (
+                    <Menu className="h-5 w-5" />
+                  )}
+                </Button>
+              </div>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Mobile menu */}
+      {/* Mobile Search Overlay */}
+      <AnimatePresence>
+        {showSearchOverlay && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50"
+              onClick={() => setShowSearchOverlay(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.2 }}
+              className="fixed top-0 left-0 right-0 z-50 p-4 bg-background border-b"
+            >
+              <div className="relative">
+                <UnifiedSearch
+                  variant="mobile"
+                  onSearch={handleSearchSubmit}
+                  onClose={() => setShowSearchOverlay(false)}
+                  placeholder="Search topics, courses, and more..."
+                />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
+                  onClick={() => setShowSearchOverlay(false)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Mobile Menu */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className={`fixed top-16 left-0 right-0 z-40 overflow-hidden shadow-lg ${
-              theme === "dark"
-                ? "bg-slate-900 border-b border-slate-800"
-                : "bg-white border-b border-slate-200"
-            }`}
+            initial={{ opacity: 0, x: "100%" }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: "100%" }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-y-0 right-0 w-full max-w-sm bg-background border-l z-50 md:hidden"
           >
-            <div className="container mx-auto px-4 py-4">
-              <nav className="flex flex-col space-y-1">
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold">Menu</h2>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
+
+              <nav className="space-y-2">
                 {navItems.map((item) => (
                   <div key={item.name}>
                     {item.submenu ? (
-                      <>
+                      <div className="space-y-1">
                         <button
-                          className={`px-4 py-3 rounded-md text-sm font-medium flex items-center justify-between ${
-                            isActive(item.path)
-                              ? theme === "dark"
-                                ? "bg-slate-800 text-white"
-                                : "bg-slate-100 text-slate-900"
-                              : theme === "dark"
-                              ? "text-slate-200"
-                              : "text-slate-800"
-                          }`}
-                          onClick={() =>
-                            toggleSubmenu(
-                              activeSubmenu === item.name ? "" : item.name
-                            )
-                          }
+                          className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md hover:bg-muted"
+                          onClick={() => toggleSubmenu(item.name)}
                         >
-                          <span className="flex items-center">
-                            {item.icon && (
-                              <span className="mr-2">{item.icon}</span>
-                            )}
+                          <div className="flex items-center gap-2">
+                            {item.icon}
                             {item.name}
-                          </span>
+                          </div>
                           <ChevronDown
                             className={`h-4 w-4 transition-transform duration-200 ${
                               activeSubmenu === item.name ? "rotate-180" : ""
                             }`}
                           />
                         </button>
-
-                        {activeSubmenu === item.name && (
-                          <div
-                            className={`mt-1 ml-4 pl-4 border-l ${
-                              theme === "dark"
-                                ? "border-slate-700"
-                                : "border-slate-200"
-                            }`}
-                          >
-                            {item.submenu.map((subItem) => (
-                              <Link
-                                key={subItem.name}
-                                to={subItem.path}
-                                className={`block px-4 py-2 text-sm rounded-md ${
-                                  subItem.highlight
-                                    ? theme === "dark"
-                                      ? "text-blue-400 font-medium"
-                                      : "text-blue-600 font-medium"
-                                    : theme === "dark"
-                                    ? "text-slate-300 hover:bg-slate-800"
-                                    : "text-slate-700 hover:bg-slate-100"
-                                } ${
-                                  isActive(subItem.path)
-                                    ? theme === "dark"
-                                      ? "bg-slate-800"
-                                      : "bg-slate-100"
-                                    : ""
-                                }`}
-                              >
-                                {subItem.name}
-                              </Link>
-                            ))}
-                          </div>
-                        )}
-                      </>
+                        <AnimatePresence>
+                          {activeSubmenu === item.name && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: "auto" }}
+                              exit={{ opacity: 0, height: 0 }}
+                              transition={{ duration: 0.2 }}
+                              className="pl-8 space-y-1"
+                            >
+                              {item.submenu.map((subItem) => (
+                                <Link
+                                  key={subItem.name}
+                                  to={subItem.path}
+                                  className="block px-3 py-2 text-sm rounded-md hover:bg-muted"
+                                  onClick={() => setMobileMenuOpen(false)}
+                                >
+                                  {subItem.name}
+                                </Link>
+                              ))}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
                     ) : (
                       <Link
                         to={item.path}
-                        className={`px-4 py-3 rounded-md text-sm font-medium flex items-center ${
-                          isActive(item.path)
-                            ? theme === "dark"
-                              ? "bg-slate-800 text-white"
-                              : "bg-slate-100 text-slate-900"
-                            : theme === "dark"
-                            ? "text-slate-200"
-                            : "text-slate-800"
-                        }`}
+                        className="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md hover:bg-muted"
+                        onClick={() => setMobileMenuOpen(false)}
                       >
-                        {item.icon && <span className="mr-2">{item.icon}</span>}
+                        {item.icon}
                         {item.name}
                       </Link>
                     )}
                   </div>
                 ))}
               </nav>
-
-              {/* Mobile menu footer */}
-              <div className="mt-6 pt-6 border-t flex flex-col gap-4">
-                <div className="flex items-center justify-between">
-                  <div
-                    className={`text-sm ${
-                      theme === "dark" ? "text-slate-400" : "text-slate-500"
-                    }`}
-                  >
-                    Switch theme
-                  </div>
-                  <ModeToggle />
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 mt-2">
-                  <Button
-                    variant="outline"
-                    className={`w-full ${
-                      theme === "dark" ? "border-slate-700 text-slate-300" : ""
-                    }`}
-                    onClick={() => navigate("/login")}
-                  >
-                    <LogIn className="h-4 w-4 mr-2" />
-                    Login
-                  </Button>
-                  <Button
-                    className={`w-full ${
-                      theme === "dark"
-                        ? "bg-blue-600 hover:bg-blue-700 text-white"
-                        : ""
-                    }`}
-                    onClick={() => navigate("/signup")}
-                  >
-                    Sign up Free
-                  </Button>
-                </div>
-              </div>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Search overlay */}
-      <AnimatePresence>
-        {showSearchOverlay && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className={`fixed inset-0 z-50 p-4 sm:p-6 md:p-20 flex items-start justify-center ${
-              theme === "dark"
-                ? "bg-slate-900/95 backdrop-blur-sm"
-                : "bg-slate-100/95 backdrop-blur-sm"
-            }`}
-          >
-            <div
-              className="fixed inset-0 bg-transparent"
-              onClick={() => setShowSearchOverlay(false)}
-            ></div>
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className={`relative w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden ${
-                theme === "dark"
-                  ? "bg-slate-800 border border-slate-700"
-                  : "bg-white border border-slate-200"
-              }`}
-            >
-              <form onSubmit={handleSearchSubmit}>
-                <div className="flex items-center px-4 py-3 border-b">
-                  <Search
-                    className={`h-5 w-5 ${
-                      theme === "dark" ? "text-slate-400" : "text-slate-500"
-                    }`}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Search topics, lessons, or keywords..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className={`w-full ml-3 bg-transparent border-none outline-none ${
-                      theme === "dark"
-                        ? "text-white placeholder:text-slate-400"
-                        : "text-slate-900 placeholder:text-slate-500"
-                    }`}
-                    autoFocus
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowSearchOverlay(false)}
-                    className={`p-1 rounded-full ${
-                      theme === "dark"
-                        ? "hover:bg-slate-700 text-slate-400"
-                        : "hover:bg-slate-200 text-slate-500"
-                    }`}
-                  >
-                    <X className="h-5 w-5" />
-                  </button>
-                </div>
-              </form>
-
-              <div
-                className={`p-4 max-h-[60vh] overflow-y-auto ${
-                  theme === "dark" ? "bg-slate-800" : "bg-white"
-                }`}
-              >
-                <div className="space-y-2">
-                  <div
-                    className={`px-3 py-1 text-xs font-medium ${
-                      theme === "dark" ? "text-slate-400" : "text-slate-500"
-                    }`}
-                  >
-                    Popular searches
-                  </div>
-                  {[
-                    "Java Basics",
-                    "Object-Oriented Programming",
-                    "Data Structures",
-                    "Exception Handling",
-                  ].map((term) => (
-                    <div
-                      key={term}
-                      className={`px-3 py-2 rounded-md cursor-pointer flex items-center gap-3 ${
-                        theme === "dark"
-                          ? "hover:bg-slate-700 text-slate-200"
-                          : "hover:bg-slate-100 text-slate-800"
-                      }`}
-                      onClick={() => {
-                        setShowSearchOverlay(false);
-                        navigate(`/search?q=${encodeURIComponent(term)}`);
-                      }}
-                    >
-                      <Search className="h-4 w-4 flex-shrink-0" />
-                      <span>{term}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-4">
-                  <div
-                    className={`px-3 py-1 text-xs font-medium ${
-                      theme === "dark" ? "text-slate-400" : "text-slate-500"
-                    }`}
-                  >
-                    Quick links
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
-                    {[
-                      {
-                        name: "All Topics",
-                        path: "/topics",
-                        icon: <BookOpen className="h-4 w-4" />,
-                      },
-                      {
-                        name: "Practice",
-                        path: "/practice",
-                        icon: <Code className="h-4 w-4" />,
-                      },
-                      {
-                        name: "Community",
-                        path: "/community",
-                        icon: <Users className="h-4 w-4" />,
-                      },
-                      {
-                        name: "Account Settings",
-                        path: "/settings",
-                        icon: <Settings className="h-4 w-4" />,
-                      },
-                    ].map((link) => (
-                      <div
-                        key={link.name}
-                        className={`px-3 py-2 rounded-md cursor-pointer flex items-center gap-3 ${
-                          theme === "dark"
-                            ? "hover:bg-slate-700 text-slate-200"
-                            : "hover:bg-slate-100 text-slate-800"
-                        }`}
-                        onClick={() => {
-                          setShowSearchOverlay(false);
-                          navigate(link.path);
-                        }}
-                      >
-                        {link.icon}
-                        <span>{link.name}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

@@ -8,10 +8,11 @@ interface TopicProgress {
 }
 
 interface ProgressContextType {
-  progress: Record<string, TopicProgress>;
-  markSubTopicComplete: (topicId: string, subtopicId: string) => void;
-  isSubTopicComplete: (topicId: string, subtopicId: string) => boolean;
+  progress: Record<string, { subtopics: Record<string, boolean> }>;
   isTopicComplete: (topicId: string) => boolean;
+  isSubTopicComplete: (topicId: string, subtopicId: string) => boolean;
+  toggleSubTopicCompletion: (topicId: string, subtopicId: string) => void;
+  getCompletionPercentage: (topicId: string) => number;
 }
 
 const ProgressContext = createContext<ProgressContextType | undefined>(
@@ -21,7 +22,9 @@ const ProgressContext = createContext<ProgressContextType | undefined>(
 export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [progress, setProgress] = useState<Record<string, TopicProgress>>({});
+  const [progress, setProgress] = useState<
+    Record<string, { subtopics: Record<string, boolean> }>
+  >({});
 
   useEffect(() => {
     // Load progress from localStorage
@@ -30,10 +33,12 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({
       setProgress(JSON.parse(savedProgress));
     } else {
       // Initialize with empty progress for all topics
-      const initialProgress: Record<string, TopicProgress> = {};
+      const initialProgress: Record<
+        string,
+        { subtopics: Record<string, boolean> }
+      > = {};
       topics.forEach((topic) => {
         initialProgress[topic.id] = {
-          completed: false,
           subtopics: topic.subtopics.reduce((acc, subtopic: SubTopic) => {
             acc[subtopic.id] = false;
             return acc;
@@ -49,45 +54,55 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({
     localStorage.setItem("topicProgress", JSON.stringify(progress));
   }, [progress]);
 
-  const markSubTopicComplete = (topicId: string, subtopicId: string) => {
-    setProgress((prev) => {
-      const newProgress = { ...prev };
-      if (!newProgress[topicId]) {
-        newProgress[topicId] = {
-          completed: false,
-          subtopics: {},
-        };
-      }
-      newProgress[topicId].subtopics[subtopicId] = true;
+  const isTopicComplete = (topicId: string) => {
+    const topicProgress = progress[topicId];
+    if (!topicProgress) return false;
 
-      // Check if all subtopics are complete
-      const topic = topics.find((t) => t.id === topicId);
-      if (topic) {
-        const allSubtopicsComplete = topic.subtopics.every(
-          (st) => newProgress[topicId].subtopics[st.id]
-        );
-        newProgress[topicId].completed = allSubtopicsComplete;
-      }
-
-      return newProgress;
-    });
+    const subtopics = Object.values(topicProgress.subtopics);
+    return subtopics.length > 0 && subtopics.every((completed) => completed);
   };
 
   const isSubTopicComplete = (topicId: string, subtopicId: string) => {
     return progress[topicId]?.subtopics[subtopicId] || false;
   };
 
-  const isTopicComplete = (topicId: string) => {
-    return progress[topicId]?.completed || false;
+  const toggleSubTopicCompletion = (topicId: string, subtopicId: string) => {
+    setProgress((prev) => {
+      const topicProgress = prev[topicId] || { subtopics: {} };
+      const newSubtopics = {
+        ...topicProgress.subtopics,
+        [subtopicId]: !topicProgress.subtopics[subtopicId],
+      };
+
+      return {
+        ...prev,
+        [topicId]: {
+          ...topicProgress,
+          subtopics: newSubtopics,
+        },
+      };
+    });
+  };
+
+  const getCompletionPercentage = (topicId: string) => {
+    const topicProgress = progress[topicId];
+    if (!topicProgress) return 0;
+
+    const subtopics = Object.values(topicProgress.subtopics);
+    if (subtopics.length === 0) return 0;
+
+    const completedCount = subtopics.filter((completed) => completed).length;
+    return Math.round((completedCount / subtopics.length) * 100);
   };
 
   return (
     <ProgressContext.Provider
       value={{
         progress,
-        markSubTopicComplete,
-        isSubTopicComplete,
         isTopicComplete,
+        isSubTopicComplete,
+        toggleSubTopicCompletion,
+        getCompletionPercentage,
       }}
     >
       {children}
