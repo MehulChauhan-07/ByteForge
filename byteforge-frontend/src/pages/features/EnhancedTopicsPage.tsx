@@ -769,7 +769,7 @@ const EnhancedTopicsPage = () => {
           // Topics List View
           // ========================
           <motion.div
-            key="topics-list"
+            key={`topic-${selectedTopic?.id}`}
             variants={containerVariants}
             initial="hidden"
             animate="visible"
