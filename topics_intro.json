@@ -1,0 +1,77 @@
+{
+  "id": "java-basics",
+  "title": "Java Basics",
+  "description": "Introduction to Java programming language",
+  "level": "Beginner",
+  "duration": "2 hours",
+  "category": "java-fundamentals",
+  "prerequisites": [],
+  "tags": ["java", "basics", "programming"],
+  "image": "/images/java-basics.jpg",
+  "updatedAt": "2024-03-20",
+  "subtopics": [
+    {
+      "id": "introduction",
+      "title": "Introduction to Java: Why It Matters",
+      "description": "Understand why Java exists, its core principles like 'Write Once, Run Anywhere', and overcome common beginner hurdles.",
+      "estimatedTime": "45 minutes",
+      "content": [
+        {
+          "type": "text",
+          "content": "Imagine You Want to Build Something\n\nYou’ve decided to build your first app — maybe a simple calculator. You open your laptop, excited, and then… You realize you have no idea how to make the computer understand what you want.\n\nYou try typing 'Add 2 and 3' somewhere, but computers don’t speak English. They need very precise instructions written in a language they understand.\n\nYou need a programming language."
+        },
+        {
+          "type": "text",
+          "content": "Now comes the real question: which one?\n\nYou hear about Python, C++, Java… and Java stands out. People say it's powerful, it's everywhere, it’s solid.\nBut you also hear it can feel a little heavy for beginners. Is it the right choice?\nLet’s walk through this properly."
+        },
+        {
+          "type": "text",
+          "content": "Trying Without Java\n\nSuppose you somehow build a basic calculator manually — adding numbers with simple instructions written in Word or Notepad.\nBut when you try to run it? Nothing happens.\nWhy? Because the computer doesn’t 'see' your logic. You didn’t write it in a language the machine understands.\nYou realize you need a proper tool — a real programming language that can turn your ideas into running programs.\n\nThis is the moment Java steps in."
+        },
+        {
+          "type": "text",
+          "content": "How Java Solves This Problem\n\nJava was built with one big goal:\n\"Write Once, Run Anywhere.\"\n\nYou write your program once, and it runs on any computer — Windows, Mac, Linux, Android — without needing to rewrite it.\nThis is possible because of the Java Virtual Machine (JVM), which acts like a translator between your code and the machine.\n\nThis was a game-changer when Java launched, and it’s still a major reason why huge companies (banks, airlines, even Android apps) trust Java today.\nIt doesn’t matter if you’re building small apps or giant systems — Java scales with you."
+        },
+        {
+          "type": "text",
+          "content": "But Isn't Java Hard?\n\nAt first glance, Java can look complicated. Even a simple program to print \"Hello, World!\" requires some setup (see the code example below).\n\nYou might think: \"Wow, that’s a lot just to print one line!\"\nTrue — Java asks you to set up some structure first. But this structure makes your programs organized, clean, and ready to grow.\n\nIt’s like learning to build with blueprints, not just piling up blocks randomly.\nEarly on, it feels slow.\nLater, when your projects get bigger, you’ll be thankful you learned the right way."
+        },
+        {
+          "type": "text",
+          "content": "Real-World Use Case:\n• Every Android app you use? Built on Java (or very closely related technologies like Kotlin).\n• Major banks, airlines, insurance companies? Their backend systems often rely heavily on Java because of its security, performance, and long-term stability.\n\nIn short, Java isn't just about learning to code. It's about learning to build things that last."
+        },
+        {
+          "type": "text",
+          "content": "Common Beginner Struggles (and How to Beat Them):\n\n✅ Java looks \"wordy\" compared to languages like Python.\nThat’s true. But all that structure teaches you discipline — something you’ll appreciate when your apps grow beyond a few hundred lines.\n\n✅ Too many new words — classes, objects, methods...\nDon't rush to memorize everything. Focus on building small, working programs. Understanding will come naturally as you practice.\n\n✅ Error messages seem confusing.\nAt first, Java’s errors will feel scary. But they’re actually like a treasure map — they tell you exactly what and where something went wrong. You’ll get good at reading them over time."
+        }
+      ],
+      "codeExamples": [
+        {
+          "title": "Basic 'Hello, World!' Program",
+          "code": "public class HelloWorld {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, World!\");\n    }\n}",
+          "language": "java",
+          "description": "Illustrates the basic structure of a Java program needed even for simple output. Notice the class and main method definition."
+        }
+      ],
+      "resources": [
+        {
+          "title": "Java Documentation",
+          "url": "https://docs.oracle.com/javase/tutorial/",
+          "type": "documentation",
+          "description": "Official Java documentation",
+          "level": "beginner"
+        }
+      ],
+      "quizQuestions": [
+        {
+          "question": "Which company developed Java?",
+          "options": ["Microsoft", "Oracle", "Sun Microsystems", "IBM"],
+          "correctAnswer": 2,
+          "explanation": "Java was developed by Sun Microsystems, which was later acquired by Oracle.",
+          "difficulty": "easy",
+          "timeLimit": 30
+        }
+      ]
+    }
+  ]
+}

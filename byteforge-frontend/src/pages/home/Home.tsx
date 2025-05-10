@@ -5,6 +5,8 @@ import Hero from "@/components/features/home/HeroSection";
 import FeatureSection from "@/components/features/home/FeatureSection";
 import JavaTopics from "@/components/features/home/JavaTopics";
 import CallToAction from "@/components/landing/CallToAction";
+import EnhancedJavaTopic from "@/components/features/home/EnhancedJavaTopic";
+import ModernCallToAction from "@/components/landing/modern-enhanced/ModernCallToAction";
 
 const HomePage = () => {
   return (
@@ -68,7 +70,8 @@ const HomePage = () => {
         </section>
 
         {/* Java Topics Section */}
-        <JavaTopics />
+        {/* <JavaTopics /> */}
+        <EnhancedJavaTopic />
 
         {/* CTA Section */}
         {/* <section className="py-16 bg-primary text-primary-foreground">
@@ -103,7 +106,8 @@ const HomePage = () => {
             </div>
           </div>
         </section> */}
-        <CallToAction />
+        {/* <CallToAction /> */}
+        <ModernCallToAction />
       </main>
     </div>
   );

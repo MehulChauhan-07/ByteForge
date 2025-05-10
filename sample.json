@@ -1,0 +1,110 @@
+{
+    "_id": ObjectId,
+    "id": "java-basics",
+    "title": "Java Basics",
+    "description": "Introduction to Java programming language",
+    "level": "Beginner",
+    "duration": "2 hours",
+    "category": "java-fundamentals",
+    "prerequisites": [],
+    "tags": ["java", "basics", "programming"],
+    "image": "/images/java-basics.jpg",
+    "updatedAt": ISODate("2024-03-20T00:00:00.000Z"),
+    "subtopics": [
+      {
+        "id": "introduction",
+        "title": "Introduction to Java: Why It Matters",
+        "description": "Understand why Java exists...",
+        "estimatedTime": "45 minutes",
+        "content": [
+          {
+            "type": "text",
+            "content": "Imagine You Want to Build Something..."
+          },
+          {
+            "type": "text",
+            "content": "Now comes the real question: which one?..."
+          }
+        ],
+        "codeExamples": [
+          {
+            "title": "Basic 'Hello, World!' Program",
+            "code": "public class HelloWorld {...}",
+            "language": "java",
+            "description": "Illustrates the basic structure..."
+          }
+        ],
+        "quizQuestions": [
+          {
+            "question": "Which company developed Java?",
+            "options": ["Microsoft", "Oracle", "Sun Microsystems", "IBM"],
+            "correctAnswer": 2,
+            "explanation": "Java was developed by Sun Microsystems...",
+            "difficulty": "easy",
+            "timeLimit": 30
+          }
+        ]
+      },
+        {
+            "id": "java-setup",
+            "title": "Setting Up Your Java Environment",
+            "description": "Learn how to set up your Java development environment...",
+            "estimatedTime": "30 minutes",
+            "content": [
+            {
+                "type": "text",
+                "content": "To start coding in Java, you need to set up your environment..."
+            }
+            ],
+            "codeExamples": [
+            {
+                "title": "Installing Java Development Kit (JDK)",
+                "code": "// Instructions for installing JDK...",
+                "language": "bash",
+                "description": "Follow these steps to install JDK..."
+            }
+            ],
+            "quizQuestions": [
+            {
+                "question": "What does JDK stand for?",
+                "options": ["Java Development Kit", "Java Data Kit", "Java Deployment Kit", "Java Design Kit"],
+                "correctAnswer": 0,
+                "explanation": "JDK stands for Java Development Kit...",
+                "difficulty": "easy",
+                "timeLimit": 20
+            }
+            ]
+        },
+        {
+            "id": "java-syntax",
+            "title": "Java Syntax and Structure",
+            "description": "Learn the basic syntax and structure of Java...",
+            "estimatedTime": "45 minutes",
+            "content": [
+            {
+                "type": "text",
+                "content": "Java syntax is the set of rules that define a correctly structured Java program..."
+            }
+            ],
+            "codeExamples": [
+            {
+                "title": "Basic Java Syntax Example",
+                "code": "// Example of basic Java syntax...",
+                "language": "java",
+                "description": "This example demonstrates the basic syntax..."
+            }
+            ],
+            "quizQuestions": [
+            {
+                "question": "What is the correct way to declare a variable in Java?",
+                "options": ["int x = 10;", "x = 10;", "$x = 10;", "@x = 10;"],
+                "correctAnswer": 0,
+                "explanation": "In Java, variables are declared with a type followed by the variable name...",
+                "difficulty": "easy",
+                "timeLimit": 30
+            }
+            ]
+        }
+    ]
+  }
+  

@@ -3,20 +3,27 @@ import LoginPage from "@/pages/auth/LoginPage";
 import SignupPage from "@/pages/auth/SignupPage";
 import TestLoginPage from "@/pages/auth/TestLoginPage";
 import HomePage from "@/pages/home/Home";
-import DashboardPage from "@/pages/DashboardPage";
 // import DashboardPage from "@/pages/dashboard/DashboardPage";
-import ProfilePage from "@/pages/ProfilePage";
 import TopicsPage from "@/pages/topic/TopicsPage";
 import NotFoundPage from "@/pages/NotFoundPage";
 import AboutPage from "@/pages/about/About";
 
+// enhanced imports
+import DashboardPage from "@/pages/DashboardPage";
+import DashboardPagev2 from "@/pages/EnhancedDash/DashboardPagev2";
+import ProfilePage from "@/pages/ProfilePage";
+import ProfilePagev2 from "@/pages/EnhancedDash/ProfilePagev2";
+
 // Protected feature pages
-import CompilerPage from "@/pages/features/CompilePage";
 import NotesPage from "@/pages/features/NotesPage";
 import ChatbotPage from "@/pages/features/ChatbotPage";
 import CommunityPage from "@/pages/features/CommunityPage";
 import TutorialsPage from "@/pages/features/TutorialsPage";
 import ExercisesPage from "@/pages/features/ExercisesPage";
+
+import CompilerPage from "@/pages/features/CompilePage";
+import CompilerPage_v1 from "@/pages/features/CompilerPage_v2";
+import CompilerPage_v2 from "@/pages/features/CompilerPage_v2";
 
 // testing imports
 import Old_CompilerPage from "@/pages/features/old_folder/old_compilepage";
@@ -25,6 +32,8 @@ import ComplexNavbar from "@/components/layout/old_files/old_navbar";
 import EnhancedTopicsPage from "@/pages/features/EnhancedTopicsPage";
 import EnhancedHome from "@/pages/home/EnhancedHome";
 import ModernEnhancedHome from "@/pages/home/ModernEnhancedHome";
+import EnhancedAbout from "@/pages/about/EnhancedAbout";
+import UrlManager from "@/pages/UrlManager";
 
 // import Layout from "@/components/layout/Layout";
 
@@ -33,6 +42,7 @@ export const routes = {
   public: [
     { path: "/", element: <HomePage /> },
     { path: "/about", element: <AboutPage /> },
+    { path: "/url", element: <UrlManager /> },
     { path: "/login", element: <LoginPage /> },
     { path: "/signup", element: <SignupPage /> },
     // { path: '/forgot-password', element: <ForgotPasswordPage /> },
@@ -45,14 +55,19 @@ export const routes = {
     // { path: "/testing/home1", element: <EnhancedHome /> },
     { path: "/testing/home2", element: <ModernEnhancedHome /> },
     { path: "/testing/compiler", element: <Old_CompilerPage /> },
+    { path: "/testing/about", element: <EnhancedAbout /> },
     { path: "/testing/navbar", element: <ComplexNavbar /> },
     // { path: "/topics", element: <TopicsPage /> },
   ],
   protected: [
     { path: "/dashboard", element: <DashboardPage /> },
+    { path: "/testing/dashboard", element: <DashboardPagev2 /> },
     { path: "/profile", element: <ProfilePage /> },
+    { path: "/testing/profile", element: <ProfilePagev2 /> },
     { path: "/tools/notes", element: <NotesPage /> },
     { path: "/tools/compiler", element: <CompilerPage /> },
+    { path: "/tools/compilerv1", element: <CompilerPage_v1 /> },
+    { path: "/tools/compilerv2", element: <CompilerPage_v2 /> },
     { path: "/tools/assistant", element: <ChatbotPage /> },
     { path: "/community", element: <CommunityPage /> },
     { path: "/exercises", element: <ExercisesPage /> },

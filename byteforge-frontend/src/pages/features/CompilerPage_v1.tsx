@@ -1,24 +1,37 @@
-"use client";
-
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import {
   Play,
+  Save,
   Code2,
   FileText,
   Share2,
+  PanelLeft,
+  TerminalSquare,
+  List,
   RefreshCw,
+  Download,
   Copy,
   Settings,
+  MoreVertical,
   Loader2,
   CheckCircle2,
+  AlertCircle,
+  Trash2,
+  PenLine,
+  Folder,
+  ChevronDown,
+  ArrowUpRight,
   XCircle,
   Maximize2,
   Minimize2,
+  PlusCircle,
   Info,
+  RotateCw,
   Coffee,
   Clock,
   PlayCircle,
+  Bookmark,
   Sparkles,
   Terminal,
 } from "lucide-react";
@@ -32,12 +45,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import {
@@ -48,14 +63,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import codeEditorService, { SavedCode } from "@/services/codeEditorService";
-import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -65,11 +72,18 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import MonacoEditor from "@monaco-editor/react";
-import { toast } from "sonner";
+import codeEditorService, { SavedCode } from "@/services/codeEditorService";
 import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
 
 // Sample code for demo
 const JAVA_TEMPLATE = `public class Main {
@@ -139,7 +153,46 @@ public class Main {
   },
 ];
 
-export default function CompilerPage() {
+// Mock file system
+const mockFiles = [
+  {
+    id: 1,
+    name: "Main.java",
+    type: "java",
+    lastModified: "2025-05-09T14:30:00Z",
+    current: true,
+  },
+  {
+    id: 2,
+    name: "Calculator.java",
+    type: "java",
+    lastModified: "2025-05-07T10:15:00Z",
+    current: false,
+  },
+  {
+    id: 3,
+    name: "README.md",
+    type: "markdown",
+    lastModified: "2025-05-05T09:30:00Z",
+    current: false,
+  },
+  {
+    id: 4,
+    name: "config.properties",
+    type: "properties",
+    lastModified: "2025-05-03T16:45:00Z",
+    current: false,
+  },
+];
+
+// Mock projects
+const mockProjects = [
+  { id: 1, name: "Java Basics", files: 4, current: true },
+  { id: 2, name: "OOP Examples", files: 7, current: false },
+  { id: 3, name: "Algorithm Practice", files: 12, current: false },
+];
+
+export default function CompilerPage_v1() {
   const { user } = useAuth();
   const [code, setCode] = useState(JAVA_TEMPLATE);
   const [input, setInput] = useState("");
@@ -147,6 +200,7 @@ export default function CompilerPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isExecuting, setIsExecuting] = useState(false);
+  const [executionTime, setExecutionTime] = useState<number | null>(null);
   const [executionStats, setExecutionStats] = useState({
     startTime: 0,
     endTime: 0,
@@ -156,16 +210,75 @@ export default function CompilerPage() {
   const [activeTab, setActiveTab] = useState("input");
   const [theme, setTheme] = useState("vs-dark");
   const [showExamples, setShowExamples] = useState(false);
+  const [showFilePanel, setShowFilePanel] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [fontSize, setFontSize] = useState("14");
+  const [showSettings, setShowSettings] = useState(false);
   const [autoComplete, setAutoComplete] = useState(true);
+  const [formatOnSave, setFormatOnSave] = useState(true);
+  const [files, setFiles] = useState(mockFiles);
+  const [projects, setProjects] = useState(mockProjects);
   const [currentFileName, setCurrentFileName] = useState("Main.java");
+  const [savedCodes, setSavedCodes] = useState<SavedCode[]>([]);
+  const [isCodeSaving, setIsCodeSaving] = useState(false);
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [codeTitle, setCodeTitle] = useState("");
+
+  const executionAbortController = useRef<AbortController | null>(null);
+
+  // Format date
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  // Get file icon based on type
+  const getFileIcon = (type: string) => {
+    switch (type) {
+      case "java":
+        return <Code2 className="h-4 w-4 text-orange-500" />;
+      case "markdown":
+        return <FileText className="h-4 w-4 text-blue-500" />;
+      default:
+        return <FileText className="h-4 w-4 text-muted-foreground" />;
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchSavedCodes();
+    }
+  }, [user]);
+
+  const fetchSavedCodes = async () => {
+    if (!user) return;
+
+    try {
+      setIsLoading(true);
+      const codes = await codeEditorService.getSavedCodes();
+      setSavedCodes(codes);
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Failed to fetch saved codes");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleExecute = async () => {
     if (!user) {
       toast.error("Please log in to execute code");
       return;
     }
+
     const startTime = Date.now();
     setIsExecuting(true);
     setError("");
@@ -196,8 +309,6 @@ export default function CompilerPage() {
         toast.error("Failed to execute code");
       }
     } finally {
-      toast.success("Code executed successfully");
-
       setIsExecuting(false);
     }
   };
@@ -229,6 +340,55 @@ export default function CompilerPage() {
     toast.success("Example loaded");
   };
 
+  const handleSaveCode = async () => {
+    if (!user) {
+      toast.error("Please log in to save code");
+      return;
+    }
+
+    try {
+      setIsCodeSaving(true);
+      await codeEditorService.saveCode(code, codeTitle || currentFileName);
+      setShowSaveDialog(false);
+      setCodeTitle("");
+      await fetchSavedCodes();
+      toast.success("Code saved successfully");
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Failed to save code");
+      }
+    } finally {
+      setIsCodeSaving(false);
+    }
+  };
+
+  const handleDeleteCode = async (id: string) => {
+    if (!user) return;
+
+    try {
+      await codeEditorService.deleteCode(id);
+      await fetchSavedCodes();
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Failed to delete code");
+      }
+    }
+  };
+
+  const handleLoadSavedCode = (savedCode: SavedCode) => {
+    setCode(savedCode.code);
+    setCurrentFileName(savedCode.title);
+    toast.success(`Loaded: ${savedCode.title}`);
+  };
+
+  const toggleFilePanel = () => {
+    setShowFilePanel(!showFilePanel);
+  };
+
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
   };
@@ -236,6 +396,28 @@ export default function CompilerPage() {
   const formatExecutionTime = (seconds: number) => {
     if (seconds < 1) return `${(seconds * 1000).toFixed(0)}ms`;
     return `${seconds.toFixed(2)}s`;
+  };
+
+  const switchFile = (fileId: number) => {
+    const updatedFiles = files.map((file) => ({
+      ...file,
+      current: file.id === fileId,
+    }));
+
+    const selectedFile = files.find((file) => file.id === fileId);
+    if (selectedFile) {
+      setCurrentFileName(selectedFile.name);
+    }
+
+    setFiles(updatedFiles);
+  };
+
+  const switchProject = (projectId: number) => {
+    const updatedProjects = projects.map((project) => ({
+      ...project,
+      current: project.id === projectId,
+    }));
+    setProjects(updatedProjects);
   };
 
   return (
@@ -299,6 +481,18 @@ export default function CompilerPage() {
           <Button
             variant="outline"
             size="sm"
+            onClick={toggleFilePanel}
+            className="bg-gradient-to-r from-slate-50 to-slate-100 hover:from-slate-100 hover:to-slate-200 border-slate-200 text-slate-700 dark:from-slate-900/50 dark:to-slate-800/50 dark:border-slate-700"
+          >
+            <PanelLeft
+              className={`h-4 w-4 mr-2 ${!showFilePanel ? "rotate-180" : ""}`}
+            />
+            <span>{showFilePanel ? "Hide Files" : "Show Files"}</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
             onClick={toggleFullscreen}
             className="bg-gradient-to-r from-slate-50 to-slate-100 hover:from-slate-100 hover:to-slate-200 border-slate-200 text-slate-700 dark:from-slate-900/50 dark:to-slate-800/50 dark:border-slate-700"
           >
@@ -333,7 +527,7 @@ export default function CompilerPage() {
               >
                 <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-3">
                   <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300 flex items-center">
-                    <Code2 className="h-4 w-4 mr-2 text-blue-500" />
+                    <Bookmark className="h-4 w-4 mr-2 text-blue-500" />
                     {example.title}
                   </CardTitle>
                 </CardHeader>
@@ -350,12 +544,161 @@ export default function CompilerPage() {
 
         {/* Main Content */}
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+          {/* File Explorer (Optional) */}
+          {showFilePanel && (
+            <motion.div
+              initial={{ opacity: 0, width: 0 }}
+              animate={{ opacity: 1, width: "auto" }}
+              exit={{ opacity: 0, width: 0 }}
+              transition={{ duration: 0.3 }}
+              className="xl:col-span-2 flex flex-col gap-4"
+            >
+              {/* Projects Section */}
+              <Card className="border-slate-200 dark:border-slate-700">
+                <CardHeader className="py-3 px-4">
+                  <CardTitle className="text-sm flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Folder className="h-4 w-4 text-blue-500" />
+                      <span>Projects</span>
+                    </div>
+                    <Button variant="ghost" size="icon" className="h-6 w-6">
+                      <PlusCircle className="h-4 w-4" />
+                    </Button>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="px-2 py-1">
+                  <ul className="space-y-1">
+                    {projects.map((project) => (
+                      <li key={project.id}>
+                        <button
+                          onClick={() => switchProject(project.id)}
+                          className={`w-full text-left px-2 py-1.5 rounded-md text-sm flex items-center justify-between ${
+                            project.current
+                              ? "bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300"
+                              : "hover:bg-slate-100 dark:hover:bg-slate-800/50"
+                          }`}
+                        >
+                          <span className="truncate">{project.name}</span>
+                          <Badge variant="outline" className="text-xs">
+                            {project.files}
+                          </Badge>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+
+              {/* Files Section */}
+              <Card className="border-slate-200 dark:border-slate-700 flex-1">
+                <CardHeader className="py-3 px-4">
+                  <CardTitle className="text-sm flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Code2 className="h-4 w-4 text-orange-500" />
+                      <span>Files</span>
+                    </div>
+                    <Button variant="ghost" size="icon" className="h-6 w-6">
+                      <PlusCircle className="h-4 w-4" />
+                    </Button>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="px-2 py-1">
+                  <ul className="space-y-1">
+                    {files.map((file) => (
+                      <li key={file.id}>
+                        <button
+                          onClick={() => switchFile(file.id)}
+                          className={`w-full text-left px-2 py-1.5 rounded-md text-sm flex items-center justify-between ${
+                            file.current
+                              ? "bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300"
+                              : "hover:bg-slate-100 dark:hover:bg-slate-800/50"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 truncate">
+                            {getFileIcon(file.type)}
+                            <span className="truncate">{file.name}</span>
+                          </div>
+                          <span className="text-xs text-slate-400">
+                            {formatDate(file.lastModified).split(",")[0]}
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+
+              {/* Saved Code Section */}
+              {user && (
+                <Card className="border-slate-200 dark:border-slate-700">
+                  <CardHeader className="py-3 px-4">
+                    <CardTitle className="text-sm flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Bookmark className="h-4 w-4 text-purple-500" />
+                        <span>Saved Code</span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={() => fetchSavedCodes()}
+                      >
+                        <RotateCw className="h-4 w-4" />
+                      </Button>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="px-2 py-1">
+                    {isLoading ? (
+                      <div className="space-y-2 py-1">
+                        <Skeleton className="h-8 w-full" />
+                        <Skeleton className="h-8 w-full" />
+                        <Skeleton className="h-8 w-full" />
+                      </div>
+                    ) : savedCodes.length === 0 ? (
+                      <div className="text-center py-4 text-sm text-slate-500">
+                        No saved code found
+                      </div>
+                    ) : (
+                      <ul className="space-y-1">
+                        {savedCodes.map((savedCode) => (
+                          <li key={savedCode.id}>
+                            <div className="w-full text-left px-2 py-1.5 rounded-md text-sm flex items-center justify-between group hover:bg-slate-100 dark:hover:bg-slate-800/50">
+                              <button
+                                onClick={() => handleLoadSavedCode(savedCode)}
+                                className="flex-1 flex items-center gap-2 truncate text-left"
+                              >
+                                <Code2 className="h-4 w-4 text-blue-500" />
+                                <span className="truncate">
+                                  {savedCode.title}
+                                </span>
+                              </button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={() => handleDeleteCode(savedCode.id)}
+                              >
+                                <Trash2 className="h-3.5 w-3.5 text-red-500" />
+                              </Button>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+            </motion.div>
+          )}
+
           {/* Editor Section */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="xl:col-span-8 flex flex-col"
+            className={`${
+              showFilePanel ? "xl:col-span-6" : "xl:col-span-8"
+            } flex flex-col`}
           >
             <Card className="flex-1 overflow-hidden border-slate-200 dark:border-slate-700 shadow-lg">
               <CardHeader className="bg-gradient-to-r from-slate-800 to-slate-700 text-white py-4 px-6 flex flex-row items-center justify-between">
@@ -396,6 +739,25 @@ export default function CompilerPage() {
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>Compile and execute Java code</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setShowSaveDialog(true)}
+                          disabled={!user}
+                          className="bg-transparent border-slate-500 text-white hover:bg-slate-600"
+                        >
+                          <Save className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Save code to your account</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
@@ -481,6 +843,16 @@ export default function CompilerPage() {
                               onCheckedChange={setAutoComplete}
                             />
                           </div>
+                          <div className="flex items-center justify-between">
+                            <Label htmlFor="formatOnSave" className="text-xs">
+                              Format on Save
+                            </Label>
+                            <Switch
+                              id="formatOnSave"
+                              checked={formatOnSave}
+                              onCheckedChange={setFormatOnSave}
+                            />
+                          </div>
                         </div>
                       </div>
                       <DropdownMenuSeparator />
@@ -518,6 +890,50 @@ export default function CompilerPage() {
                 />
               </CardContent>
             </Card>
+
+            {/* Save Dialog */}
+            <Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Save Code</DialogTitle>
+                  <DialogDescription>
+                    Give your code snippet a title to save it to your account.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="title" className="text-right">
+                      Title
+                    </Label>
+                    <Input
+                      id="title"
+                      placeholder="e.g., Fibonacci Sequence"
+                      className="col-span-3"
+                      value={codeTitle}
+                      onChange={(e) => setCodeTitle(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowSaveDialog(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button onClick={handleSaveCode} disabled={isCodeSaving}>
+                    {isCodeSaving ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      <>Save</>
+                    )}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </motion.div>
 
           {/* Input/Output Section */}
@@ -661,6 +1077,14 @@ export default function CompilerPage() {
                   </span>
                   <Badge variant="outline" className="font-mono">
                     Ctrl + F
+                  </Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-600 dark:text-slate-300">
+                    Save
+                  </span>
+                  <Badge variant="outline" className="font-mono">
+                    Ctrl + S
                   </Badge>
                 </div>
                 <div className="pt-2 text-slate-500 dark:text-slate-400 text-xs">

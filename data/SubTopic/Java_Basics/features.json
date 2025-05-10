@@ -1,0 +1,45 @@
+{
+  "subtopicId": "features",
+  "topicId": "java-basics",
+  "title": "Core Features of Java",
+  "description": "Learn about the core features of Java, including platform independence, object-oriented programming, security, and more.",
+  "estimatedTime": "45 minutes",
+  "content": [
+    {
+      "type": "text",
+      "content": "Core Features of Java (Why Developers Fell in Love)\n\nJava became popular due to its core features that made it stand out among other languages. These include:\n\n- **Platform Independent**: Thanks to the JVM, Java code runs on any machine with the JVM.\n- **Object-Oriented**: Java uses objects to combine data and actions, making it easier to manage large programs.\n- **Simple and Familiar**: Java’s syntax is similar to C/C++ but without the dangerous parts.\n- **Secure**: Java runs in a 'sandbox' to prevent malicious code from harming the host system."
+    },
+    {
+      "type": "text",
+      "content": "Other Features Include:\n\n- **Robust**: Java performs thorough checks on your code to avoid crashes.\n- **Multithreaded**: Java allows tasks to run simultaneously, like downloading files and playing videos.\n- **Automatic Memory Management**: Java uses Garbage Collection to handle memory, so developers don’t need to worry about manual cleanup."
+    },
+    {
+      "type": "text",
+      "content": "Real-World Example\n\nJava powers a wide range of real-world applications today. For instance, Android apps are primarily written in Java, and many large-scale web applications like LinkedIn and Netflix use Java for backend services."
+    }
+  ],
+  "codeExamples": [],
+  "resources": [
+    {
+      "title": "Core Features of Java - Detailed Explanation",
+      "url": "https://www.oracle.com/java/technologies/javase/overview.html",
+      "type": "documentation",
+      "description": "Explore the detailed core features of Java and how they contribute to its power and popularity."
+    }
+  ],
+  "quizQuestions": [
+    {
+      "question": "What is one of the key promises of Java?",
+      "options": [
+        "Write Once, Run Anywhere",
+        "Write Once, Compile Anywhere",
+        "Compile Once, Run Everywhere",
+        "Write Anywhere, Run Everywhere"
+      ],
+      "correctAnswer": 0,
+      "explanation": "The key promise of Java is 'Write Once, Run Anywhere,' meaning code can be written once and executed on any system with the JVM.",
+      "difficulty": "easy",
+      "timeLimit": 30
+    }
+  ]
+}

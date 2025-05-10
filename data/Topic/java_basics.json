@@ -1,0 +1,26 @@
+[
+  {
+    "id": "java-basics",
+    "title": "Java Basics",
+    "description": "Introduction to Java programming language",
+    "level": "Beginner",
+    "duration": "2 hours",
+    "category": "java-fundamentals",
+    "prerequisites": [],
+    "tags": ["java", "basics", "programming"],
+    "image": "/images/java-basics.jpg",
+    "updatedAt": "2024-03-20"
+  },
+  {
+    "id": "history-features-java",
+    "title": "History and Features of Java",
+    "description": "Learn about the history and key features of Java, including how it revolutionized programming and why it’s still in use today.",
+    "level": "Beginner",
+    "duration": "1 hour 30 minutes",
+    "category": "java-fundamentals",
+    "prerequisites": ["java-basics"],
+    "tags": ["java", "history", "features", "programming"],
+    "image": "/images/history-features-java.jpg",
+    "updatedAt": "2025-05-10"
+  }
+]
