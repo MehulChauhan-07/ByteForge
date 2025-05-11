@@ -49,6 +49,7 @@ export const routes = {
     { path: "/topics", element: <EnhancedTopicsPage /> },
     { path: "/topics/:topicId", element: <EnhancedTopicsPage /> },
     { path: "/topics/:topicId/:subtopicId", element: <EnhancedTopicsPage /> },
+    { path: "/topics/:topicId/subtopics/:subtopicId", element: <EnhancedTopicsPage /> },
 
     // testing routes
     { path: "/testing", element: <TestLoginPage /> },
