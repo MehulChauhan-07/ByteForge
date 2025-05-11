@@ -1,0 +1,40 @@
+  {
+    "subtopicId": "history",
+    "topicId": "java-basics",
+    "title": "History of Java",
+    "description": "Explore the origins of Java, from the early 90s to its development by Sun Microsystems and its promise of portability.",
+    "estimatedTime": "45 minutes",
+    "content": [
+      {
+        "type": "text",
+        "content": "Imagine You’re in 1990…\n\nYou’re a software developer in the early ’90s. Computers are starting to pop up everywhere. There’s Windows, Mac, IBM, Sun Microsystems machines — but the problem is: **Every machine speaks a different language!**\n\nDevelopers were stuck rewriting applications for each system. The solution? A programming language that could run anywhere. Enter Java."
+      },
+      {
+        "type": "text",
+        "content": "How We Were Stuck Before Java\n\nSuppose you built a simple weather app for your IBM desktop. It works great, but when you try to run it on a Mac — it crashes. Java solved this problem by allowing code to run on any machine with the Java Virtual Machine (JVM)."
+      },
+      {
+        "type": "text",
+        "content": "Enter Java: The Game-Changer\n\nIn 1991, Sun Microsystems, led by James Gosling, started the 'Green Project' to create software for set-top boxes. They soon realized that they needed a new kind of programming language that would be portable, reliable, and small enough for small devices. This led to the birth of Java in 1995, named after the coffee that the team drank while developing it."
+      }
+    ],
+    "codeExamples": [],
+    "resources": [
+      {
+        "title": "Java History and Evolution",
+        "url": "https://en.wikipedia.org/wiki/Java_(programming_language)",
+        "type": "documentation",
+        "description": "Learn more about the history of Java from its inception to its current status as one of the most widely used languages."
+      }
+    ],
+    "quizQuestions": [
+      {
+        "question": "What year was Java officially released?",
+        "options": ["1990", "1995", "1998", "2000"],
+        "correctAnswer": 1,
+        "explanation": "Java was officially released in 1995 by Sun Microsystems.",
+        "difficulty": "easy",
+        "timeLimit": 30
+      }
+    ]
+  }

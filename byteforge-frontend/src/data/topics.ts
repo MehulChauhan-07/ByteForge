@@ -12,13 +12,13 @@ import {
 // Categories definition
 export const categories: Category[] = [
   {
-    id: "java-fundamentals",
-    title: "Java Fundamentals",
-    description: "Learn the basics of Java programming language",
-    icon: "java",
-    topics: ["java-basics", "oop", "collections", "exceptions"],
-    order: 1,
-    color: "#007396",
+    "id": "java-fundamentals",
+    "title": "Java Fundamentals",
+    "description": "Learn the basics of Java programming language",
+    "icon": "java",
+    "topics": ["java-basics", "oop", "collections", "exceptions"],
+    "order": 1,
+    "color": "#007396",
   },
   {
     id: "advanced-java",

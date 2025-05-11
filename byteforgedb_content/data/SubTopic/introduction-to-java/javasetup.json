@@ -1,0 +1,50 @@
+{
+  "subtopicId": "installation-setup",
+  "topicId": "introduction-to-java",
+  "title": "Java Installation and Setup",
+  "description": "Understand how to set up your computer to write and run Java programs using the Java Development Kit (JDK).",
+  "estimatedTime": "40 minutes",
+  "content": [
+    {
+      "type": "text",
+      "content": "# Imagine You Want to Start Building Apps 🚀\n\nYou need the proper setup to run Java code, much like needing a video player to watch movies."
+    },
+    {
+      "type": "text",
+      "content": "## Why We Get Stuck Without Setup ⚠\n\nWithout a Java compiler and JVM, your computer *cannot understand Java code*."
+    },
+    {
+      "type": "text",
+      "content": "## Introducing: Java Development Kit (JDK) 🛠\n\nThe JDK includes *everything*: compiler, JVM, libraries, and tools needed to write and run Java applications."
+    },
+    {
+      "type": "text",
+      "content": "## Step-by-Step: Installing Java 📋\n\n1. *Download the JDK* - Visit Oracle's website or use OpenJDK 📥\n2. *Install it* - Follow the installation wizard 💻\n3. *Set the PATH environment variable* - So your system can find Java commands 🔍\n4. **Test using java -version** - Verify everything works ✅"
+    }
+  ],
+  "codeExamples": [],
+  "resources": [
+    {
+      "title": "JDK Installation Guide",
+      "url": "https://docs.oracle.com/en/java/javase/17/install/overview-jdk-installation.html",
+      "type": "documentation",
+      "description": "Official guide to install Java JDK",
+      "level": "beginner"
+    }
+  ],
+  "quizQuestions": [
+    {
+      "question": "What does the JDK include?",
+      "options": [
+        "Only a compiler",
+        "Only a JVM",
+        "Compiler and JVM",
+        "Only libraries"
+      ],
+      "correctAnswer": 2,
+      "explanation": "The JDK includes both a compiler and a JVM along with other tools needed for Java development.",
+      "difficulty": "easy",
+      "timeLimit": 30
+    }
+  ]
+}

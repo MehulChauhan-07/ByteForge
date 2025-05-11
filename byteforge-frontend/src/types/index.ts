@@ -1,16 +1,15 @@
 export interface Topic {
-  [x: string]: any;
   id: string;
   title: string;
   description: string;
   level: "Beginner" | "Intermediate" | "Advanced";
   duration: string;
   category: string;
-  prerequisites?: string[];
+  prerequisites: string[];
   tags: string[];
-  image: string;
+  image?: string;
   updatedAt: string;
-  subtopics: SubTopic[];
+  subtopics?: Subtopic[];
   progress?: {
     completed: boolean;
     lastAccessed: string;
@@ -38,16 +37,37 @@ export interface ContentBlock {
   difficulty?: "easy" | "medium" | "hard";
 }
 
-export interface SubTopic {
-  id: string;
+export interface Subtopic {
+  subtopicId: string;
+  topicId: string;
   title: string;
-  description?: string;
+  description: string;
   estimatedTime: string;
-  content: ContentBlock[];
-  codeExamples?: CodeExample[];
-  resources?: Resource[];
-  exercises?: Exercise[];
-  quizQuestions?: QuizQuestion[];
+  content: {
+    type: string;
+    content: string;
+  }[];
+  codeExamples: {
+    title: string;
+    code: string;
+    language: string;
+    description: string;
+  }[];
+  resources: {
+    title: string;
+    url: string;
+    type: string;
+    description: string;
+    level?: string;
+  }[];
+  quizQuestions: {
+    question: string;
+    options: string[];
+    correctAnswer: number;
+    explanation: string;
+    difficulty: string;
+    timeLimit: number;
+  }[];
 }
 
 export interface CodeExample {

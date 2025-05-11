@@ -22,7 +22,7 @@ import type { Topic } from "@/types";
 
 interface TopicCardProps {
   topic: Topic;
-  onClick: () => void;
+  onClick: (e?: React.MouseEvent<HTMLDivElement>) => void;
   progress: number;
 }
 
@@ -111,16 +111,16 @@ const EnhancedTopicCard = ({ topic, onClick, progress }: TopicCardProps) => {
               What you'll learn:
             </h4>
             <ul className="space-y-2">
-              {topic.subtopics.slice(0, 3).map((subtopic) => (
+              {topic.subtopics?.slice(0, 3).map((subtopic) => (
                 <li
-                  key={subtopic.id}
+                  key={subtopic.subtopicId}
                   className="text-sm flex items-center gap-2 transition-transform hover:translate-x-1"
                 >
                   <div className="h-2 w-2 rounded-full bg-primary"></div>
                   <span>{subtopic.title}</span>
                 </li>
               ))}
-              {topic.subtopics.length > 3 && (
+              {topic.subtopics && topic.subtopics.length > 3 && (
                 <li className="text-sm text-muted-foreground pl-4">
                   + {topic.subtopics.length - 3} more subtopics
                 </li>

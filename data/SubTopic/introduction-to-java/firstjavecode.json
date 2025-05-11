@@ -1,0 +1,52 @@
+{
+  "subtopicId": "first-java-program",
+  "topicId": "introduction-to-java",
+  "title": "Your First Java Program",
+  "description": "Write, compile, and run your first Java program — the classic 'Hello, World!' example.",
+  "estimatedTime": "45 minutes",
+  "content": [
+    {
+      "type": "text",
+      "content": "# Writing Your First Java Program 💻\n\nCreate a simple file HelloWorld.java with a basic class and a main method that prints 'Hello, World!'."
+    },
+    {
+      "type": "text",
+      "content": "## Understanding the Code 🧩\n\n- public class HelloWorld {} - *The class declaration* that must match your filename\n- public static void main(String[] args) {} - *The entry point* of your program\n- System.out.println(\"Hello, World!\"); - *The print statement* that outputs text to console"
+    },
+    {
+      "type": "text",
+      "content": "## Steps to Run the Program ▶\n\n1. **Save as HelloWorld.java** - Make sure filename matches class name exactly\n2. *Compile using javac* - Run javac HelloWorld.java in terminal\n3. *Run using java command* - Execute java HelloWorld (no .java extension)"
+    },
+    {
+      "type": "text",
+      "content": "## Common Beginner Mistakes ⚠\n\n- *Filename mismatch* - HelloWorld.java must contain a class named HelloWorld\n- *Missing braces* - Each opening { needs a closing }\n- *Case sensitivity* - Java is case-sensitive! String ≠ string\n- *Incorrect main method signature* - Must be public static void main(String[] args)"
+    }
+  ],
+  "codeExamples": [
+    {
+      "title": "Hello World Program",
+      "code": "public class HelloWorld {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, World!\");\n    }\n}",
+      "language": "java",
+      "description": "Your first Java program that prints 'Hello, World!' to the console."
+    }
+  ],
+  "resources": [
+    {
+      "title": "Java Hello World Tutorial",
+      "url": "https://www.w3schools.com/java/java_intro.asp",
+      "type": "tutorial",
+      "description": "Simple guide for beginners to write their first Java program.",
+      "level": "beginner"
+    }
+  ],
+  "quizQuestions": [
+    {
+      "question": "What must match the filename in a Java program?",
+      "options": ["Method name", "Variable name", "Class name", "Package name"],
+      "correctAnswer": 2,
+      "explanation": "In Java, the filename must exactly match the public class name declared in the file.",
+      "difficulty": "easy",
+      "timeLimit": 30
+    }
+  ]
+}

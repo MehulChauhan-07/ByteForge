@@ -1,0 +1,64 @@
+{
+  "subtopicId": "introduction",
+  "topicId": "java-basics",
+  "title": "Introduction to Java: Why It Matters",
+  "description": "Understand why Java exists, its core principles like 'Write Once, Run Anywhere', and overcome common beginner hurdles.",
+  "estimatedTime": "45 minutes",
+  "content": [
+    {
+      "type": "text",
+      "content": "Imagine You Want to Build Something\n\nYou’ve decided to build your first app — maybe a simple calculator..."
+    },
+    {
+      "type": "text",
+      "content": "Now comes the real question: which one?\n\nYou hear about Python, C++, Java… and Java stands out..."
+    },
+    {
+      "type": "text",
+      "content": "Trying Without Java\n\nSuppose you somehow build a basic calculator manually..."
+    },
+    {
+      "type": "text",
+      "content": "How Java Solves This Problem\n\nJava was built with one big goal: \"Write Once, Run Anywhere.\"..."
+    },
+    {
+      "type": "text",
+      "content": "But Isn't Java Hard?\n\nAt first glance, Java can look complicated..."
+    },
+    {
+      "type": "text",
+      "content": "Real-World Use Case:\n• Every Android app you use? Built on Java..."
+    },
+    {
+      "type": "text",
+      "content": "Common Beginner Struggles (and How to Beat Them):\n\n✅ Java looks \"wordy\" compared to languages like Python..."
+    }
+  ],
+  "codeExamples": [
+    {
+      "title": "Basic 'Hello, World!' Program",
+      "code": "public class HelloWorld {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, World!\");\n    }\n}",
+      "language": "java",
+      "description": "Illustrates the basic structure of a Java program needed even for simple output. Notice the class and main method definition."
+    }
+  ],
+  "resources": [
+    {
+      "title": "Java Documentation",
+      "url": "https://docs.oracle.com/javase/tutorial/",
+      "type": "documentation",
+      "description": "Official Java documentation",
+      "level": "beginner"
+    }
+  ],
+  "quizQuestions": [
+    {
+      "question": "Which company developed Java?",
+      "options": ["Microsoft", "Oracle", "Sun Microsystems", "IBM"],
+      "correctAnswer": 2,
+      "explanation": "Java was developed by Sun Microsystems, which was later acquired by Oracle.",
+      "difficulty": "easy",
+      "timeLimit": 30
+    }
+  ]
+}

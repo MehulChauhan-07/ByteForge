@@ -2,8 +2,10 @@ import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "./navbar/Navbar";
 // import Navbar from "@components/temp/Navbar";
 import Footer from "./Footer";
+
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect } from "react";
+import ModernFooter from "./Enhanced/ModernFooter";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -36,7 +38,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <main className="flex-1">
               <Outlet /> {children}
             </main>
-            <Footer />
+            <ModernFooter />
+            {/* <Footer /> */}
           </motion.div>
         </AnimatePresence>
       </div>
