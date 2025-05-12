@@ -15,21 +15,22 @@ import ProfilePage from "@/pages/ProfilePage";
 import ProfilePagev2 from "@/pages/EnhancedDash/ProfilePagev2";
 
 // Protected feature pages
-import NotesPage from "@/pages/features/NotesPage";
-import ChatbotPage from "@/pages/features/ChatbotPage";
-import CommunityPage from "@/pages/features/CommunityPage";
+import NotesPage_v0 from "@/pages/features/Tools/Notes/NotesPage_v0";
+import NotesPage from "@/pages/features/Tools/Notes/NotesPage";
+import ChatbotPage from "@/pages/features/Tools/ChatbotPage";
+import CommunityPage from "@/pages/features/Tools/CommunityPage";
 import TutorialsPage from "@/pages/features/TutorialsPage";
 import ExercisesPage from "@/pages/features/ExercisesPage";
 
-import CompilerPage from "@/pages/features/CompilePage";
-import CompilerPage_v1 from "@/pages/features/CompilerPage_v2";
-import CompilerPage_v2 from "@/pages/features/CompilerPage_v2";
+import CompilerPage from "@/pages/features/Tools/Compiler/CompilePage";
+import CompilerPage_v1 from "@/pages/features/Tools/Compiler/CompilerPage_v2";
+import CompilerPage_v2 from "@/pages/features/Tools/Compiler/CompilerPage_v2";
 
 // testing imports
 import Old_CompilerPage from "@/pages/features/old_folder/old_compilepage";
 import ComplexNavbar from "@/components/layout/old_files/old_navbar";
 // import EnhancedTopicsPage from "@/pages/topic/EnhancedTopicPage";
-import EnhancedTopicsPage from "@/pages/features/EnhancedTopicsPage";
+import EnhancedTopicsPage from "@/pages/features/Topic/EnhancedTopicsPage";
 import EnhancedHome from "@/pages/home/EnhancedHome";
 import ModernEnhancedHome from "@/pages/home/ModernEnhancedHome";
 import EnhancedAbout from "@/pages/about/EnhancedAbout";
@@ -49,7 +50,10 @@ export const routes = {
     { path: "/topics", element: <EnhancedTopicsPage /> },
     { path: "/topics/:topicId", element: <EnhancedTopicsPage /> },
     { path: "/topics/:topicId/:subtopicId", element: <EnhancedTopicsPage /> },
-    { path: "/topics/:topicId/subtopics/:subtopicId", element: <EnhancedTopicsPage /> },
+    {
+      path: "/topics/:topicId/subtopics/:subtopicId",
+      element: <EnhancedTopicsPage />,
+    },
 
     // testing routes
     { path: "/testing", element: <TestLoginPage /> },
@@ -65,7 +69,10 @@ export const routes = {
     { path: "/testing/dashboard", element: <DashboardPagev2 /> },
     { path: "/profile", element: <ProfilePage /> },
     { path: "/testing/profile", element: <ProfilePagev2 /> },
+    // notes
+    // { path: "/tools/notes", element: <NotesPage /> },
     { path: "/tools/notes", element: <NotesPage /> },
+    { path: "/tools/note", element: <NotesPage_v0 /> },
     { path: "/tools/compiler", element: <CompilerPage /> },
     { path: "/tools/compilerv1", element: <CompilerPage_v1 /> },
     { path: "/tools/compilerv2", element: <CompilerPage_v2 /> },

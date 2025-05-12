@@ -10,7 +10,7 @@ import { Plus, Trash2, Edit2, Save, X } from "lucide-react";
 import noteService, { Note } from "@/services/noteService";
 import { toast } from "sonner";
 
-const NotesPage = () => {
+export default function NotesPage_v0() {
   const { user } = useAuth();
   const [notes, setNotes] = useState<Note[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -255,6 +255,6 @@ const NotesPage = () => {
       )}
     </div>
   );
-};
+}
 
-export default NotesPage;
+// export default NotesPage;
