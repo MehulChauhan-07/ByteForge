@@ -5,7 +5,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Topic } from "@/types";
+import { Topic, Subtopic } from "@/types";
 
 interface QuickJumpNavProps {
   topic: Topic;
@@ -23,7 +23,9 @@ export const QuickJumpNav = ({
   const [isOpen, setIsOpen] = useState(false);
 
   // Find current subtopic index
-  const currentIndex = subtopics.findIndex((s) => s.id === activeSubtopicId);
+  const currentIndex = subtopics.findIndex(
+    (s) => s.subtopicId === activeSubtopicId
+  );
   const prevSubtopic = currentIndex > 0 ? subtopics[currentIndex - 1] : null;
   const nextSubtopic =
     currentIndex < subtopics.length - 1 ? subtopics[currentIndex + 1] : null;
@@ -42,14 +44,14 @@ export const QuickJumpNav = ({
           <div className="max-h-[60vh] overflow-y-auto py-1">
             {subtopics.map((subtopic, index) => (
               <button
-                key={subtopic.id}
+                key={subtopic.subtopicId}
                 className={`w-full text-left px-3 py-2 text-sm hover:bg-accent ${
-                  subtopic.id === activeSubtopicId
+                  subtopic.subtopicId === activeSubtopicId
                     ? "bg-primary/10 text-primary font-medium"
                     : ""
                 }`}
                 onClick={() => {
-                  onSubtopicClick(subtopic.id);
+                  onSubtopicClick(subtopic.subtopicId);
                   setIsOpen(false);
                 }}
               >
@@ -65,7 +67,7 @@ export const QuickJumpNav = ({
         {prevSubtopic && (
           <button
             className="flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-md hover:bg-accent"
-            onClick={() => onSubtopicClick(prevSubtopic.id)}
+            onClick={() => onSubtopicClick(prevSubtopic.subtopicId)}
           >
             <ChevronUp className="h-3.5 w-3.5" />
             <span>Previous</span>
@@ -75,7 +77,7 @@ export const QuickJumpNav = ({
         {nextSubtopic && (
           <button
             className="flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-md hover:bg-accent"
-            onClick={() => onSubtopicClick(nextSubtopic.id)}
+            onClick={() => onSubtopicClick(nextSubtopic.subtopicId)}
           >
             <span>Next</span>
             <ChevronDown className="h-3.5 w-3.5" />

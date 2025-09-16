@@ -182,7 +182,7 @@ interface UserProfileDropdownProps {
   isOpen: boolean;
   onClose: () => void;
   user: {
-    name: string;
+    username: string;
     email: string;
   };
 }

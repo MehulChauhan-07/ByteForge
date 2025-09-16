@@ -1,4 +1,6 @@
 export interface NavItem {
+  icon: ReactNode;
+  to: Key | null | undefined;
   title: string;
   href: string;
   description?: string;

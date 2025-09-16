@@ -21,9 +21,11 @@ export const EnhancedTabs = ({
   onTabChange,
   topic,
 }: EnhancedTabsProps) => {
-  const hasResources = topic.subtopics.some((s) => s.resources?.length);
-  const hasQuizzes = topic.subtopics.some((s) => s.quizQuestions?.length);
-  const hasExercises = topic.subtopics.some((s) => s.exercises?.length);
+  const hasResources = (topic.subtopics ?? []).some((s) => s.resources?.length);
+  const hasQuizzes = (topic.subtopics ?? []).some(
+    (s) => s.quizQuestions?.length
+  );
+  const hasExercises = (topic.subtopics ?? []).some((s) => s.exercises?.length);
 
   const tabs = [
     {

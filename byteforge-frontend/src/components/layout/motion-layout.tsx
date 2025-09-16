@@ -18,19 +18,19 @@ const animationVariants = {
     initial: { opacity: 0, x: -20 },
     animate: { opacity: 1, x: 0 },
     exit: { opacity: 0, x: 20 },
-    transition: { duration: 0.4, ease: "easeInOut" },
+    transition: { duration: 0.4, ease: [0.42, 0, 0.58, 1] as const },
   },
   scale: {
     initial: { opacity: 0, scale: 0.95 },
     animate: { opacity: 1, scale: 1 },
     exit: { opacity: 0, scale: 0.95 },
-    transition: { duration: 0.3, ease: "easeOut" },
+    transition: { duration: 0.3, ease: [0, 0, 0.2, 1] as const },
   },
   flip: {
     initial: { opacity: 0, rotateY: -10 },
     animate: { opacity: 1, rotateY: 0 },
     exit: { opacity: 0, rotateY: 10 },
-    transition: { duration: 0.4, ease: "easeInOut" },
+    transition: { duration: 0.4, ease: [0.42, 0, 0.58, 1] as const },
   },
   none: {
     initial: {},

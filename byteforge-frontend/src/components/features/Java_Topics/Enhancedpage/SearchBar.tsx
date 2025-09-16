@@ -58,13 +58,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
       const topicMatch = topic.title
         .toLowerCase()
         .includes(query.toLowerCase());
-      const subtopicMatches = topic.subtopics
+      const subtopicMatches = (topic.subtopics ?? [])
         .filter((subtopic) =>
           subtopic.title.toLowerCase().includes(query.toLowerCase())
         )
         .map((subtopic) => ({
           type: "subtopic" as const,
-          id: subtopic.id,
+          id: subtopic.subtopicId,
           title: subtopic.title,
           parentId: topic.id,
           parentTitle: topic.title,

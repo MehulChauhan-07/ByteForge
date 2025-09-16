@@ -85,7 +85,7 @@ export const EnhancedTopicCard = ({
         </div>
 
         <div className="mt-4 text-xs text-muted-foreground">
-          {topic.subtopics.length} subtopics
+          {topic.subtopics?.length ?? 0} subtopics
         </div>
       </div>
     </motion.div>

@@ -69,17 +69,17 @@ const UnifiedSearch: React.FC<UnifiedSearchProps> = ({
       const topicMatch = topic.title
         .toLowerCase()
         .includes(debouncedQuery.toLowerCase());
-      const subtopicMatches = topic.subtopics
+      const subtopicMatches = (topic.subtopics ?? [])
         .filter((subtopic) =>
           subtopic.title.toLowerCase().includes(debouncedQuery.toLowerCase())
         )
         .map((subtopic) => ({
           type: "subtopic" as const,
-          id: subtopic.id,
+          id: subtopic.subtopicId,
           title: subtopic.title,
           parentId: topic.id,
           parentTitle: topic.title,
-          url: `/topics/${topic.id}/${subtopic.id}`,
+          url: `/topics/${topic.id}/${subtopic.subtopicId}`,
         }));
 
       if (topicMatch) {

@@ -1,12 +1,27 @@
-import { Code, Link, MessageSquare, Save, Users } from "lucide-react";
+import {
+  Code,
+  MessageSquare,
+  Save,
+  Users,
+  Link as LinkIcon,
+} from "lucide-react";
+import { Link } from "react-router-dom";
 import { CollapsibleSection } from "./CollapsibleSection";
 import { useEffect, useState } from "react";
-import { toolItems } from "./navbar-Items";
+import { useLocation } from "react-router-dom";
+import { TOOL_ITEMS } from "./navbar-Items";
+
+interface CollapsibleSectionProps {
+  title: string;
+  icon: React.ReactElement;
+  children: React.ReactNode;
+}
 
 {
   /* Tools section */
 }
 export const Tools = () => {
+  const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
 
@@ -23,7 +38,7 @@ export const Tools = () => {
   return (
     <CollapsibleSection title="Tools" icon={<Code className="h-5 w-5" />}>
       <div className="flex flex-col gap-1">
-        {toolItems.map((item) => (
+        {TOOL_ITEMS.map((item) => (
           <Link
             key={item.to}
             to={item.to}

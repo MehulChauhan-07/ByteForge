@@ -61,7 +61,7 @@ const TopicQuiz: React.FC<TopicQuizProps> = ({
             ? score + 1
             : score;
         const percentage = Math.round((finalScore / questions.length) * 100);
-        updateQuizScore(topicId, percentage);
+        updateQuizScore?.(topicId, percentage);
       }
     }
   };

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/layout/ThemeProvider";
@@ -35,7 +35,7 @@ const ModernLearningPathPreview = () => {
   );
 
   // Animation variants
-  const containerVariants = {
+  const containerVariants:Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -45,7 +45,7 @@ const ModernLearningPathPreview = () => {
     },
   };
 
-  const itemVariants = {
+  const itemVariants:Variants= {
     hidden: { opacity: 0, x: -20 },
     visible: {
       opacity: 1,

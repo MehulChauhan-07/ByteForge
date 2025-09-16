@@ -31,8 +31,8 @@ const TopicSidebar: React.FC<TopicSidebarProps> = ({ className }) => {
 
   const renderTopic = (topic: Topic) => {
     const isExpanded = expandedTopics.has(topic.id);
-    const hasSubtopicActive = topic.subtopics.some((subtopic) =>
-      isActive(`/topics/${topic.id}/${subtopic.id}`)
+    const hasSubtopicActive = (topic.subtopics ?? []).some((subtopic) =>
+      isActive(`/topics/${topic.id}/${subtopic.subtopicId}`)
     );
 
     return (
@@ -54,13 +54,14 @@ const TopicSidebar: React.FC<TopicSidebarProps> = ({ className }) => {
         </button>
         {isExpanded && (
           <div className="ml-6 space-y-1">
-            {topic.subtopics.map((subtopic) => (
+            {(topic.subtopics ?? []).map((subtopic) => (
               <Link
-                key={subtopic.id}
-                to={`/topics/${topic.id}/${subtopic.id}`}
+                key={subtopic.subtopicId}
+                to={`/topics/${topic.id}/${subtopic.subtopicId}`}
                 className={cn(
                   "block p-2 rounded-md hover:bg-accent transition-colors",
-                  isActive(`/topics/${topic.id}/${subtopic.id}`) && "bg-accent"
+                  isActive(`/topics/${topic.id}/${subtopic.subtopicId}`) &&
+                    "bg-accent"
                 )}
               >
                 {subtopic.title}

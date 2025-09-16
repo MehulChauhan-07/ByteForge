@@ -8,11 +8,15 @@ interface TopicProgress {
 }
 
 interface ProgressContextType {
-  progress: Record<string, { subtopics: Record<string, boolean> }>;
+  progress: Record<
+    string,
+    { subtopics: Record<string, boolean>; quizScore?: number }
+  >;
   isTopicComplete: (topicId: string) => boolean;
   isSubTopicComplete: (topicId: string, subtopicId: string) => boolean;
   toggleSubTopicCompletion: (topicId: string, subtopicId: string) => void;
   getCompletionPercentage: (topicId: string) => number;
+  updateQuizScore?: (topicId: string, percentage: number) => void;
 }
 
 const ProgressContext = createContext<ProgressContextType | undefined>(
@@ -23,7 +27,7 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [progress, setProgress] = useState<
-    Record<string, { subtopics: Record<string, boolean> }>
+    Record<string, { subtopics: Record<string, boolean>; quizScore?: number }>
   >({});
 
   useEffect(() => {
@@ -35,14 +39,18 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({
       // Initialize with empty progress for all topics
       const initialProgress: Record<
         string,
-        { subtopics: Record<string, boolean> }
+        { subtopics: Record<string, boolean>; quizScore?: number }
       > = {};
       topics.forEach((topic) => {
         initialProgress[topic.id] = {
-          subtopics: topic.subtopics.reduce((acc, subtopic: SubTopic) => {
-            acc[subtopic.id] = false;
-            return acc;
-          }, {} as Record<string, boolean>),
+          subtopics: (topic.subtopics ?? []).reduce(
+            (acc, subtopic: SubTopic) => {
+              acc[subtopic.subtopicId] = false;
+              return acc;
+            },
+            {} as Record<string, boolean>
+          ),
+          quizScore: 0,
         };
       });
       setProgress(initialProgress);
@@ -84,6 +92,16 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   };
 
+  const updateQuizScore = (topicId: string, percentage: number) => {
+    setProgress((prev) => ({
+      ...prev,
+      [topicId]: {
+        subtopics: prev[topicId]?.subtopics ?? {},
+        quizScore: percentage,
+      },
+    }));
+  };
+
   const getCompletionPercentage = (topicId: string) => {
     const topicProgress = progress[topicId];
     if (!topicProgress) return 0;
@@ -103,6 +121,7 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({
         isSubTopicComplete,
         toggleSubTopicCompletion,
         getCompletionPercentage,
+        updateQuizScore,
       }}
     >
       {children}

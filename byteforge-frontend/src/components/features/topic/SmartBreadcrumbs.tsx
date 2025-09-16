@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ChevronRight, Home } from "lucide-react";
-import { Topic } from "@/types";
+import { Topic, Subtopic } from "@/types";
 
 interface BreadcrumbsProps {
   topic?: Topic;
@@ -27,7 +27,7 @@ export const SmartBreadcrumbs = ({ topic, subtopic }: BreadcrumbsProps) => {
       if (subtopic) {
         items.push({
           label: subtopic.title,
-          path: `/topics/${topic.id}/${subtopic.id}`,
+          path: `/topics/${topic.id}/${subtopic.subtopicId}`,
         });
       }
     }
