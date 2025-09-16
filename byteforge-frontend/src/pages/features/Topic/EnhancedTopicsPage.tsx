@@ -342,6 +342,13 @@ const EnhancedTopicsPage = () => {
       {/* Filter drawer for mobile */}
       <Sheet open={filterDrawerOpen} onOpenChange={setFilterDrawerOpen}>
         <SheetContent side="left" className="w-[300px] sm:w-[400px] p-0">
+          {/* Accessible title/description for Sheet (Radix Dialog under the hood) */}
+          <SheetHeader className="sr-only">
+            <SheetTitle>Filter Drawer</SheetTitle>
+            <SheetDescription>
+              Filters and tags for refining topics
+            </SheetDescription>
+          </SheetHeader>
           <SheetHeader className="p-4 border-b">
             <SheetTitle className="flex items-center gap-2">
               <Filter className="h-4 w-4" />
@@ -523,7 +530,7 @@ const EnhancedTopicsPage = () => {
 
       {/* Main content */}
       <div className="flex-1 overflow-auto">
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="sync">
           {!selectedTopic ? (
             // Topics List View
             <motion.div
