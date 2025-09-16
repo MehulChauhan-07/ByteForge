@@ -40,8 +40,8 @@ export const Tools = () => {
       <div className="flex flex-col gap-1">
         {TOOL_ITEMS.map((item) => (
           <Link
-            key={item.to}
-            to={item.to}
+            key={String(item.to)}
+            to={String(item.to)}
             className="flex items-center gap-2 p-2 rounded-md hover:bg-accent transition-colors"
             onClick={closeSidebar}
           >

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { topics } from "@/data/topics";
-import { Topic, SubTopic } from "../types";
+import { Topic, Subtopic } from "../types";
 
 interface TopicProgress {
   completed: boolean;
@@ -44,7 +44,7 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({
       topics.forEach((topic) => {
         initialProgress[topic.id] = {
           subtopics: (topic.subtopics ?? []).reduce(
-            (acc, subtopic: SubTopic) => {
+            (acc, subtopic: Subtopic) => {
               acc[subtopic.subtopicId] = false;
               return acc;
             },
