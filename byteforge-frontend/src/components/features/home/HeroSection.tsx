@@ -28,7 +28,7 @@ const Hero = () => {
 
   // get user name from user context
   const userName = user?.username || "Developer";
-  // Set up code examples with dynamic username
+  // Set up code examples with dynam  ic username
   const codeSteps = [
     {
       code: `System.out.println("Hello, ${userName} from ByteForge!");`,

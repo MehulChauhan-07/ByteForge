@@ -1031,7 +1031,7 @@ const EnhancedTopicsPage = () => {
                       </div>
 
                       {/* Additional Options */}
-                      <div className="space-y-3 pt-2 border-t border-slate-200 dark:border-slate-800">
+                      {/* <div className="space-y-3 pt-2 border-t border-slate-200 dark:border-slate-800">
                         <div className="flex items-center justify-between">
                           <Label
                             htmlFor="show-completed"
@@ -1052,7 +1052,7 @@ const EnhancedTopicsPage = () => {
                           </Label>
                           <Switch id="show-bookmarks" />
                         </div>
-                      </div>
+                      </div> */}
 
                       {/* Clear Filters Button */}
                       {(searchQuery || levelFilter || categoryFilter) && (

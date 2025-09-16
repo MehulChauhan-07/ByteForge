@@ -145,7 +145,7 @@ const EnhancedTopicsPage = () => {
     .sort((a, b) => {
       switch (sortOrder) {
         case "newest":
-          return (
+          return (  
             new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
           );
         case "popular":

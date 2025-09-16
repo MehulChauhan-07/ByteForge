@@ -2,7 +2,7 @@
 import LoginPage from "@/pages/auth/LoginPage";
 import SignupPage from "@/pages/auth/SignupPage";
 import TestLoginPage from "@/pages/auth/TestLoginPage";
-import HomePage from "@/pages/home/Home";
+import HomePage from "@/pages/home/v0/Home";
 // import DashboardPage from "@/pages/dashboard/DashboardPage";
 import TopicsPage from "@/pages/topic/TopicsPage";
 import NotFoundPage from "@/pages/NotFoundPage";
@@ -31,18 +31,22 @@ import Old_CompilerPage from "@/pages/features/old_folder/old_compilepage";
 import ComplexNavbar from "@/components/layout/old_files/old_navbar";
 // import EnhancedTopicsPage from "@/pages/topic/EnhancedTopicPage";
 import EnhancedTopicsPage from "@/pages/features/Topic/EnhancedTopicsPage";
-import EnhancedHome from "@/pages/home/EnhancedHome";
-import ModernEnhancedHome from "@/pages/home/ModernEnhancedHome";
+import EnhancedHome from "@/pages/home/v1/EnhancedHome";
+import ModernEnhancedHome from "@/pages/home/v1/ModernEnhancedHome";
 import EnhancedAbout from "@/pages/about/EnhancedAbout";
 import UrlManager from "@/pages/UrlManager";
+import EnhancedNotePage from "@/pages/features/Tools/Notes/EnhancedNotepage";
+import EnhancedHomev2 from "@/pages/home/v2/EnhancedHomev2";
 
 // import Layout from "@/components/layout/Layout";
 
 // Route configurations
 export const routes = {
   public: [
-    { path: "/", element: <HomePage /> },
-    { path: "/about", element: <AboutPage /> },
+    { path: "/old", element: <HomePage /> },
+    { path: "/", element: <EnhancedHomev2 /> },
+    // { path: "/about", element: <AboutPage /> },
+    { path: "/about", element: <EnhancedAbout /> },
     { path: "/url", element: <UrlManager /> },
     { path: "/login", element: <LoginPage /> },
     { path: "/signup", element: <SignupPage /> },
@@ -71,8 +75,9 @@ export const routes = {
     { path: "/testing/profile", element: <ProfilePagev2 /> },
     // notes
     // { path: "/tools/notes", element: <NotesPage /> },
-    { path: "/tools/notes", element: <NotesPage /> },
-    { path: "/tools/note", element: <NotesPage_v0 /> },
+    { path: "/tools/notesv1", element: <NotesPage /> },
+    { path: "/tools/notesv0", element: <NotesPage_v0 /> },
+    { path: "/tools/notes", element: <EnhancedNotePage /> },
     { path: "/tools/compiler", element: <CompilerPage /> },
     { path: "/tools/compilerv1", element: <CompilerPage_v1 /> },
     { path: "/tools/compilerv2", element: <CompilerPage_v2 /> },

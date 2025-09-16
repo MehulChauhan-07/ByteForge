@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import Hero from "@/components/features/home/HeroSection";
 import FeatureSection from "@/components/features/home/FeatureSection";
 import JavaTopics from "@/components/features/home/JavaTopics";
-import CallToAction from "@/components/landing/CallToAction";
+import CallToAction from "@/components/landing/default/CallToAction";
 import EnhancedJavaTopic from "@/components/features/home/EnhancedJavaTopic";
 import ModernCallToAction from "@/components/landing/modern-enhanced/ModernCallToAction";
 

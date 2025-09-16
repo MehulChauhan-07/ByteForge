@@ -236,7 +236,7 @@ const TopicDetails: React.FC<TopicDetailsProps> = ({ topic, onBack }) => {
                       <TooltipContent>Share</TooltipContent>
                     </Tooltip>
 
-                    <Tooltip>
+                    {/* <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
                           variant="secondary"
@@ -247,7 +247,7 @@ const TopicDetails: React.FC<TopicDetailsProps> = ({ topic, onBack }) => {
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>Discuss</TooltipContent>
-                    </Tooltip>
+                    </Tooltip> */}
                   </TooltipProvider>
                 </div>
 
@@ -641,7 +641,7 @@ const TopicDetails: React.FC<TopicDetailsProps> = ({ topic, onBack }) => {
                         </CardContent>
 
                         <CardFooter className="bg-slate-50 dark:bg-slate-900/50 px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
-                          <div className="flex items-center gap-4">
+                          {/* <div className="flex items-center gap-4">
                             <Avatar className="h-10 w-10">
                               <AvatarImage src="/images/instructor.jpg" />
                               <AvatarFallback>JD</AvatarFallback>
@@ -654,7 +654,7 @@ const TopicDetails: React.FC<TopicDetailsProps> = ({ topic, onBack }) => {
                                 Senior Java Developer
                               </div>
                             </div>
-                          </div>
+                          </div> */}
 
                           <div className="flex flex-wrap items-center gap-2 self-end md:self-center">
                             <Button

@@ -16,7 +16,7 @@ const HomePage = () => {
       {/* <ModernTestimonialSection /> */}
       <ModernCallToAction />
       {/* <Footer /> */}
-      </Fragment>
+    </Fragment>
   );
 };
 

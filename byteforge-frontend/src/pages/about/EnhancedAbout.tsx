@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Link } from "react-router-dom";
 
 const containerAnimation = {
   hidden: { opacity: 0 },
@@ -62,18 +63,18 @@ const AboutPage = () => {
       description:
         "Follow a structured curriculum that takes you from beginner to advanced Java concepts with practical examples",
     },
-    {
-      icon: <Users className="h-6 w-6 text-primary" />,
-      title: "Community Support",
-      description:
-        "Connect with other learners, ask questions, and share your progress with our supportive community",
-    },
-    {
-      icon: <MessageSquare className="h-6 w-6 text-primary" />,
-      title: "Discussion Forums",
-      description:
-        "Participate in topic-specific discussions to deepen your understanding and solve coding challenges",
-    },
+    // {
+    //   icon: <Users className="h-6 w-6 text-primary" />,
+    //   title: "Community Support",
+    //   description:
+    //     "Connect with other learners, ask questions, and share your progress with our supportive community",
+    // },
+    // {
+    //   icon: <MessageSquare className="h-6 w-6 text-primary" />,
+    //   title: "Discussion Forums",
+    //   description:
+    //     "Participate in topic-specific discussions to deepen your understanding and solve coding challenges",
+    // },
     {
       icon: <Lightbulb className="h-6 w-6 text-primary" />,
       title: "Project-Based Learning",
@@ -84,32 +85,25 @@ const AboutPage = () => {
 
   const team = [
     {
-      name: "Mehul Chauhan",
+      name: "Rana khunti",
       role: "Founder & Lead Developer",
+      image: "/images/team/rana.jpg",
+      initial: "RK",
+      github: "ranakhunti",
+    },
+    {
+      name: "Mehulsinh Chauhan",
+      role: "UI/UX Designer & Developer",
       image: "/images/team/mehul.jpg",
       initial: "MC",
       github: "MehulChauhan-07",
     },
     {
-      name: "Jane Smith",
-      role: "Curriculum Designer",
-      image: "/images/team/jane.jpg",
-      initial: "JS",
-      github: "janesmith",
-    },
-    {
-      name: "Alex Johnson",
-      role: "Java Expert",
-      image: "/images/team/alex.jpg",
-      initial: "AJ",
-      github: "alexj",
-    },
-    {
-      name: "Priya Patel",
-      role: "UI/UX Designer",
-      image: "/images/team/priya.jpg",
-      initial: "PP",
-      github: "priyap",
+      name: "Akash Panchal",
+      role: "Educational Content Designer",
+      image: "/images/team/akash.jpg",
+      initial: "AP",
+      github: "akashpanchal",
     },
   ];
 
@@ -188,7 +182,7 @@ const AboutPage = () => {
           </div>
 
           {/* Statistics */}
-          <motion.div
+          {/* <motion.div
             className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16 max-w-4xl mx-auto"
             variants={containerAnimation}
             initial="hidden"
@@ -208,7 +202,7 @@ const AboutPage = () => {
                 </div>
               </motion.div>
             ))}
-          </motion.div>
+          </motion.div> */}
         </div>
       </motion.div>
 
@@ -379,133 +373,6 @@ const AboutPage = () => {
         </div>
       </motion.section>
 
-      {/* Testimonials */}
-      <motion.section
-        className="bg-gradient-to-br from-slate-100 to-white dark:from-slate-900 dark:to-slate-900/50 py-16"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1, transition: { duration: 0.8 } }}
-      >
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto mb-12 text-center">
-            <Badge
-              variant="outline"
-              className="mb-4 px-3 py-1 text-sm rounded-full bg-primary/10 text-primary border-primary/20"
-            >
-              Testimonials
-            </Badge>
-            <h2 className="text-3xl font-bold mb-4">What Our Students Say</h2>
-            <p className="text-lg text-slate-600 dark:text-slate-400">
-              Hear from learners who have transformed their Java programming
-              skills with ByteForge.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm"
-            >
-              <div className="flex gap-1 mb-4">
-                {Array(5)
-                  .fill(0)
-                  .map((_, i) => (
-                    <Star
-                      key={i}
-                      className="h-5 w-5 fill-yellow-400 text-yellow-400"
-                    />
-                  ))}
-              </div>
-              <p className="italic mb-6 text-slate-700 dark:text-slate-300">
-                "ByteForge transformed how I approach Java programming. The
-                interactive lessons and real-time compiler made learning
-                enjoyable and practical."
-              </p>
-              <div className="flex items-center gap-3">
-                <Avatar className="h-10 w-10">
-                  <AvatarFallback>RM</AvatarFallback>
-                </Avatar>
-                <div>
-                  <div className="font-medium">Rachel Martinez</div>
-                  <div className="text-sm text-muted-foreground">
-                    Web Developer
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm"
-            >
-              <div className="flex gap-1 mb-4">
-                {Array(5)
-                  .fill(0)
-                  .map((_, i) => (
-                    <Star
-                      key={i}
-                      className="h-5 w-5 fill-yellow-400 text-yellow-400"
-                    />
-                  ))}
-              </div>
-              <p className="italic mb-6 text-slate-700 dark:text-slate-300">
-                "As someone with no coding background, ByteForge made Java
-                accessible and understandable. The step-by-step approach and
-                practice exercises were invaluable."
-              </p>
-              <div className="flex items-center gap-3">
-                <Avatar className="h-10 w-10">
-                  <AvatarFallback>KL</AvatarFallback>
-                </Avatar>
-                <div>
-                  <div className="font-medium">Kevin Lee</div>
-                  <div className="text-sm text-muted-foreground">
-                    Data Analyst
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm"
-            >
-              <div className="flex gap-1 mb-4">
-                {Array(5)
-                  .fill(0)
-                  .map((_, i) => (
-                    <Star
-                      key={i}
-                      className="h-5 w-5 fill-yellow-400 text-yellow-400"
-                    />
-                  ))}
-              </div>
-              <p className="italic mb-6 text-slate-700 dark:text-slate-300">
-                "The community support at ByteForge is phenomenal. Whenever I
-                got stuck, someone was always there to help. The curriculum is
-                comprehensive yet approachable."
-              </p>
-              <div className="flex items-center gap-3">
-                <Avatar className="h-10 w-10">
-                  <AvatarFallback>SD</AvatarFallback>
-                </Avatar>
-                <div>
-                  <div className="font-medium">Sophia Davis</div>
-                  <div className="text-sm text-muted-foreground">
-                    CS Student
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </motion.section>
-
       {/* CTA Section */}
       <motion.section
         className="container mx-auto px-4 py-16"
@@ -525,10 +392,12 @@ const AboutPage = () => {
             </p>
 
             <div className="flex flex-wrap justify-center gap-4">
-              <Button size="lg" className="rounded-full gap-2">
-                <Rocket className="h-5 w-5" />
-                Start Learning Now
-              </Button>
+              <Link to="/topics">
+                <Button size="lg" className="rounded-full gap-2">
+                  <Rocket className="h-5 w-5" />
+                  Start Learning Now
+                </Button>
+              </Link>
 
               <Button
                 size="lg"
@@ -544,7 +413,7 @@ const AboutPage = () => {
       </motion.section>
 
       {/* Footer */}
-      <footer className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-12">
+      {/* <footer className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-12">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-2">
@@ -587,7 +456,7 @@ const AboutPage = () => {
             </p>
           </div>
         </div>
-      </footer>
+      </footer> */}
     </div>
   );
 };

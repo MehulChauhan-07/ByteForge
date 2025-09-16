@@ -1,7 +1,7 @@
 import {
   Topic,
   Category,
-  SubTopic,
+  Subtopic,
   ContentBlock,
   CodeExample,
   Resource,
@@ -654,4 +654,5 @@ export const topics: Topic[] = [
       },
     ],
   },
+  
 ];

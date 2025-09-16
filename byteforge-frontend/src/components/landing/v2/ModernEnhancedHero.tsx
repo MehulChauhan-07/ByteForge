@@ -17,6 +17,8 @@ import {
   Coffee,
   Search,
   ChevronRight,
+  Terminal,
+  Cpu,
 } from "lucide-react";
 
 // Animation variants
@@ -269,7 +271,7 @@ const ModernHeroSection = () => {
                           ) ||
                           topic.topics?.some((t) =>
                             t.toLowerCase().includes(searchQuery.toLowerCase())
-                          ) 
+                          )
                       )
                       .slice(0, 5)
                       .map((topic) => (
@@ -408,9 +410,12 @@ const ModernHeroSection = () => {
                 className={`text-lg md:text-xl leading-relaxed max-w-xl
                 ${theme === "dark" ? "text-slate-300" : "text-slate-600"}`}
               >
-                Interactive tutorials, hands-on coding exercises, and a
+                {/* Interactive tutorials, hands-on coding exercises, and a
                 structured curriculum to take you from beginner to advanced Java
-                developer.
+                developer. */}
+                An intuitive learning platform designed to help you become a
+                Java expert through interactive lessons, real-time coding, and
+                AI-powered assistance.
               </p>
             </motion.div>
 
@@ -439,9 +444,9 @@ const ModernHeroSection = () => {
                     ? "border-slate-500 text-slate-300 hover:bg-slate-700 hover:text-white"
                     : "border-slate-300 text-slate-700 hover:bg-slate-100 hover:text-slate-900"
                 }`}
-                onClick={() => navigate("/roadmap")}
+                onClick={() => navigate("/topics/java-basics")}
               >
-                View Roadmap
+                View Topics
               </Button>
             </motion.div>
 
@@ -475,7 +480,35 @@ const ModernHeroSection = () => {
                 </div>
               </div>
 
+              {/* Code compiler */}
               <div className="flex items-center gap-2">
+                <div
+                  className={`p-2 rounded-full
+                  ${theme === "dark" ? "bg-blue-500/20" : "bg-blue-100"}`}
+                >
+                  <Terminal
+                    className={`h-5 w-5
+                    ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}
+                  />
+                </div>
+                <div>
+                  <div
+                    className={`text-xl font-bold
+                    ${theme === "dark" ? "text-white" : "text-slate-900"}`}
+                  >
+                    Live Compiler
+                  </div>
+                  <div
+                    className={`text-sm
+                    ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}
+                  >
+                    Write & Run Code
+                  </div>
+                </div>
+              </div>
+
+              {/* count code example */}
+              {/* <div className="flex items-center gap-2">
                 <div
                   className={`p-2 rounded-full
                   ${theme === "dark" ? "bg-blue-500/20" : "bg-blue-100"}`}
@@ -499,8 +532,36 @@ const ModernHeroSection = () => {
                     Code Examples
                   </div>
                 </div>
+              </div> */}
+
+              {/* AI assistant */}
+              <div className="flex items-center gap-2">
+                <div
+                  className={`p-2 rounded-full
+                  ${theme === "dark" ? "bg-blue-500/20" : "bg-blue-100"}`}
+                >
+                  <Cpu
+                    className={`h-5 w-5
+                    ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}
+                  />
+                </div>
+                <div>
+                  <div
+                    className={`text-xl font-bold
+                    ${theme === "dark" ? "text-white" : "text-slate-900"}`}
+                  >
+                    AI Assistant
+                  </div>
+                  <div
+                    className={`text-sm
+                    ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`}
+                  >
+                    24/7 Support
+                  </div>
+                </div>
               </div>
 
+              {/* Active users */}
               <div className="flex items-center gap-2">
                 <div
                   className={`p-2 rounded-full
@@ -536,32 +597,6 @@ const ModernHeroSection = () => {
             </motion.div>
 
             {/* Add your ModeToggle component here if you want it in the hero section */}
-            <motion.div variants={itemVariants} className="mt-2">
-              <p
-                className={`text-sm ${
-                  theme === "dark" ? "text-slate-400" : "text-slate-500"
-                }`}
-              >
-                Prefer a different look?
-              </p>
-              <div className="mt-2">
-                {/* You can import and use your ModeToggle component here */}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className={`${
-                    theme === "dark"
-                      ? "border-slate-700 bg-slate-800 text-slate-200"
-                      : "border-slate-200 bg-white text-slate-700"
-                  }`}
-                  onClick={toggleTheme}
-                >
-                  {theme === "dark"
-                    ? "Switch to Light Mode"
-                    : "Switch to Dark Mode"}
-                </Button>
-              </div>
-            </motion.div>
           </motion.div>
 
           {/* Right Column - Learning Path Visualization */}

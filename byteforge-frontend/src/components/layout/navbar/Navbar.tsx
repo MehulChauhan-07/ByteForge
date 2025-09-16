@@ -29,6 +29,7 @@ import {
   GraduationCap,
   Hash,
   ArrowLeft,
+  ChevronRight,
 } from "lucide-react";
 import { ModeToggle } from "@/components/shared/ModeToggle";
 import {
@@ -58,6 +59,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Settings, LogOut, History, HelpCircle } from "lucide-react";
 import { useTheme } from "../ThemeProvider";
+import { topics, categories } from "@/data/topics";
+import { useProgress } from "@/context/ProgressContext";
 
 // Constants
 const QUICK_LINKS = [
@@ -451,7 +454,7 @@ const getInitials = (name: string): string => {
 const UserProfileDropdown = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-
+  const [showSearch, setShowSearch] = useState(false);
   if (!user) return null;
 
   return (
@@ -564,7 +567,10 @@ const SkipToContentLink = () => (
 
 const Navbar: React.FC = () => {
   const { user, logout, isAuthenticated, isLoading } = useAuth();
+  const { getCompletionPercentage } = useProgress();
 
+  // new popup search
+  const [showSearch, setShowSearch] = useState(false);
   // Search state variables - separate for different UI contexts
   const [searchQuery, setSearchQuery] = useState("");
   const [desktopSearchOpen, setDesktopSearchOpen] = useState(false);
@@ -637,7 +643,37 @@ const Navbar: React.FC = () => {
       setSearchQuery("");
     }
   };
+  const recommendedTopics = [...topics]
+    .sort((a, b) => {
+      const progressA = getCompletionPercentage(a.id);
+      const progressB = getCompletionPercentage(b.id);
 
+      // Sort by in-progress topics first (those with some progress but not complete)
+      if (
+        progressA > 0 &&
+        progressA < 100 &&
+        (progressB === 0 || progressB === 100)
+      ) {
+        return -1;
+      }
+      if (
+        progressB > 0 &&
+        progressB < 100 &&
+        (progressA === 0 || progressA === 100)
+      ) {
+        return 1;
+      }
+      // Then by not started topics
+      if (progressA === 0 && progressB > 0) {
+        return -1;
+      }
+      if (progressB === 0 && progressA > 0) {
+        return 1;
+      }
+      // Default to newer topics
+      return b.id.localeCompare(a.id);
+    })
+    .slice(0, 3);
   // old search section
   // Load recent searches from localStorage
   useEffect(() => {
@@ -1332,7 +1368,8 @@ const Navbar: React.FC = () => {
                 <Search className="h-5 w-5" />
               </Button> */}
               <button
-                onClick={() => setShowSearchOverlay(true)}
+                // onClick={() => setShowSearchOverlay(true)}
+                onClick={() => setShowSearch(!showSearch)}
                 className={`p-2 rounded-md ${
                   theme === "dark"
                     ? "hover:bg-slate-800 text-slate-300"
@@ -1429,188 +1466,188 @@ const Navbar: React.FC = () => {
               <AnimatePresence>
                 {mobileSearchOpen && (
                   <motion.div
-                    className="fixed inset-0 bg-background/95 backdrop-blur-sm z-50 p-4 flex flex-col"
+                    className="fixed inset-0 z-[999] bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm flex items-center justify-center p-4"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                   >
-                    <div className="flex items-center gap-2 pb-4 border-b">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setMobileSearchOpen(false)}
-                        aria-label="Close search"
-                      >
-                        <ArrowLeft className="h-5 w-5" />
-                      </Button>
-                      <h2 className="text-lg font-medium">Search</h2>
-                    </div>
-
-                    <div className="relative my-4">
-                      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input
-                        type="search"
-                        placeholder="Search topics, courses, articles..."
-                        className="pl-9 pr-8"
-                        value={searchQuery}
-                        onChange={handleSearchQueryChange}
-                        onKeyDown={handleSearchKeyDown}
-                        autoFocus
-                      />
-                      {searchQuery && (
+                    <div className="w-full max-w-2xl">
+                      <div className="relative">
+                        <input
+                          type="text"
+                          placeholder="Search topics, lessons or concepts..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className={`w-full p-4 pl-12 rounded-xl text-lg
+                                  ${
+                                    theme === "dark"
+                                      ? "bg-slate-800 text-white border-slate-700 focus:border-blue-500"
+                                      : "bg-white text-slate-900 border-slate-200 focus:border-blue-500"
+                                  } 
+                                  border-2 outline-none transition-colors`}
+                          autoFocus
+                        />
+                        <Search
+                          className={`absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5
+                                ${
+                                  theme === "dark"
+                                    ? "text-slate-400"
+                                    : "text-slate-500"
+                                }`}
+                        />
                         <button
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                          onClick={() => setSearchQuery("")}
-                          aria-label="Clear search"
+                          className={`absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-full
+                                  ${
+                                    theme === "dark"
+                                      ? "text-slate-400 hover:bg-slate-700"
+                                      : "text-slate-500 hover:bg-slate-100"
+                                  }`}
+                          onClick={() => setShowSearch(false)}
                         >
-                          <X className="h-4 w-4" />
+                          ✕
                         </button>
-                      )}
-                    </div>
+                      </div>
 
-                    <div className="flex-1 overflow-y-auto">
-                      {!searchQuery.trim() && (
-                        <>
-                          {/* Recent searches */}
-                          {recentSearches.length > 0 && (
-                            <div className="mb-4">
-                              <h3 className="text-sm font-medium mb-2">
-                                Recent Searches
-                              </h3>
-                              <div className="space-y-2">
-                                {recentSearches.map((search, index) => (
-                                  <motion.div
-                                    key={`recent-${index}`}
-                                    className="p-3 bg-accent/30 rounded-md cursor-pointer flex items-center gap-2"
-                                    whileHover={{ x: 5 }}
-                                    onClick={() => {
-                                      setSearchQuery(search);
-                                    }}
-                                  >
-                                    <History className="h-4 w-4 text-muted-foreground" />
-                                    <span>{search}</span>
-                                  </motion.div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Popular categories */}
-                          <div>
-                            <h3 className="text-sm font-medium mb-2">
-                              Popular Categories
-                            </h3>
-                            <div className="grid grid-cols-2 gap-2">
-                              {[
-                                "Java Basics",
-                                "OOP",
-                                "Collections",
-                                "Multithreading",
-                                "IO",
-                                "Exceptions",
-                              ].map((category) => (
-                                <motion.div
-                                  key={category}
-                                  className="p-3 bg-accent/30 rounded-md cursor-pointer flex flex-col items-center justify-center"
-                                  whileHover={{ scale: 1.02 }}
-                                  whileTap={{ scale: 0.98 }}
+                      {searchQuery && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className={`mt-4 rounded-xl overflow-hidden
+                                  ${
+                                    theme === "dark"
+                                      ? "bg-slate-800 border border-slate-700"
+                                      : "bg-white shadow-lg"
+                                  }`}
+                        >
+                          <div
+                            className={`p-3
+                                  ${
+                                    theme === "dark"
+                                      ? "border-b border-slate-700"
+                                      : "border-b border-slate-100"
+                                  }`}
+                          >
+                            <p
+                              className={`text-sm
+                                    ${
+                                      theme === "dark"
+                                        ? "text-slate-400"
+                                        : "text-slate-500"
+                                    }`}
+                            >
+                              Search results for "{searchQuery}"
+                            </p>
+                          </div>
+                          <div className="p-1">
+                            {topics
+                              .filter(
+                                (topic) =>
+                                  topic.title
+                                    .toLowerCase()
+                                    .includes(searchQuery.toLowerCase()) ||
+                                  topic.description
+                                    .toLowerCase()
+                                    .includes(searchQuery.toLowerCase()) ||
+                                  topic.tags?.some((tag) =>
+                                    tag
+                                      .toLowerCase()
+                                      .includes(searchQuery.toLowerCase())
+                                  ) ||
+                                  topic.topics?.some((t) =>
+                                    t
+                                      .toLowerCase()
+                                      .includes(searchQuery.toLowerCase())
+                                  )
+                              )
+                              .slice(0, 5)
+                              .map((topic) => (
+                                <button
+                                  key={topic.id}
+                                  className={`flex items-center w-full text-left p-3 rounded-lg
+                                          ${
+                                            theme === "dark"
+                                              ? "hover:bg-slate-700"
+                                              : "hover:bg-slate-50"
+                                          }`}
                                   onClick={() => {
-                                    setSearchQuery(category);
+                                    navigate(`/topics/${topic.id}`);
+                                    setShowSearch(false);
                                   }}
                                 >
-                                  <span className="text-sm font-medium">
-                                    {category}
-                                  </span>
-                                </motion.div>
-                              ))}
-                            </div>
-                          </div>
-                        </>
-                      )}
-
-                      {/* Search results */}
-                      {(searchQuery.trim() || isLoadingSuggestions) && (
-                        <div className="mt-2">
-                          {isLoadingSuggestions ? (
-                            <div className="py-8 flex flex-col items-center justify-center">
-                              <motion.div
-                                animate={{ rotate: 360 }}
-                                transition={{
-                                  duration: 1,
-                                  repeat: Infinity,
-                                  ease: "linear",
-                                }}
-                              >
-                                <Loader2 className="h-8 w-8 text-primary" />
-                              </motion.div>
-                              <span className="mt-4 text-muted-foreground">
-                                Searching...
-                              </span>
-                            </div>
-                          ) : searchSuggestions.length > 0 ? (
-                            <div className="space-y-4">
-                              {/* Group by type */}
-                              {(["topic", "course", "article"] as const).map(
-                                (type) => {
-                                  const items = searchSuggestions.filter(
-                                    (s) => s.type === type
-                                  );
-                                  if (!items.length) return null;
-
-                                  return (
-                                    <div key={type}>
-                                      <h3 className="text-sm font-medium mb-2 flex items-center gap-2">
-                                        {getSuggestionIcon(type)}
-                                        {type.charAt(0).toUpperCase() +
-                                          type.slice(1)}
-                                        s
-                                      </h3>
-                                      <div className="space-y-2">
-                                        {items.map((suggestion, index) => (
-                                          <motion.div
-                                            key={suggestion.id}
-                                            className={`p-3 bg-accent/30 rounded-md cursor-pointer ${
-                                              selectedSuggestionIndex ===
-                                              searchSuggestions.indexOf(
-                                                suggestion
-                                              )
-                                                ? "bg-accent"
-                                                : ""
+                                  <div
+                                    className={`p-2 rounded-full mr-3
+                                          ${
+                                            theme === "dark"
+                                              ? "bg-slate-700"
+                                              : "bg-slate-100"
+                                          }`}
+                                  >
+                                    <BookOpen
+                                      className={`h-4 w-4
+                                            ${
+                                              theme === "dark"
+                                                ? "text-blue-400"
+                                                : "text-blue-500"
                                             }`}
-                                            whileHover={{ x: 5 }}
-                                            whileTap={{ scale: 0.98 }}
-                                            onClick={() =>
-                                              handleSuggestionClick(suggestion)
-                                            }
-                                          >
-                                            <div className="font-medium">
-                                              {suggestion.title}
-                                            </div>
-                                          </motion.div>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  );
-                                }
-                              )}
-                            </div>
-                          ) : (
-                            <div className="py-8 text-center">
-                              <p className="text-muted-foreground">
-                                No results found for "{searchQuery}"
-                              </p>
-                              <p className="text-sm text-muted-foreground mt-2">
-                                Try a different search term or browse topics
-                              </p>
-                              <Button
-                                className="mt-4"
-                                onClick={handleViewAllResults}
-                              >
-                                Browse Topics
-                              </Button>
-                            </div>
-                          )}
-                        </div>
+                                    />
+                                  </div>
+                                  <div className="flex-grow">
+                                    <h3
+                                      className={`font-medium
+                                            ${
+                                              theme === "dark"
+                                                ? "text-white"
+                                                : "text-slate-900"
+                                            }`}
+                                    >
+                                      {topic.title}
+                                    </h3>
+                                    <p
+                                      className={`text-sm truncate
+                                            ${
+                                              theme === "dark"
+                                                ? "text-slate-400"
+                                                : "text-slate-500"
+                                            }`}
+                                    >
+                                      {topic.description}
+                                    </p>
+                                  </div>
+                                  <ChevronRight
+                                    className={`h-4 w-4
+                                          ${
+                                            theme === "dark"
+                                              ? "text-slate-500"
+                                              : "text-slate-400"
+                                          }`}
+                                  />
+                                </button>
+                              ))}
+                          </div>
+                          <div
+                            className={`p-3 text-center
+                                  ${
+                                    theme === "dark"
+                                      ? "border-t border-slate-700"
+                                      : "border-t border-slate-100"
+                                  }`}
+                          >
+                            <button
+                              className={`text-sm font-medium
+                                      ${
+                                        theme === "dark"
+                                          ? "text-blue-400 hover:text-blue-300"
+                                          : "text-blue-600 hover:text-blue-700"
+                                      }`}
+                              onClick={() => {
+                                navigate(`/topics?q=${searchQuery}`);
+                                setShowSearch(false);
+                              }}
+                            >
+                              See all results
+                            </button>
+                          </div>
+                        </motion.div>
                       )}
                     </div>
                   </motion.div>
@@ -1671,7 +1708,7 @@ const Navbar: React.FC = () => {
                 </div> */}
 
                 <div className="flex items-center">
-                  <UserProfileDropdown /> 
+                  <UserProfileDropdown />
                 </div>
               </>
             )}
@@ -1695,154 +1732,192 @@ const Navbar: React.FC = () => {
           </div>
         </div>
       </motion.header>
+
       {/* Search overlay */}
       <AnimatePresence>
-        {showSearchOverlay && (
+        {showSearch && (
           <motion.div
+            className="fixed inset-0 z-[999] bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm flex items-center justify-center p-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className={`fixed inset-0 z-50 p-4 sm:p-6 md:p-20 flex items-start justify-center ${
-              theme === "dark"
-                ? "bg-slate-900/95 backdrop-blur-sm"
-                : "bg-slate-100/95 backdrop-blur-sm"
-            }`}
+            transition={{ duration: 0.2 }}
           >
-            <div
-              className="fixed inset-0 bg-transparent"
-              onClick={() => setShowSearchOverlay(false)}
-            ></div>
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className={`relative w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden ${
-                theme === "dark"
-                  ? "bg-slate-800 border border-slate-700"
-                  : "bg-white border border-slate-200"
-              }`}
-            >
-              <form onSubmit={handleSearchSubmit}>
-                <div className="flex items-center px-4 py-3 border-b">
-                  <Search
-                    className={`h-5 w-5 ${
-                      theme === "dark" ? "text-slate-400" : "text-slate-500"
-                    }`}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Search topics, lessons, or keywords..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className={`w-full ml-3 bg-transparent border-none outline-none ${
-                      theme === "dark"
-                        ? "text-white placeholder:text-slate-400"
-                        : "text-slate-900 placeholder:text-slate-500"
-                    }`}
-                    autoFocus
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowSearchOverlay(false)}
-                    className={`p-1 rounded-full ${
-                      theme === "dark"
-                        ? "hover:bg-slate-700 text-slate-400"
-                        : "hover:bg-slate-200 text-slate-500"
-                    }`}
-                  >
-                    <X className="h-5 w-5" />
-                  </button>
-                </div>
-              </form>
+            <div className="w-full max-w-2xl">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search topics, lessons or concepts..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className={`w-full p-4 pl-12 rounded-xl text-lg
+                          ${
+                            theme === "dark"
+                              ? "bg-slate-800 text-white border-slate-700 focus:border-blue-500"
+                              : "bg-white text-slate-900 border-slate-200 focus:border-blue-500"
+                          } 
+                          border-2 outline-none transition-colors`}
+                  autoFocus
+                />
+                <Search
+                  className={`absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5
+                        ${
+                          theme === "dark" ? "text-slate-400" : "text-slate-500"
+                        }`}
+                />
+                <button
+                  className={`absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-full
+                          ${
+                            theme === "dark"
+                              ? "text-slate-400 hover:bg-slate-700"
+                              : "text-slate-500 hover:bg-slate-100"
+                          }`}
+                  onClick={() => setShowSearch(false)}
+                >
+                  ✕
+                </button>
+              </div>
 
-              <div
-                className={`p-4 max-h-[60vh] overflow-y-auto ${
-                  theme === "dark" ? "bg-slate-800" : "bg-white"
-                }`}
-              >
-                <div className="space-y-2">
+              {searchQuery && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`mt-4 rounded-xl overflow-hidden
+                          ${
+                            theme === "dark"
+                              ? "bg-slate-800 border border-slate-700"
+                              : "bg-white shadow-lg"
+                          }`}
+                >
                   <div
-                    className={`px-3 py-1 text-xs font-medium ${
-                      theme === "dark" ? "text-slate-400" : "text-slate-500"
-                    }`}
+                    className={`p-3
+                          ${
+                            theme === "dark"
+                              ? "border-b border-slate-700"
+                              : "border-b border-slate-100"
+                          }`}
                   >
-                    Popular searches
+                    <p
+                      className={`text-sm
+                            ${
+                              theme === "dark"
+                                ? "text-slate-400"
+                                : "text-slate-500"
+                            }`}
+                    >
+                      Search results for "{searchQuery}"
+                    </p>
                   </div>
-                  {[
-                    "Java Basics",
-                    "Object-Oriented Programming",
-                    "Data Structures",
-                    "Exception Handling",
-                  ].map((term) => (
-                    <div
-                      key={term}
-                      className={`px-3 py-2 rounded-md cursor-pointer flex items-center gap-3 ${
-                        theme === "dark"
-                          ? "hover:bg-slate-700 text-slate-200"
-                          : "hover:bg-slate-100 text-slate-800"
-                      }`}
+                  <div className="p-1">
+                    {topics
+                      .filter(
+                        (topic) =>
+                          topic.title
+                            .toLowerCase()
+                            .includes(searchQuery.toLowerCase()) ||
+                          topic.description
+                            .toLowerCase()
+                            .includes(searchQuery.toLowerCase()) ||
+                          topic.tags?.some((tag) =>
+                            tag
+                              .toLowerCase()
+                              .includes(searchQuery.toLowerCase())
+                          ) ||
+                          topic.topics?.some((t) =>
+                            t.toLowerCase().includes(searchQuery.toLowerCase())
+                          )
+                      )
+                      .slice(0, 5)
+                      .map((topic) => (
+                        <button
+                          key={topic.id}
+                          className={`flex items-center w-full text-left p-3 rounded-lg
+                                  ${
+                                    theme === "dark"
+                                      ? "hover:bg-slate-700"
+                                      : "hover:bg-slate-50"
+                                  }`}
+                          onClick={() => {
+                            navigate(`/topics/${topic.id}`);
+                            setShowSearch(false);
+                          }}
+                        >
+                          <div
+                            className={`p-2 rounded-full mr-3
+                                  ${
+                                    theme === "dark"
+                                      ? "bg-slate-700"
+                                      : "bg-slate-100"
+                                  }`}
+                          >
+                            <BookOpen
+                              className={`h-4 w-4
+                                    ${
+                                      theme === "dark"
+                                        ? "text-blue-400"
+                                        : "text-blue-500"
+                                    }`}
+                            />
+                          </div>
+                          <div className="flex-grow">
+                            <h3
+                              className={`font-medium
+                                    ${
+                                      theme === "dark"
+                                        ? "text-white"
+                                        : "text-slate-900"
+                                    }`}
+                            >
+                              {topic.title}
+                            </h3>
+                            <p
+                              className={`text-sm truncate
+                                    ${
+                                      theme === "dark"
+                                        ? "text-slate-400"
+                                        : "text-slate-500"
+                                    }`}
+                            >
+                              {topic.description}
+                            </p>
+                          </div>
+                          <ChevronRight
+                            className={`h-4 w-4
+                                  ${
+                                    theme === "dark"
+                                      ? "text-slate-500"
+                                      : "text-slate-400"
+                                  }`}
+                          />
+                        </button>
+                      ))}
+                  </div>
+                  <div
+                    className={`p-3 text-center
+                          ${
+                            theme === "dark"
+                              ? "border-t border-slate-700"
+                              : "border-t border-slate-100"
+                          }`}
+                  >
+                    <button
+                      className={`text-sm font-medium
+                              ${
+                                theme === "dark"
+                                  ? "text-blue-400 hover:text-blue-300"
+                                  : "text-blue-600 hover:text-blue-700"
+                              }`}
                       onClick={() => {
-                        setShowSearchOverlay(false);
-                        navigate(`/topics?q=${encodeURIComponent(term)}`);
+                        navigate(`/topics?q=${searchQuery}`);
+                        setShowSearch(false);
                       }}
                     >
-                      <Search className="h-4 w-4 flex-shrink-0" />
-                      <span>{term}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-4">
-                  <div
-                    className={`px-3 py-1 text-xs font-medium ${
-                      theme === "dark" ? "text-slate-400" : "text-slate-500"
-                    }`}
-                  >
-                    Quick links
+                      See all results
+                    </button>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
-                    {[
-                      {
-                        name: "All Topics",
-                        path: "/topics",
-                        icon: <BookOpen className="h-4 w-4" />,
-                      },
-                      {
-                        name: "Practice",
-                        path: "/practice",
-                        icon: <Code className="h-4 w-4" />,
-                      },
-                      {
-                        name: "Community",
-                        path: "/community",
-                        icon: <Users className="h-4 w-4" />,
-                      },
-                      {
-                        name: "Account Settings",
-                        path: "/settings",
-                        icon: <Settings className="h-4 w-4" />,
-                      },
-                    ].map((link) => (
-                      <div
-                        key={link.name}
-                        className={`px-3 py-2 rounded-md cursor-pointer flex items-center gap-3 ${
-                          theme === "dark"
-                            ? "hover:bg-slate-700 text-slate-200"
-                            : "hover:bg-slate-100 text-slate-800"
-                        }`}
-                        onClick={() => {
-                          setShowSearchOverlay(false);
-                          navigate(link.path);
-                        }}
-                      >
-                        {link.icon}
-                        <span>{link.name}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
+                </motion.div>
+              )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -1851,3 +1926,6 @@ const Navbar: React.FC = () => {
 };
 
 export default Navbar;
+function getCompletionPercentage(id: string) {
+  throw new Error("Function not implemented.");
+}

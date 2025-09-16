@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+  import { motion } from "framer-motion";
 import {
   Card,
   CardContent,
@@ -129,7 +129,7 @@ const EnhancedTopicCard = ({ topic, onClick, progress }: TopicCardProps) => {
           </div>
 
           {/* Progress */}
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="text-slate-500 dark:text-slate-400 font-medium">
                 Your Progress
@@ -144,7 +144,7 @@ const EnhancedTopicCard = ({ topic, onClick, progress }: TopicCardProps) => {
                 transition={{ duration: 0.8, ease: "easeOut" }}
               />
             </div>
-          </div>
+          </div> */}
         </CardContent>
 
         <CardFooter className="border-t pt-4 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/50 relative z-10">

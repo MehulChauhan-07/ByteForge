@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import { topics, categories } from "@/data/topics";
-import EnhancedHero from "@/components/landing/EnhacedHero";
+import EnhancedHero from "@/components/landing/default/EnhacedHero";
 
 const EnhancedJavaTopic = () => {
   const navigate = useNavigate();
