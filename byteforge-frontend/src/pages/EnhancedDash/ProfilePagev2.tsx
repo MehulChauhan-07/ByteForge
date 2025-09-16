@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import {
   User,
   Settings,
@@ -50,7 +50,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
-const containerAnimation = {
+const containerAnimation: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -60,7 +60,7 @@ const containerAnimation = {
   },
 };
 
-const itemAnimation = {
+const itemAnimation: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,

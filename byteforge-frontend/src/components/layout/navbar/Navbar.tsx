@@ -1553,7 +1553,7 @@ const Navbar: React.FC = () => {
                                       .toLowerCase()
                                       .includes(searchQuery.toLowerCase())
                                   ) ||
-                                  topic.topics?.some((t) =>
+                                  topic.topics?.some((t: string) =>
                                     t
                                       .toLowerCase()
                                       .includes(searchQuery.toLowerCase())
@@ -1823,7 +1823,7 @@ const Navbar: React.FC = () => {
                               .toLowerCase()
                               .includes(searchQuery.toLowerCase())
                           ) ||
-                          topic.topics?.some((t) =>
+                          topic.topics?.some((t: string) =>
                             t.toLowerCase().includes(searchQuery.toLowerCase())
                           )
                       )

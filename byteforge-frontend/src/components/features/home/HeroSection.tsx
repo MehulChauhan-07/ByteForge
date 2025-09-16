@@ -26,7 +26,7 @@ const Hero = () => {
   const { theme } = useTheme();
   // Get initials for avatar fallback
 
-  // get user name from user context
+  // get username from user context
   const userName = user?.username || "Developer";
   // Set up code examples with dynam  ic username
   const codeSteps = [

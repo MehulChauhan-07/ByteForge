@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "@/components/layout/ThemeProvider"; // Your ThemeProvider path
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 
 // Animation variants
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -33,7 +33,7 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { y: 20, opacity: 0 },
   visible: {
     y: 0,
@@ -46,7 +46,7 @@ const itemVariants = {
   },
 };
 
-const pathItemVariants = {
+const pathItemVariants: Variants = {
   hidden: { scale: 0.8, opacity: 0 },
   visible: {
     scale: 1,
@@ -269,7 +269,7 @@ const ModernHeroSection = () => {
                               .toLowerCase()
                               .includes(searchQuery.toLowerCase())
                           ) ||
-                          topic.topics?.some((t) =>
+                          topic.topics?.some((t: string) =>
                             t.toLowerCase().includes(searchQuery.toLowerCase())
                           )
                       )

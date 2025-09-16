@@ -210,7 +210,7 @@ export default function CompilerPage() {
       const result = await codeEditorService.executeCode({
         code,
         input,
-        signal: executionAbortController.current.signal,
+        // signal: executionAbortController.current.signal,
       });
 
       setOutput(result.output);

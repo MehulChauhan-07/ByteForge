@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { AnimatedRoute } from "@/components/layout/motion-layout";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import {
   Code,
   BookOpen,
@@ -19,7 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 
 // Animation variants
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -29,7 +29,7 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { y: 20, opacity: 0 },
   visible: {
     y: 0,

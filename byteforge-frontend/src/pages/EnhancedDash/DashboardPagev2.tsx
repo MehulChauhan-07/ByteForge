@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import {
   BookOpen,
   Calendar,
@@ -49,7 +49,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 
-const containerAnimation = {
+const containerAnimation: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -59,7 +59,7 @@ const containerAnimation = {
   },
 };
 
-const itemAnimation = {
+const itemAnimation: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,

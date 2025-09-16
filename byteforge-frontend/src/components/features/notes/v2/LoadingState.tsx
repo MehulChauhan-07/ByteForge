@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
 
 const spinTransition = {
-  loop: Infinity,
+  repeat: Infinity,
   duration: 1,
-  ease: "linear",
+  ease: "linear" as const,
 };
 
 const LoadingState = () => {

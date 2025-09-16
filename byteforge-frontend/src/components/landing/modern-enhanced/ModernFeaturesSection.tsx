@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import {motion, Variants} from "framer-motion";
 import { useTheme } from "@/components/layout/ThemeProvider";
 import {
   Zap,
@@ -76,7 +76,7 @@ const ModernFeaturesSection = () => {
   const { theme } = useTheme();
 
   // Animation variants
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -86,7 +86,7 @@ const ModernFeaturesSection = () => {
     },
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { y: 20, opacity: 0 },
     visible: {
       y: 0,

@@ -19,6 +19,10 @@ const topics: Topic[] = [
     description: "Learn the fundamentals of Java programming language",
     level: "Beginner",
     duration: "4 hours",
+    category: "core",
+    prerequisites: [],
+    tags: ["java", "basics"],
+    updatedAt: "2025-01-01T00:00:00Z",
     topics: ["Variables & Data Types", "Operators", "Control Flow", "Arrays"],
     image: "/placeholder.svg?height=200&width=400",
   },
@@ -28,6 +32,10 @@ const topics: Topic[] = [
     description: "Master object-oriented programming concepts in Java",
     level: "Intermediate",
     duration: "6 hours",
+    category: "core",
+    prerequisites: ["java-basics"],
+    tags: ["java", "oop"],
+    updatedAt: "2025-01-01T00:00:00Z",
     topics: [
       "Classes & Objects",
       "Inheritance",
@@ -51,6 +59,10 @@ const topics: Topic[] = [
     description: "Learn how to handle errors and exceptions in Java",
     level: "Intermediate",
     duration: "3 hours",
+    category: "core",
+    prerequisites: ["java-basics"],
+    tags: ["java", "exceptions"],
+    updatedAt: "2025-01-01T00:00:00Z",
     topics: [
       "Try-Catch Blocks",
       "Checked vs Unchecked",
@@ -65,6 +77,10 @@ const topics: Topic[] = [
     description: "Work with files and I/O streams in Java",
     level: "Intermediate",
     duration: "4 hours",
+    category: "core",
+    prerequisites: ["java-basics"],
+    tags: ["java", "io"],
+    updatedAt: "2025-01-01T00:00:00Z",
     topics: ["File Handling", "Streams", "Readers & Writers", "NIO"],
     image: "/placeholder.svg?height=200&width=400",
   },
@@ -74,6 +90,10 @@ const topics: Topic[] = [
     description: "Build concurrent applications with Java threads",
     level: "Advanced",
     duration: "8 hours",
+    category: "advanced",
+    prerequisites: ["java-basics", "oop-java"],
+    tags: ["java", "threads", "concurrency"],
+    updatedAt: "2025-01-01T00:00:00Z",
     topics: [
       "Threads",
       "Synchronization",
@@ -131,7 +151,7 @@ const JavaTopics = () => {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
-                  {topic.topics.map((subtopic) => (
+                  {topic.topics.map((subtopic: string) => (
                     <Badge key={subtopic} variant="outline">
                       {subtopic}
                     </Badge>

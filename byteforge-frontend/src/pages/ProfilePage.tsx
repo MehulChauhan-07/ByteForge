@@ -109,8 +109,11 @@ const ProfilePage = () => {
       username: user.username,
       email: user.email,
       displayName: user.username,
-      bio: user.bio || "Java enthusiast learning to code!",
-      preferredLanguage: user.preferredLanguage || "Java",
+      // !hard coded
+      // bio: user.bio || "Java enthusiast learning to code!",
+      // preferredLanguage: user.preferredLanguage || "Java",
+      bio: "Java enthusiast learning to code!",
+      preferredLanguage: "Java",
     });
 
     // Here you would fetch user learning statistics
@@ -465,8 +468,11 @@ const ProfilePage = () => {
                             email: user.email,
                             displayName: user.username,
                             bio:
-                              user.bio || "Java enthusiast learning to code!",
-                            preferredLanguage: user.preferredLanguage || "Java",
+                              // !hard coded
+                              //   user.bio || "Java enthusiast learning to code!",
+                              // preferredLanguage: user.preferredLanguage || "Java",
+                              "Java enthusiast learning to code!",
+                            preferredLanguage: "Java",
                           });
                         }}
                         disabled={isLoading}

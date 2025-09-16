@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import {
   Search,
   Filter,
@@ -89,7 +89,7 @@ import EnhancedTopicCard from "@/components/features/Java_Topics/Enhancedpage/En
 import TopicDetails from "@/components/features/Java_Topics/Enhancedpage/TopicDetails";
 
 // Animation variants
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -100,7 +100,7 @@ const containerVariants = {
   exit: { opacity: 0 },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { y: 30, opacity: 0 },
   visible: {
     y: 0,
@@ -251,7 +251,7 @@ const EnhancedTopicsPage = () => {
           topic.tags.some((tag) =>
             tag.toLowerCase().includes(searchQuery.toLowerCase())
           ) ||
-          topic.subtopics.some((subtopic) =>
+          (topic.subtopics ?? []).some((subtopic) =>
             subtopic.title.toLowerCase().includes(searchQuery.toLowerCase())
           )
         : true;
@@ -807,7 +807,7 @@ const EnhancedTopicsPage = () => {
                               <div className="flex items-center gap-2">
                                 <BookOpen className="h-4 w-4 text-primary" />
                                 <span className="text-sm">
-                                  {featuredTopic.subtopics.length} Lessons
+                                  {featuredTopic.subtopics?.length ?? 0} Lessons
                                 </span>
                               </div>
                               <div className="flex items-center gap-2">
@@ -849,7 +849,7 @@ const EnhancedTopicsPage = () => {
                               What you'll learn:
                             </h3>
                             <ul className="space-y-3">
-                              {featuredTopic.subtopics
+                              {(featuredTopic.subtopics ?? [])
                                 .slice(0, 5)
                                 .map((subtopic, idx) => (
                                   <li
@@ -864,10 +864,10 @@ const EnhancedTopicsPage = () => {
                                     </span>
                                   </li>
                                 ))}
-                              {featuredTopic.subtopics.length > 5 && (
+                              {(featuredTopic.subtopics?.length ?? 0) > 5 && (
                                 <li className="pl-9 text-sm text-white/70">
-                                  +{featuredTopic.subtopics.length - 5} more
-                                  lessons
+                                  +{(featuredTopic.subtopics?.length ?? 0) - 5}{" "}
+                                  more lessons
                                 </li>
                               )}
                             </ul>
@@ -1357,7 +1357,7 @@ const EnhancedTopicsPage = () => {
                                     <div className="flex flex-wrap items-center gap-6 mt-3">
                                       <div className="flex items-center gap-2">
                                         <div className="text-xs bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md">
-                                          {topic.subtopics.length} lessons
+                                          {topic.subtopics?.length ?? 0} lessons
                                         </div>
                                       </div>
                                       <div className="flex items-center gap-2">

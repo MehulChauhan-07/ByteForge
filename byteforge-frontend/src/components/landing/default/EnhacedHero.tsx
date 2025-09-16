@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -53,7 +53,7 @@ const EnhancedHero = () => {
   const recommendedTopic = getRecommendedNextTopic();
 
   // Animation variants
-  const containerVariants = {
+  const containerVariants: Variants= {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -64,7 +64,7 @@ const EnhancedHero = () => {
     },
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { y: 20, opacity: 0 },
     visible: {
       y: 0,
@@ -77,7 +77,7 @@ const EnhancedHero = () => {
     },
   };
 
-  const pathItemVariants = {
+  const pathItemVariants: Variants = {
     hidden: { scale: 0.8, opacity: 0 },
     visible: {
       scale: 1,

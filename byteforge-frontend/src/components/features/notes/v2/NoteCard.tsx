@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import { Note } from "@/services/noteService";
 import { useTheme } from "@/components/layout/ThemeProvider";
 import {
@@ -129,7 +129,7 @@ const NoteCard = ({
   });
 
   // Animation variants
-  const containerVariants = {
+  const containerVariants: Variants = {
     hover: {
       y: -8,
       transition: { type: "spring", stiffness: 400, damping: 25 },

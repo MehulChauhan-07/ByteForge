@@ -7,7 +7,7 @@ import { ProgressProvider } from "./context/ProgressContext";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ThemeProvider defaultTheme="system" storageKey="byteforge-theme">
+    <ThemeProvider defaultTheme="light" storageKey="byteforge-theme">
       <ProgressProvider>
         <App />
       </ProgressProvider>

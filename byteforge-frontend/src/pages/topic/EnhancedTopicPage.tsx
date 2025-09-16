@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import {
   Search,
   Filter,
@@ -31,7 +31,7 @@ import EnhancedTopicCard from "@/components/features/Java_Topics/Enhancedpage/En
 import TopicDetails from "@/components/features/Java_Topics/Enhancedpage/TopicDetails";
 
 // Animation variants
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -42,13 +42,13 @@ const containerVariants = {
   exit: { opacity: 0 },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { y: 30, opacity: 0 },
   visible: {
     y: 0,
     opacity: 1,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       stiffness: 300,
       damping: 24,
     },
@@ -130,7 +130,7 @@ const EnhancedTopicsPage = () => {
           topic.tags.some((tag) =>
             tag.toLowerCase().includes(searchQuery.toLowerCase())
           ) ||
-          topic.subtopics.some((subtopic) =>
+          (topic.subtopics ?? []).some((subtopic) =>
             subtopic.title.toLowerCase().includes(searchQuery.toLowerCase())
           )
         : true;
@@ -145,7 +145,7 @@ const EnhancedTopicsPage = () => {
     .sort((a, b) => {
       switch (sortOrder) {
         case "newest":
-          return (  
+          return (
             new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
           );
         case "popular":

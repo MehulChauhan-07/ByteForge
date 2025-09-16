@@ -4,7 +4,6 @@ import SignupPage from "@/pages/auth/SignupPage";
 import TestLoginPage from "@/pages/auth/TestLoginPage";
 import HomePage from "@/pages/home/v0/Home";
 // import DashboardPage from "@/pages/dashboard/DashboardPage";
-import TopicsPage from "@/pages/topic/TopicsPage";
 import NotFoundPage from "@/pages/NotFoundPage";
 import AboutPage from "@/pages/about/About";
 

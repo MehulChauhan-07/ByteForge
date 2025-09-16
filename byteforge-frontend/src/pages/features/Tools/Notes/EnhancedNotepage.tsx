@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import noteService, { Note } from "@/services/noteService";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ import EmptyNoteState from "@/components/features/notes/v2/EmptyNoteState";
 import LoadingState from "@/components/features/notes/v2/LoadingState";
 
 // Animation variants
-const pageTransitions = {
+const pageTransitions: Variants = {
   initial: { opacity: 0, y: 20 },
   animate: {
     opacity: 1,
@@ -266,7 +266,7 @@ const EnhancedNotePage = () => {
         onChangeSortOrder={setSortOrder}
         isCreating={isCreating}
         currentView={currentView}
-        userName={user.displayName || "User"}
+        userName={"User"}
         totalNotes={notes.length}
       />
 

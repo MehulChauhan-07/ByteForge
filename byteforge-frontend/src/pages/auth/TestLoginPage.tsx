@@ -455,19 +455,19 @@ const UserProfileDropdown = ({ isOpen, onClose }: UserProfileDropdownProps) => {
               <Avatar>
                 <AvatarImage
                   src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                    user.name
+                    user.username
                   )}&background=random`}
-                  alt={user.name}
+                  alt={user.username}
                 />
                 <AvatarFallback>
-                  {user.name
+                  {user.username
                     .split(" ")
-                    .map((n) => n[0])
+                    .map((n: string) => n[0])
                     .join("")}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <h3 className="font-medium">{user.name}</h3>
+                <h3 className="font-medium">{user.username}</h3>
                 <p className="text-sm text-muted-foreground">{user.email}</p>
               </div>
             </div>
@@ -674,12 +674,12 @@ const Navbar: React.FC = () => {
                   <Avatar className="h-8 w-8">
                     <AvatarImage
                       src={`https://ui-avatars.com/api/?name=${
-                        user?.name || "User"
+                        user?.username || "User"
                       }&background=random`}
-                      alt={user?.name || "User"}
+                      alt={user?.username || "User"}
                     />
                     <AvatarFallback>
-                      {getInitials(user?.name || "User")}
+                      {getInitials(user?.username || "User")}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
@@ -688,7 +688,7 @@ const Navbar: React.FC = () => {
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium leading-none">
-                      {user?.name || "User"}
+                      {user?.username || "User"}
                     </p>
                     <p className="text-xs leading-none text-muted-foreground">
                       {user?.email || ""}
