@@ -43,6 +43,7 @@ import { cn } from "@/lib/utils";
 import type { Topic } from "@/types";
 import { useProgress } from "@/context/ProgressContext";
 import CodeEditor from "@/components/features/CodeEditor";
+import { topics } from "@/data/topics";
 
 interface TopicDetailsProps {
   topic: Topic;
@@ -64,29 +65,29 @@ const TopicDetails: React.FC<TopicDetailsProps> = ({ topic, onBack }) => {
   const { isSubTopicComplete, toggleSubTopicCompletion } = useProgress();
 
   useEffect(() => {
-    if (!activeSubtopicId && topic.subtopics.length > 0) {
-      setActiveSubtopicId(topic.subtopics[0].id);
+    if (!activeSubtopicId && topic.subtopics && topic.subtopics.length > 0) {
+      setActiveSubtopicId(topic.subtopics[0].subtopicId);
     }
   }, [topic, activeSubtopicId]);
 
-  const currentSubtopicIndex = topic.subtopics.findIndex(
-    (s) => s.id === activeSubtopicId
-  );
+  const currentSubtopicIndex = topic.subtopics
+    ? topic.subtopics.findIndex((s) => s.subtopicId === activeSubtopicId)
+    : -1;
 
   const handleNextSubtopic = () => {
-    if (currentSubtopicIndex < topic.subtopics.length - 1) {
+    if (topic.subtopics && currentSubtopicIndex < topic.subtopics.length - 1) {
       const nextSubtopic = topic.subtopics[currentSubtopicIndex + 1];
-      setActiveSubtopicId(nextSubtopic.id);
-      navigate(`/topics/${topic.id}/${nextSubtopic.id}`);
+      setActiveSubtopicId(nextSubtopic.subtopicId);
+      navigate(`/topics/${topic.id}/${nextSubtopic.subtopicId}`);
       setShowSubtopicsList(false);
     }
   };
 
   const handlePreviousSubtopic = () => {
-    if (currentSubtopicIndex > 0) {
+    if (topic.subtopics && currentSubtopicIndex > 0) {
       const prevSubtopic = topic.subtopics[currentSubtopicIndex - 1];
-      setActiveSubtopicId(prevSubtopic.id);
-      navigate(`/topics/${topic.id}/${prevSubtopic.id}`);
+      setActiveSubtopicId(prevSubtopic.subtopicId);
+      navigate(`/topics/${topic.id}/${prevSubtopic.subtopicId}`);
       setShowSubtopicsList(false);
     }
   };
@@ -109,14 +110,20 @@ const TopicDetails: React.FC<TopicDetailsProps> = ({ topic, onBack }) => {
     setUserRating(rating);
   };
 
-  const activeSubtopic = topic.subtopics.find((s) => s.id === activeSubtopicId);
+  const activeSubtopic = topic.subtopics?.find(
+    (s) => s.subtopicId === activeSubtopicId
+  );
 
   // Progress percentage for the entire topic
-  const topicProgress = Math.round(
-    (topic.subtopics.filter((s) => isSubTopicComplete(topic.id, s.id)).length /
-      topic.subtopics.length) *
-      100
-  );
+  const topicProgress = topic.subtopics
+    ? Math.round(
+        (topic.subtopics.filter((s) =>
+          isSubTopicComplete(topic.id, s.subtopicId)
+        ).length /
+          topic.subtopics.length) *
+          100
+      )
+    : 0;
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -235,19 +242,6 @@ const TopicDetails: React.FC<TopicDetailsProps> = ({ topic, onBack }) => {
                       </TooltipTrigger>
                       <TooltipContent>Share</TooltipContent>
                     </Tooltip>
-
-                    {/* <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="secondary"
-                          size="icon"
-                          className="rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm hover:scale-110 transition-transform"
-                        >
-                          <MessageSquare className="h-5 w-5" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Discuss</TooltipContent>
-                    </Tooltip> */}
                   </TooltipProvider>
                 </div>
 
@@ -321,19 +315,22 @@ const TopicDetails: React.FC<TopicDetailsProps> = ({ topic, onBack }) => {
                 <h3 className="font-semibold text-lg flex items-center justify-between">
                   <span>Module Contents</span>
                   <span className="text-xs text-muted-foreground bg-primary/10 px-2 py-1 rounded-full">
-                    {topic.subtopics.length} lessons
+                    {topic.subtopics?.length || 0} lessons
                   </span>
                 </h3>
               </div>
 
               <div className="max-h-[calc(100vh-200px)] overflow-y-auto p-2">
-                {topic.subtopics.map((subtopic, idx) => {
-                  const isComplete = isSubTopicComplete(topic.id, subtopic.id);
-                  const isActive = subtopic.id === activeSubtopicId;
+                {topic.subtopics?.map((subtopic, idx) => {
+                  const isComplete = isSubTopicComplete(
+                    topic.id,
+                    subtopic.subtopicId
+                  );
+                  const isActive = subtopic.subtopicId === activeSubtopicId;
 
                   return (
                     <motion.div
-                      key={subtopic.id}
+                      key={subtopic.subtopicId}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.05 }}
@@ -346,7 +343,9 @@ const TopicDetails: React.FC<TopicDetailsProps> = ({ topic, onBack }) => {
                             "bg-primary/10 text-primary hover:bg-primary/15",
                           isComplete && "border-l-4 border-green-500 pl-2"
                         )}
-                        onClick={() => handleSubtopicSelect(subtopic.id)}
+                        onClick={() =>
+                          handleSubtopicSelect(subtopic.subtopicId)
+                        }
                       >
                         <div className="flex items-center gap-3">
                           <div
@@ -427,7 +426,7 @@ const TopicDetails: React.FC<TopicDetailsProps> = ({ topic, onBack }) => {
                     </span>
                     <span className="text-muted-foreground">of</span>
                     <span className="font-medium">
-                      {topic.subtopics.length}
+                      {topic.subtopics?.length || 0}
                     </span>
                     <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
                   </Button>
@@ -442,16 +441,18 @@ const TopicDetails: React.FC<TopicDetailsProps> = ({ topic, onBack }) => {
                         className="absolute top-full left-0 mt-2 w-64 z-50 bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 overflow-hidden"
                       >
                         <div className="max-h-60 overflow-y-auto">
-                          {topic.subtopics.map((subtopic, idx) => (
+                          {topic.subtopics?.map((subtopic, idx) => (
                             <Button
-                              key={subtopic.id}
+                              key={subtopic.subtopicId}
                               variant="ghost"
                               className={cn(
                                 "w-full justify-start p-2 rounded-none",
-                                subtopic.id === activeSubtopicId &&
+                                subtopic.subtopicId === activeSubtopicId &&
                                   "bg-primary/10 text-primary"
                               )}
-                              onClick={() => handleSubtopicSelect(subtopic.id)}
+                              onClick={() =>
+                                handleSubtopicSelect(subtopic.subtopicId)
+                              }
                             >
                               <span className="mr-2 text-xs">{idx + 1}.</span>
                               <span className="truncate">{subtopic.title}</span>
@@ -467,7 +468,10 @@ const TopicDetails: React.FC<TopicDetailsProps> = ({ topic, onBack }) => {
                   variant="outline"
                   size="sm"
                   onClick={handleNextSubtopic}
-                  disabled={currentSubtopicIndex === topic.subtopics.length - 1}
+                  disabled={
+                    !topic.subtopics ||
+                    currentSubtopicIndex === topic.subtopics.length - 1
+                  }
                   className="gap-2 rounded-full"
                 >
                   Next
@@ -479,22 +483,25 @@ const TopicDetails: React.FC<TopicDetailsProps> = ({ topic, onBack }) => {
                 {activeSubtopic && (
                   <Button
                     variant={
-                      isSubTopicComplete(topic.id, activeSubtopic.id)
+                      isSubTopicComplete(topic.id, activeSubtopic.subtopicId)
                         ? "default"
                         : "outline"
                     }
                     size="sm"
                     onClick={() =>
-                      toggleSubTopicCompletion(topic.id, activeSubtopic.id)
+                      toggleSubTopicCompletion(
+                        topic.id,
+                        activeSubtopic.subtopicId
+                      )
                     }
                     className={cn(
                       "gap-2 rounded-full",
-                      isSubTopicComplete(topic.id, activeSubtopic.id) &&
+                      isSubTopicComplete(topic.id, activeSubtopic.subtopicId) &&
                         "bg-green-500 hover:bg-green-600"
                     )}
                   >
                     <CheckSquare className="h-4 w-4" />
-                    {isSubTopicComplete(topic.id, activeSubtopic.id)
+                    {isSubTopicComplete(topic.id, activeSubtopic.subtopicId)
                       ? "Completed"
                       : "Mark Complete"}
                   </Button>
@@ -596,7 +603,7 @@ const TopicDetails: React.FC<TopicDetailsProps> = ({ topic, onBack }) => {
                                     <div className="flex items-center gap-2">
                                       <span className="font-medium flex items-center">
                                         <Code className="h-3.5 w-3.5 mr-1.5 text-primary" />
-                                        {block.language || "java"}
+                                        {"java"}
                                       </span>
                                       <Badge
                                         variant="outline"
@@ -621,7 +628,7 @@ const TopicDetails: React.FC<TopicDetailsProps> = ({ topic, onBack }) => {
                                   <div className="code-container relative">
                                     <CodeEditor
                                       code={block.content}
-                                      language={block.language || "java"}
+                                      language={"java"}
                                       readOnly
                                     />
                                     {/* Run code button for examples */}
@@ -641,21 +648,6 @@ const TopicDetails: React.FC<TopicDetailsProps> = ({ topic, onBack }) => {
                         </CardContent>
 
                         <CardFooter className="bg-slate-50 dark:bg-slate-900/50 px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
-                          {/* <div className="flex items-center gap-4">
-                            <Avatar className="h-10 w-10">
-                              <AvatarImage src="/images/instructor.jpg" />
-                              <AvatarFallback>JD</AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <div className="text-sm font-medium">
-                                Author: John Doe
-                              </div>
-                              <div className="text-xs text-muted-foreground">
-                                Senior Java Developer
-                              </div>
-                            </div>
-                          </div> */}
-
                           <div className="flex flex-wrap items-center gap-2 self-end md:self-center">
                             <Button
                               variant="outline"
@@ -666,8 +658,9 @@ const TopicDetails: React.FC<TopicDetailsProps> = ({ topic, onBack }) => {
                               Ask a question
                             </Button>
 
-                            {currentSubtopicIndex <
-                            topic.subtopics.length - 1 ? (
+                            {topic.subtopics &&
+                            currentSubtopicIndex <
+                              topic.subtopics.length - 1 ? (
                               <Button
                                 variant="default"
                                 size="sm"
@@ -879,9 +872,7 @@ const TopicDetails: React.FC<TopicDetailsProps> = ({ topic, onBack }) => {
                           <div className="rounded-lg overflow-hidden">
                             <div className="bg-slate-100 dark:bg-slate-800 text-xs px-4 py-2 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
                               <div className="flex items-center gap-2">
-                                <span className="font-medium">
-                                  {exercise.language || "java"}
-                                </span>
+                                <span className="font-medium">{"java"}</span>
                                 <Badge
                                   variant="outline"
                                   className="text-[10px] px-1.5 py-0 h-4 rounded-full bg-primary/10 text-primary border-primary/20"
@@ -914,7 +905,7 @@ const TopicDetails: React.FC<TopicDetailsProps> = ({ topic, onBack }) => {
                             <div className="code-container relative">
                               <CodeEditor
                                 code={exercise.initialCode}
-                                language={exercise.language || "java"}
+                                language={"java"}
                               />
                             </div>
                           </div>

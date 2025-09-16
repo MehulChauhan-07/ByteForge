@@ -8,7 +8,7 @@ import authService from "@/services/authService";
 
 const ProfilePage = () => {
   const [user, setUser] = useState<{
-    id: number;
+    id: string;
     username: string;
     email: string;
   } | null>(null);

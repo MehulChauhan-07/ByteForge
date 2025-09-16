@@ -101,7 +101,7 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
                 </motion.button>
 
                 <AnimatePresence>
-                  {isActive && (
+                  {isActive && topic.subtopics && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
@@ -110,16 +110,19 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
                       className="pl-8 space-y-1"
                     >
                       {topic.subtopics.map((subtopic) => {
+                        // Use subtopicId which is the correct property name as per our type definition
                         const isSubTopicCompleted = isSubTopicComplete(
                           topic.id,
-                          subtopic.id
+                          subtopic.subtopicId
                         );
 
                         return (
                           <motion.button
-                            key={subtopic.id}
+                            key={subtopic.subtopicId}
                             onClick={() =>
-                              navigate(`/topics/${topic.id}/${subtopic.id}`)
+                              navigate(
+                                `/topics/${topic.id}/${subtopic.subtopicId}`
+                              )
                             }
                             className={cn(
                               "w-full flex items-center gap-3 px-4 py-2.5 text-sm rounded-lg transition-all duration-200",

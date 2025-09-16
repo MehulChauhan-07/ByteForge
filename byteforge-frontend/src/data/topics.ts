@@ -12,13 +12,13 @@ import {
 // Categories definition
 export const categories: Category[] = [
   {
-    "id": "java-fundamentals",
-    "title": "Java Fundamentals",
-    "description": "Learn the basics of Java programming language",
-    "icon": "java",
-    "topics": ["java-basics", "oop", "collections", "exceptions"],
-    "order": 1,
-    "color": "#007396",
+    id: "java-fundamentals",
+    title: "Java Fundamentals",
+    description: "Learn the basics of Java programming language",
+    icon: "java",
+    topics: ["java-basics", "oop", "collections", "exceptions"],
+    order: 1,
+    color: "#007396",
   },
   {
     id: "advanced-java",
@@ -70,6 +70,7 @@ export const categories: Category[] = [
 export const topics: Topic[] = [
   {
     id: "java-basics",
+    topics: "java-basics",
     title: "Java Basics",
     description: "Introduction to Java programming language",
     level: "Beginner",
@@ -81,7 +82,7 @@ export const topics: Topic[] = [
     updatedAt: "2024-03-20",
     subtopics: [
       {
-        id: "introduction",
+        subtopicId: "introduction",
         title: "Introduction to Java: Why It Matters", // Slightly updated title
         description:
           "Understand why Java exists, its core principles like 'Write Once, Run Anywhere', and overcome common beginner hurdles.", // Updated description
@@ -152,9 +153,12 @@ export const topics: Topic[] = [
             timeLimit: 30,
           },
         ],
+        topicId: "",
+        exercises: [],
       },
       {
-        id: "variables",
+        subtopicId: "variables", // Changed from 'id' to 'subtopicId'
+        topicId: "java-basics",
         title: "Variables and Data Types",
         description: "Learn about Java variables and data types",
         estimatedTime: "30 minutes",
@@ -173,8 +177,7 @@ export const topics: Topic[] = [
             type: "code",
             content:
               "int age = 25;\ndouble salary = 50000.50;\nchar grade = 'A';\nboolean isActive = true;\nString name = \"John\"; // String is a reference type, not primitive",
-            language: "java",
-          }, 
+          },
         ],
         codeExamples: [
           {
@@ -229,11 +232,13 @@ export const topics: Topic[] = [
             difficulty: "easy",
             estimatedTime: "15 minutes",
             points: 10,
+            initialCode: "",
           },
         ],
       },
       {
-        id: "operators",
+        subtopicId: "operators",
+        topicId: "java-basics",
         title: "Operators",
         description:
           "Using operators to perform operations on variables and values",
@@ -263,9 +268,11 @@ export const topics: Topic[] = [
           },
         ],
         quizQuestions: [],
+        exercises: [],
       },
       {
-        id: "control-flow",
+        subtopicId: "control-flow", // Changed from 'id' to 'subtopicId'
+        topicId: "java-basics",
         title: "Control Flow",
         description: "Learn about control flow statements in Java",
         estimatedTime: "30 minutes",
@@ -292,9 +299,11 @@ export const topics: Topic[] = [
         ],
         resources: [],
         quizQuestions: [],
+        exercises: [],
       },
       {
-        id: "arrays",
+        subtopicId: "arrays", // Changed from 'id' to 'subtopicId'
+        topicId: "java-basics",
         title: "Arrays",
         description: "Learn about arrays in Java",
         estimatedTime: "30 minutes",
@@ -321,11 +330,13 @@ export const topics: Topic[] = [
         ],
         resources: [],
         quizQuestions: [],
+        exercises: [],
       },
     ],
   },
   {
     id: "oop-java",
+    topics: "oop-java", // Added missing topics property
     title: "Object-Oriented Programming",
     description: "Master object-oriented programming concepts in Java",
     level: "Intermediate",
@@ -337,7 +348,8 @@ export const topics: Topic[] = [
     updatedAt: "2024-03-20",
     subtopics: [
       {
-        id: "classes-objects",
+        subtopicId: "classes-objects", // Changed from 'id' to 'subtopicId'
+        topicId: "oop-java",
         title: "Classes and Objects",
         description: "Learn about classes and objects in Java",
         estimatedTime: "60 minutes",
@@ -387,9 +399,11 @@ export const topics: Topic[] = [
             timeLimit: 30,
           },
         ],
+        exercises: [],
       },
       {
-        id: "inheritance",
+        subtopicId: "inheritance", // Changed from 'id' to 'subtopicId'
+        topicId: "oop-java",
         title: "Inheritance",
         description: "Understanding inheritance and class hierarchies",
         estimatedTime: "60 minutes",
@@ -433,9 +447,11 @@ export const topics: Topic[] = [
             timeLimit: 30,
           },
         ],
+        exercises: [],
       },
       {
-        id: "polymorphism",
+        subtopicId: "polymorphism", // Changed from 'id' to 'subtopicId'
+        topicId: "oop-java",
         title: "Polymorphism",
         description: "Understanding polymorphic behavior in Java",
         estimatedTime: "60 minutes",
@@ -479,9 +495,11 @@ export const topics: Topic[] = [
             timeLimit: 45,
           },
         ],
+        exercises: [],
       },
       {
-        id: "encapsulation",
+        subtopicId: "encapsulation", // Changed from 'id' to 'subtopicId'
+        topicId: "oop-java",
         title: "Encapsulation",
         description: "Learn about data hiding and access control",
         estimatedTime: "45 minutes",
@@ -530,11 +548,13 @@ export const topics: Topic[] = [
             timeLimit: 30,
           },
         ],
+        exercises: [],
       },
     ],
   },
   {
     id: "java-collections",
+    topics: "java-collections", // Added missing topics property
     title: "Java Collections Framework",
     description: "Learn about Java's built-in data structures",
     level: "Intermediate",
@@ -546,20 +566,19 @@ export const topics: Topic[] = [
     updatedAt: "2024-03-20",
     subtopics: [
       {
-        id: "lists",
+        subtopicId: "lists", // Changed from 'id' to 'subtopicId'
+        topicId: "java-collections",
         title: "Lists and ArrayList",
         description: "Working with dynamic arrays in Java",
         estimatedTime: "45 minutes",
         content: [
           {
             type: "text",
-            content:
-              "Lists are ordered collections that allow duplicate elements. ArrayList is the most commonly used implementation of the List interface, providing dynamic array functionality.",
+            content: "Lists are ordered collections that allow duplicate elements. ArrayList is the most commonly used implementation of the List interface, providing dynamic array functionality.",
           },
           {
             type: "text",
-            content:
-              "Key features:\n• Dynamic sizing\n• Index-based access\n• Ordered elements\n• Allows duplicates\n• Null elements allowed",
+            content: "Key features:\n• Dynamic sizing\n• Index-based access\n• Ordered elements\n• Allows duplicates\n• Null elements allowed",
           },
         ],
         codeExamples: [
@@ -584,17 +603,18 @@ export const topics: Topic[] = [
             question: "Which interface does ArrayList implement?",
             options: ["List", "Set", "Map", "Queue"],
             correctAnswer: 0,
-            explanation:
-              "ArrayList implements the List interface, which provides ordered collection functionality.",
+            explanation: "ArrayList implements the List interface, which provides ordered collection functionality.",
             difficulty: "easy",
             timeLimit: 30,
           },
         ],
+        exercises: []
       },
     ],
   },
   {
     id: "exception-handling",
+    topics: "exception-handling", // Added missing topics property
     title: "Exception Handling",
     description: "Learn how to handle errors and exceptions in Java",
     level: "Intermediate",
@@ -606,15 +626,15 @@ export const topics: Topic[] = [
     updatedAt: "2024-03-20",
     subtopics: [
       {
-        id: "try-catch",
+        subtopicId: "try-catch",
+        topicId: "exception-handling",
         title: "Try-Catch Blocks",
         description: "Basic exception handling with try-catch",
         estimatedTime: "45 minutes",
         content: [
           {
             type: "text",
-            content:
-              "Exception handling in Java is done using try-catch blocks. The try block contains code that might throw an exception, and the catch block handles the exception if it occurs.",
+            content: "Exception handling in Java is done using try-catch blocks. The try block contains code that might throw an exception, and the catch block handles the exception if it occurs.",
           },
         ],
         codeExamples: [
@@ -636,8 +656,7 @@ export const topics: Topic[] = [
         ],
         quizQuestions: [
           {
-            question:
-              "Which block is always executed in a try-catch statement?",
+            question: "Which block is always executed in a try-catch statement?",
             options: [
               "try block",
               "catch block",
@@ -645,14 +664,13 @@ export const topics: Topic[] = [
               "throw block",
             ],
             correctAnswer: 2,
-            explanation:
-              "The finally block is always executed, whether an exception occurs or not.",
+            explanation: "The finally block is always executed, whether an exception occurs or not.",
             difficulty: "easy",
             timeLimit: 30,
           },
         ],
+        exercises: []
       },
     ],
   },
-  
 ];

@@ -1,6 +1,6 @@
 export interface Topic {
-  topics: any;
   id: string;
+  topics: any;
   title: string;
   description: string;
   level: "Beginner" | "Intermediate" | "Advanced";
@@ -53,6 +53,21 @@ export interface Subtopic {
     code: string;
     language: string;
     description: string;
+  }[];
+  exercises: {
+    title: string;
+    description?: string;
+    initialCode: string;
+    starterCode?: string;
+    solution?: string;
+    testCases: {
+      input: string;
+      expectedOutput: string;
+      explanation?: string;
+    }[];
+    difficulty: "easy" | "medium" | "hard";
+    estimatedTime: string;
+    points: number;
   }[];
   resources: {
     title: string;

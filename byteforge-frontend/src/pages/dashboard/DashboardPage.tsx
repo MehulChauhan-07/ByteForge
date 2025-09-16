@@ -174,7 +174,7 @@ const DashboardPage: React.FC = () => {
       {/* Welcome section */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">
-          Welcome back, {user?.name || "Learner"}!
+          Welcome back, {user?.username || "Learner"}!
         </h1>
         <p className="text-muted-foreground">
           Pick up where you left off and continue your Java learning journey.
